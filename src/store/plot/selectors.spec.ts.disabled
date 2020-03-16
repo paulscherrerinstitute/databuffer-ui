@@ -1,0 +1,206 @@
+// ======================================================================
+//
+//                        A  T  T  E  N  T  I  O  N
+//                       ===========================
+//
+// TL;DR
+//
+// selectors.ts does not compile, so we cannot test it, so we need to
+// exclude it from test discovery by renaming it.
+//
+//
+// Details
+//
+// tsc complains about fields not present in type DataPoint, but we
+// didn't get around to update the API pacakges, yet.
+// Still, tsc will generate output JavaScript which will be bundled by
+// rollup just fine.
+// **But** ts-node which is processing the file to run mocha on it,
+// breaks on these errors. So we need to make sure, that mocha doesn't
+// discover it. That's why it's renamed.
+//
+// I still decided to commit it, as the tests themselves should be a
+// viable starting point in the future.
+//
+// ======================================================================
+import { describe, it } from 'mocha'
+import { expect } from 'chai'
+
+import * as selectors from './selectors'
+
+import { RootState } from '../reducer'
+import { initialState } from './reducer'
+import { ChannelSearchState } from '../channelsearch/reducer'
+import { RoutingState } from '../routing/reducer'
+
+const BASE_STATE: RootState = {
+	channelSearch: {} as ChannelSearchState,
+	plot: initialState,
+	route: {} as RoutingState,
+}
+
+const EXAMPLE_STATE_WITH_DATA = {
+	...BASE_STATE,
+	plot: {
+		...BASE_STATE.plot,
+		startTime: 1000,
+		endTime: 2000,
+		startPulse: 30,
+		endPulse: 40,
+		queryMode: 'time',
+		channels: [
+			{ name: 'channel2', backend: 'backend2' },
+			{ name: 'channel3', backend: 'backend2' },
+			{ name: 'channel1', backend: 'backend2' },
+			{ name: 'channel2', backend: 'backend1' },
+			{ name: 'channel1', backend: 'backend3' },
+			{ name: 'channel1', backend: 'backend1' },
+		],
+		fetching: false,
+		error: null,
+		request: {
+			sentAt: 3000,
+			finishedAt: 4000,
+		},
+		response: [
+			//
+		],
+		yAxes: [
+			//
+		],
+		dataSeries: [
+			//
+		],
+	},
+}
+
+describe('plot selectors', () => {
+	it('receives startTime', () => {
+		const state1 = {
+			...BASE_STATE,
+			plot: { ...BASE_STATE.plot, startTime: 100 },
+		}
+		const state2 = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				startTime: 200,
+			},
+		}
+		expect(selectors.startTime(state1)).to.equal(100)
+		expect(selectors.startTime(state2)).to.equal(200)
+	})
+
+	it('receives endTime', () => {
+		const state1 = {
+			...BASE_STATE,
+			plot: { ...BASE_STATE.plot, endTime: 100 },
+		}
+		const state2 = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				endTime: 200,
+			},
+		}
+		expect(selectors.endTime(state1)).to.equal(100)
+		expect(selectors.endTime(state2)).to.equal(200)
+	})
+
+	// it('receives startPulse', () => {
+	//   const state1 = {
+	//     ...BASE_STATE,
+	//     plot: { ...BASE_STATE.plot, startPulse: 100 },
+	//   }
+	//   const state2 = {
+	//     ...BASE_STATE,
+	//     plot: {
+	//       ...BASE_STATE.plot,
+	//       startPulse: 200,
+	//     },
+	//   }
+	//   expect(selectors.startPulse(state1)).to.equal(100)
+	//   expect(selectors.startPulse(state2)).to.equal(200)
+	// })
+
+	// it('receives endPulse', () => {
+	//   const state1 = {
+	//     ...BASE_STATE,
+	//     plot: { ...BASE_STATE.plot, endPulse: 100 },
+	//   }
+	//   const state2 = {
+	//     ...BASE_STATE,
+	//     plot: {
+	//       ...BASE_STATE.plot,
+	//       endPulse: 200,
+	//     },
+	//   }
+	//   expect(selectors.endPulse(state1)).to.equal(100)
+	//   expect(selectors.endPulse(state2)).to.equal(200)
+	// })
+
+	// it('receives queryMode', () => {
+	//   const state1 = {
+	//     ...BASE_STATE,
+	//     plot: { ...BASE_STATE.plot, queryMode: 'time' },
+	//   }
+	//   const state2 = {
+	//     ...BASE_STATE,
+	//     plot: {
+	//       ...BASE_STATE.plot,
+	//       queryMode: 'pulse,
+	//     },
+	//   }
+	//   expect(selectors.queryMode(state1)).to.equal('time')
+	//   expect(selectors.queryMode(state2)).to.equal('pulse')
+	// })
+
+	it('retrieves channels', () => {
+		const state1 = {
+			...BASE_STATE,
+			plot: { ...BASE_STATE.plot, channels: [{ name: 'ch1', backend: 'b1' }] },
+		}
+		const state2 = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				channels: [
+					{ name: 'ch1', backend: 'b1' },
+					{ name: 'ch2', backend: 'b2' },
+				],
+			},
+		}
+		expect(selectors.channels(state1)).to.deep.equal(state1.plot.channels)
+		expect(selectors.channels(state2)).to.deep.equal(state2.plot.channels)
+	})
+
+	it('retrieves error', () => {
+		const state1 = {
+			...BASE_STATE,
+			plot: { ...BASE_STATE.plot, error: null },
+		}
+		const state2 = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				error: new Error('example error'),
+			},
+		}
+		expect(selectors.error(state1)).to.be.null
+		expect(selectors.error(state2)).to.be.instanceOf(Error)
+		expect(selectors.error(state2).message).to.equal('example error')
+	})
+
+	it('retrieves fetching', () => {
+		const state1 = {
+			...BASE_STATE,
+			plot: { ...BASE_STATE.plot, fetching: true },
+		}
+		const state2 = {
+			...BASE_STATE,
+			plot: { ...BASE_STATE.plot, fetching: false },
+		}
+		expect(selectors.fetching(state1)).to.be.true
+		expect(selectors.fetching(state2)).to.be.false
+	})
+})

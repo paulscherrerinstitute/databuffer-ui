@@ -1,0 +1,2 @@
+# disable diff output
+package-lock.json -diff
