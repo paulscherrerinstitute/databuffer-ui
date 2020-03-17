@@ -1,7 +1,7 @@
 import { PlotActions, PlotActionTypes } from './actions'
 import { ChannelDataResponse } from '../../api/queryrest'
 import { YAxis, DataSeries, Channel } from './models'
-import { channelToId } from '@psi/databuffer-queryrest/channel'
+import { channelToId } from '@psi/databuffer-query-js/channel'
 
 export interface PlotState {
 	startTime: number

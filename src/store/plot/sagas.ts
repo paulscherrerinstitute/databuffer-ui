@@ -5,7 +5,7 @@ import {
 	EventFields,
 	AggregationType,
 	AggregationOperation,
-} from '@psi/databuffer-queryrest/query-data'
+} from '@psi/databuffer-query-js/query-data'
 
 import { PlotActionTypes, PlotActions } from './actions'
 import * as PlotSelectors from './selectors'

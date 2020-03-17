@@ -30,7 +30,7 @@ import { Snackbar } from '@material/mwc-snackbar'
 import { formatDate } from '../util'
 import { store, RootState } from '../store'
 import { Channel, PlotActions, PlotSelectors } from '../store/plot/'
-import { channelToId } from '@psi/databuffer-queryrest/channel'
+import { channelToId } from '@psi/databuffer-query-js/channel'
 
 import * as datefns from 'date-fns'
 import { ChannelDataResponse } from '../api/queryrest'

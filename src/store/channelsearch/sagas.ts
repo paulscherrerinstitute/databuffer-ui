@@ -2,10 +2,10 @@
 import { call, put, select, takeLatest } from 'redux-saga/effects'
 import { ChannelTypes, ChannelSearchActions } from './actions'
 import * as ChannelSearchSelectors from './selectors'
-import { channelToId } from '@psi/databuffer-queryrest/channel'
+import { channelToId } from '@psi/databuffer-query-js/channel'
 
 import { queryRestApi } from '../../api/queryrest'
-import { QueryOptions } from '@psi/databuffer-queryrest/query-channel-names'
+import { QueryOptions } from '@psi/databuffer-query-js/query-channel-names'
 
 export default [searchChannelListener]
 

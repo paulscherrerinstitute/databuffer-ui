@@ -1,10 +1,10 @@
 import { createSelector } from 'reselect'
 import Highcharts from 'highcharts'
-import { channelToId } from '@psi/databuffer-queryrest/channel'
+import { channelToId } from '@psi/databuffer-query-js/channel'
 import {
 	QueryResponseItem,
 	DataPoint,
-} from '@psi/databuffer-queryrest/query-data'
+} from '@psi/databuffer-query-js/query-data'
 
 import { RootState } from '../reducer'
 

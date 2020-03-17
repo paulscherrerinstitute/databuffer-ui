@@ -1,6 +1,6 @@
 {
 	"name": "@psi/databuffer-ui",
-	"version": "0.0.1",
+	"version": "4.0.0",
 	"description": "Databuffer UI",
 	"scripts": {
 		"build": "rollup -c",
@@ -57,7 +57,8 @@
 		"@material/mwc-icon-button": "^0.13.0",
 		"@material/mwc-snackbar": "^0.13.0",
 		"@material/mwc-textfield": "^0.13.0",
-		"@psi/databuffer-queryrest": "^0.2.2",
+		"@psi/databuffer-query-js": "^0.2.2",
+		"@psi/databuffer-web-components": "^1.0.0",
 		"date-fns": "^2.11.0",
 		"highcharts": "^8.0.4",
 		"lit-element": "^2.2.1",

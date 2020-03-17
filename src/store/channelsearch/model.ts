@@ -1,4 +1,4 @@
-// import { Channel } from '@psi/databuffer-queryrest/channel'
+// import { Channel } from '@psi/databuffer-query-js/channel'
 
 export interface Channel {
 	backend: string
@@ -12,6 +12,6 @@ export interface ChannelWithTags extends Channel {
 
 // export {
 //   QueryResponse,
-// } from '@psi/databuffer-queryrest/query-channel-names'
+// } from '@psi/databuffer-query-js/query-channel-names'
 
 export type IdToChannelMap = { [id: string]: Channel }

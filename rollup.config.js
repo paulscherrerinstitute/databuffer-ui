@@ -7,14 +7,14 @@ import minifyHTML from 'rollup-plugin-minify-html-literals'
 import typescript from 'rollup-plugin-typescript'
 import { terser } from 'rollup-plugin-terser'
 
-import * as package from './package.json'
+import { version as pkgVersion } from './package.json'
 
 // assume production mode for normal build, dev if watched
 // flag is used to enable / disable HTML & JS minification
 const production = !process.env.ROLLUP_WATCH
 const appVersion = production
-	? `v${process.env.APP_VERSION || package.version}`
-	: `v${process.env.APP_VERSION || package.version}-dev`
+	? `v${process.env.APP_VERSION || pkgVersion}`
+	: `v${process.env.APP_VERSION || pkgVersion}-dev`
 
 export default {
 	input: 'src/index.ts',

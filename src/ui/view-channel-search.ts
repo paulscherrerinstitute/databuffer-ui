@@ -21,13 +21,13 @@ import { TextField } from '@material/mwc-textfield'
 
 import pluralize from 'pluralize'
 
-import '@psi/daq-web-ui-components/daq-pill'
-import { DaqPillSelectedEvent } from '@psi/daq-web-ui-components/daq-pill'
-import '@psi/daq-web-ui-components/daq-pill-list'
+import '@psi/databuffer-web-components/daq-pill'
+import { DaqPillSelectedEvent } from '@psi/databuffer-web-components/daq-pill'
+import '@psi/databuffer-web-components/daq-pill-list'
 import {
 	DaqPillListElement,
 	DaqPillListSelectedEvent,
-} from '@psi/daq-web-ui-components/daq-pill-list'
+} from '@psi/databuffer-web-components/daq-pill-list'
 
 import { store, RootState, RoutingActions } from '../store'
 import {
