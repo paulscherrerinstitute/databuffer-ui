@@ -2,7 +2,7 @@
 import { call, put, select, takeLatest } from 'redux-saga/effects'
 import {
 	QueryRequest,
-	EventFields,
+	EventField,
 	AggregationType,
 	AggregationOperation,
 } from '@psi/databuffer-query-js/query-data'
@@ -30,10 +30,10 @@ function* drawPlotSaga(action: ReturnType<typeof PlotActions.drawPlot>) {
 			endSeconds: end / 1000,
 		},
 		eventFields: [
-			EventFields.GLOBAL_MILLIS,
-			EventFields.PULSE_ID,
-			EventFields.VALUE,
-			'eventCount',
+			EventField.GLOBAL_MILLIS,
+			EventField.PULSE_ID,
+			EventField.VALUE,
+			EventField.EVENT_COUNT,
 		],
 		aggregation: {
 			aggregationType: AggregationType.VALUE,

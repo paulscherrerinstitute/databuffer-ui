@@ -3,7 +3,8 @@ import Highcharts from 'highcharts'
 import { channelToId } from '@psi/databuffer-query-js/channel'
 import {
 	QueryResponseItem,
-	DataPoint,
+	Event,
+	AggregationResult,
 } from '@psi/databuffer-query-js/query-data'
 
 import { RootState } from '../reducer'
@@ -23,31 +24,28 @@ interface HighChartsDataPointWithoutBinning {
 	x: number
 	y: number
 	eventCount: number
-	min: number
-	mean: number
-	max: number
 }
 
 const needsBinning = (item: QueryResponseItem): boolean => {
 	if (item.data.length === 0) return false
-	return item.data.some((x: DataPoint): boolean => x.eventCount > 1)
+	return item.data.some((x: Event): boolean => x.eventCount > 1)
 }
 
 const mapDataPointWithBinning = (
-	dataPoint: DataPoint
+	dataPoint: Event
 ): HighChartsDataPointWithBinning => ({
 	x: dataPoint.globalMillis,
-	y: dataPoint.value.mean,
+	y: (dataPoint.value as AggregationResult).mean,
 	eventCount: dataPoint.eventCount,
-	min: dataPoint.value.min,
-	mean: dataPoint.value.mean,
-	max: dataPoint.value.max,
+	min: (dataPoint.value as AggregationResult).min,
+	mean: (dataPoint.value as AggregationResult).mean,
+	max: (dataPoint.value as AggregationResult).max,
 })
 const mapDataPointWithoutBinning = (
-	dataPoint: DataPoint
+	dataPoint: Event
 ): HighChartsDataPointWithoutBinning => ({
 	x: dataPoint.globalMillis,
-	y: dataPoint.value.mean,
+	y: (dataPoint.value as AggregationResult).mean,
 	eventCount: dataPoint.eventCount,
 })
 

@@ -43,8 +43,15 @@ describe('plot reducer', () => {
 				yAxes: [],
 				dataSeries: [],
 			})
-			expect(initialState.startTime).to.be.closeTo(Date.now() - 1000, 500)
-			expect(initialState.endTime).to.be.closeTo(Date.now(), 500)
+
+			// give it 5 seconds of jitter, because sometimes the startup time
+			// of the test runner can break this test
+			expect(initialState.startTime).to.be.closeTo(Date.now() - 1000, 5000)
+			expect(initialState.endTime).to.be.closeTo(Date.now(), 5000)
+
+			// so rather, just to be sure, check the relative distance of the
+			// initial start and end times
+			expect(initialState.endTime - initialState.startTime).to.equal(1000)
 		})
 
 		it('should return initial state at the beginning', () => {
@@ -68,10 +75,7 @@ describe('plot reducer', () => {
 			}
 			const action = EXAMPLE_ACTION_SELECT_CHANNEL
 			const nextState = reducer(previousState, action)
-			expect(nextState)
-				.to.have.property('channels')
-				.be.an('array')
-				.of.length(1)
+			expect(nextState).to.have.property('channels').be.an('array').of.length(1)
 			expect(nextState).to.have.deep.own.property('channels', [
 				EXAMPLE_CHANNELS[EXAMPLE_INDEX],
 			])

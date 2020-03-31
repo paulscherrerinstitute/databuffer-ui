@@ -1,28 +1,3 @@
-// ======================================================================
-//
-//                        A  T  T  E  N  T  I  O  N
-//                       ===========================
-//
-// TL;DR
-//
-// selectors.ts does not compile, so we cannot test it, so we need to
-// exclude it from test discovery by renaming it.
-//
-//
-// Details
-//
-// tsc complains about fields not present in type DataPoint, but we
-// didn't get around to update the API pacakges, yet.
-// Still, tsc will generate output JavaScript which will be bundled by
-// rollup just fine.
-// **But** ts-node which is processing the file to run mocha on it,
-// breaks on these errors. So we need to make sure, that mocha doesn't
-// discover it. That's why it's renamed.
-//
-// I still decided to commit it, as the tests themselves should be a
-// viable starting point in the future.
-//
-// ======================================================================
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 
