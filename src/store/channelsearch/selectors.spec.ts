@@ -111,4 +111,36 @@ describe('channelsearch selectors', () => {
 		const val = selectors.availableTags(state1)
 		expect(val).to.deep.equal(['backend1', 'backend2', 'backend3'])
 	})
+
+	it('retrieves available backends', () => {
+		const state1 = {
+			...BASE_STATE,
+			channelSearch: { ...BASE_STATE.channelSearch, availableBackends: [] },
+		}
+		const state2 = {
+			...BASE_STATE,
+			channelSearch: {
+				...BASE_STATE.channelSearch,
+				availableBackends: ['a', 'b', 'c'],
+			},
+		}
+		expect(selectors.availableBackends(state1)).to.deep.equal([])
+		expect(selectors.availableBackends(state2)).to.deep.equal(['a', 'b', 'c'])
+	})
+
+	it('retrieves selected backends', () => {
+		const state1 = {
+			...BASE_STATE,
+			channelSearch: { ...BASE_STATE.channelSearch, selectedBackends: [] },
+		}
+		const state2 = {
+			...BASE_STATE,
+			channelSearch: {
+				...BASE_STATE.channelSearch,
+				selectedBackends: ['a', 'b', 'c'],
+			},
+		}
+		expect(selectors.selectedBackends(state1)).to.deep.equal([])
+		expect(selectors.selectedBackends(state2)).to.deep.equal(['a', 'b', 'c'])
+	})
 })

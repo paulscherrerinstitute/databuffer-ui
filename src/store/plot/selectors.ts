@@ -75,7 +75,7 @@ export const requestDuration = createSelector(
 )
 export const shouldDisplayChart = createSelector(
 	[requestFinishedAt, error],
-	(finishedAt, error) => finishedAt && !error
+	(finishedAt, error) => !!finishedAt && !error
 )
 
 export const channelsWithoutData = createSelector([response], response =>
