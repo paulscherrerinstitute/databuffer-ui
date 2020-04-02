@@ -103,6 +103,16 @@ export default (
 			return {
 				...state,
 				channels: action.payload.channels,
+				yAxes: action.payload.channels.map((ch, idx) => ({
+					title: channelToId(ch),
+					side: idx % 2 === 0 ? 'left' : 'right',
+					unit: '',
+				})),
+				dataSeries: action.payload.channels.map((ch, idx) => ({
+					name: channelToId(ch),
+					channelIndex: idx,
+					yAxisIndex: idx,
+				})),
 			}
 
 		case PlotActionTypes.DRAW_PLOT:
