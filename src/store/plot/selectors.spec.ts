@@ -7,8 +7,8 @@ import { RootState } from '../reducer'
 import { initialState } from './reducer'
 import { ChannelSearchState } from '../channelsearch/reducer'
 import { RoutingState } from '../routing/reducer'
-import {
-	QueryResponse,
+import type {
+	DataResponse,
 	AggregationResult,
 } from '@psi/databuffer-query-js/query-data'
 import { YAxis, DataSeries } from './models'
@@ -28,7 +28,7 @@ const EXAMPLE_CHANNELS = [
 	{ name: 'channel1', backend: 'backend1' },
 ]
 
-const EXAMPLE_RESPONSE: QueryResponse = [
+const EXAMPLE_RESPONSE: DataResponse = [
 	{
 		channel: EXAMPLE_CHANNELS[0],
 		data: [
@@ -564,18 +564,19 @@ describe('plot selectors', () => {
 					...BASE_STATE.plot,
 					channels: EXAMPLE_CHANNELS,
 					response: EXAMPLE_RESPONSE,
-					dataSeries: [
-						{
-							name: 'a',
-							channelIndex: 0,
-							yAxisIndex: 0,
-						},
-						{
-							name: 'b',
-							channelIndex: 1,
-							yAxisIndex: 1,
-						},
-					] as DataSeries[],
+					dataSeries:
+						[
+							{
+								name: 'a',
+								channelIndex: 0,
+								yAxisIndex: 0,
+							},
+							{
+								name: 'b',
+								channelIndex: 1,
+								yAxisIndex: 1,
+							},
+						] as DataSeries[],
 				},
 			}
 		})

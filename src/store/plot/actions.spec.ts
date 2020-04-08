@@ -2,14 +2,14 @@ import { describe, it } from 'mocha'
 import { expect } from 'chai'
 
 import { PlotActions, PlotActionTypes } from './actions'
-import { ChannelDataResponse } from '../../api/queryrest'
+import type { DataResponse } from '../../api/queryrest'
 
 const EXAMPLE_LIST_OF_CHANNELS = [
 	{ name: 'ch1', backend: 'b1' },
 	{ name: 'ch2', backend: 'b2' },
 	{ name: 'ch3', backend: 'b3' },
 ]
-const EXAMPLE_CHANNEL_DATA_RESPONSE: ChannelDataResponse = [
+const EXAMPLE_CHANNEL_DATA_RESPONSE: DataResponse = [
 	{
 		channel: { name: 'ch1', backend: 'b1' },
 		data: [],

@@ -1,8 +1,8 @@
 import { createSelector } from 'reselect'
 import Highcharts from 'highcharts'
 import { channelToId } from '@psi/databuffer-query-js/channel'
-import {
-	QueryResponseItem,
+import type {
+	DataResponseItem,
 	Event,
 	AggregationResult,
 } from '@psi/databuffer-query-js/query-data'
@@ -26,7 +26,7 @@ interface HighChartsDataPointWithoutBinning {
 	eventCount: number
 }
 
-const needsBinning = (item: QueryResponseItem): boolean => {
+const needsBinning = (item: DataResponseItem): boolean => {
 	if (item.data.length === 0) return false
 	return item.data.some((x: Event): boolean => x.eventCount > 1)
 }
@@ -80,7 +80,7 @@ export const shouldDisplayChart = createSelector(
 
 export const channelsWithoutData = createSelector([response], response =>
 	response
-		.filter((x: QueryResponseItem) => x.data.length === 0)
+		.filter((x: DataResponseItem) => x.data.length === 0)
 		.map(x => x.channel)
 )
 

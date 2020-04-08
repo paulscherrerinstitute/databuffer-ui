@@ -1,5 +1,5 @@
 import { PlotActions, PlotActionTypes } from './actions'
-import { ChannelDataResponse } from '../../api/queryrest'
+import type { DataResponse } from '../../api/queryrest'
 import { YAxis, DataSeries, Channel } from './models'
 import { channelToId } from '@psi/databuffer-query-js/channel'
 
@@ -16,7 +16,7 @@ export interface PlotState {
 		sentAt: number
 		finishedAt: number
 	}
-	response: ChannelDataResponse
+	response: DataResponse
 	yAxes: YAxis[]
 	dataSeries: DataSeries[]
 }

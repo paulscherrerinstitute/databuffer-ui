@@ -1,6 +1,6 @@
 import { createAction, ActionsUnion } from '../actions'
 import { Channel } from './models'
-import { ChannelDataResponse } from '../../api/queryrest'
+import type { DataResponse } from '../../api/queryrest'
 
 export enum PlotActionTypes {
 	SELECT_CHANNEL = 'daq-web-ui-app/SELECT_CHANNEL',
@@ -29,7 +29,7 @@ export const PlotActions = {
 		}),
 	drawPlotRequest: (timestamp: number) =>
 		createAction(PlotActionTypes.DRAW_PLOT_REQUEST, { timestamp }),
-	drawPlotSuccess: (timestamp: number, response: ChannelDataResponse) =>
+	drawPlotSuccess: (timestamp: number, response: DataResponse) =>
 		createAction(PlotActionTypes.DRAW_PLOT_SUCCESS, {
 			timestamp,
 			response,

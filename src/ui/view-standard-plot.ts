@@ -33,14 +33,14 @@ import { Channel, PlotActions, PlotSelectors } from '../store/plot/'
 import { channelToId } from '@psi/databuffer-query-js/channel'
 
 import * as datefns from 'date-fns'
-import { ChannelDataResponse } from '../api/queryrest'
+import type { DataResponse } from '../api/queryrest'
 
 const TIMESTAMP_PATTERN = `^\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}\\.\\d{3}$`
 const TIMESTAMP_REGEX = new RegExp(TIMESTAMP_PATTERN)
 
 @customElement('view-standard-plot')
 export class StandardPlotElement extends connect(store, LitElement) {
-	@property({ type: Array }) response: ChannelDataResponse
+	@property({ type: Array }) response: DataResponse
 	@property({ type: Number }) startTime: number
 	@property({ type: Number }) endTime: number
 	@property({ type: Array }) channels: Channel[]

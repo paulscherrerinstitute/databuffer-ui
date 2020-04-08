@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import reducer, { initialState, PlotState } from './reducer'
 import { PlotActions } from './actions'
 import { YAxis, DataSeries } from './models'
-import { ChannelDataResponse } from '../../api/queryrest'
+import type { DataResponse } from '../../api/queryrest'
 
 // some fixtures
 const EXAMPLE_ERROR = new Error('example error')
@@ -15,7 +15,7 @@ const EXAMPLE_CHANNELS = [
 	{ name: 'ch4', backend: 'b1' },
 ]
 const EXAMPLE_IDS = ['b1/ch1', 'b2/ch2', 'b3/ch3', 'b1/ch4']
-const EXAMPLE_RESPONSE: ChannelDataResponse = [
+const EXAMPLE_RESPONSE: DataResponse = [
 	{
 		channel: EXAMPLE_CHANNELS[0],
 		data: [

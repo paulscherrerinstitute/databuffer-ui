@@ -1,6 +1,7 @@
 import { QueryRest } from '@psi/databuffer-query-js'
-import { QueryResponseItem as ChannelNamesResponseItem } from '@psi/databuffer-query-js/query-channel-names/response'
-import { QueryResponseItem as ChannelDataResponseItem } from '@psi/databuffer-query-js/query-data/response'
-export type ChannelDataResponse = ChannelDataResponseItem[]
-export type ChannelNamesResponse = ChannelNamesResponseItem[]
+import type {
+	DataResponse,
+	ChannelNamesResponse,
+} from '@psi/databuffer-query-js'
+export type { DataResponse, ChannelNamesResponse }
 export const queryRestApi = new QueryRest(window.DatabufferUi.QUERY_API)
