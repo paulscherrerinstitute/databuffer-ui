@@ -45,7 +45,15 @@ export class HomeElement extends connect(store, LitElement) {
 	render() {
 		return html`
 			<div id="logo">DAQ Web UI</div>
-			<p id="version">Version: APP_VERSION_STRING</p>
+			<p id="version">
+				Version: APP_VERSION_STRING.
+				<a
+					href="https://github.com/paulscherrerinstitute/databuffer-ui/blob/master/CHANGELOG.md"
+					target="_blank"
+					>View changelog</a
+				>
+				for details.
+			</p>
 
 			<mwc-textfield
 				id="query"
