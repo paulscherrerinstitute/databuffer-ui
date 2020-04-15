@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 
-import { ChannelConfig } from './model'
+import { ChannelConfig, getShapeName } from './model'
 import { RootState } from '../reducer'
 
 const getState = (state: RootState) => state.channelSearch
@@ -32,19 +32,21 @@ export const results = createSelector([resultEntities], entities =>
 )
 
 export const resultsWithTags = createSelector([results], results =>
-	results.map(x => ({ ...x, tags: [x.backend] }))
+	results.map(x => ({ ...x, tags: [x.backend, getShapeName(x)] }))
 )
 
 export const availableTags = createSelector(
 	[resultsWithTags],
 	resultsWithTags =>
-		resultsWithTags.reduce(
-			(aggr, current) => [
-				...aggr,
-				...current.tags.filter(t => !aggr.includes(t)),
-			],
-			[]
-		)
+		resultsWithTags
+			.reduce(
+				(aggr, current) => [
+					...aggr,
+					...current.tags.filter(t => !aggr.includes(t)),
+				],
+				[]
+			)
+			.sort()
 )
 
 export const fetching = createSelector([getState], state => state.fetching)

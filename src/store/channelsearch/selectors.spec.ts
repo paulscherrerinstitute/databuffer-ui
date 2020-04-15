@@ -7,6 +7,7 @@ import { RootState } from '../reducer'
 import { initialState } from './reducer'
 import { PlotState } from '../plot/reducer'
 import { RoutingState } from '../routing/reducer'
+import { ShapeName } from './model'
 
 const BASE_STATE: RootState = {
 	channelSearch: initialState,
@@ -141,12 +142,36 @@ describe('channelsearch selectors', () => {
 			.resultsWithTags(state1)
 			.map(x => ({ name: x.name, backend: x.backend, tags: x.tags }))
 		expect(val).to.deep.equal([
-			{ name: 'channel1', backend: 'backend1', tags: ['backend1'] },
-			{ name: 'channel1', backend: 'backend2', tags: ['backend2'] },
-			{ name: 'channel1', backend: 'backend3', tags: ['backend3'] },
-			{ name: 'channel2', backend: 'backend1', tags: ['backend1'] },
-			{ name: 'channel2', backend: 'backend2', tags: ['backend2'] },
-			{ name: 'channel3', backend: 'backend2', tags: ['backend2'] },
+			{
+				name: 'channel1',
+				backend: 'backend1',
+				tags: ['backend1', ShapeName.IMAGE],
+			},
+			{
+				name: 'channel1',
+				backend: 'backend2',
+				tags: ['backend2', ShapeName.WAVEFORM],
+			},
+			{
+				name: 'channel1',
+				backend: 'backend3',
+				tags: ['backend3', ShapeName.IMAGE],
+			},
+			{
+				name: 'channel2',
+				backend: 'backend1',
+				tags: ['backend1', ShapeName.WAVEFORM],
+			},
+			{
+				name: 'channel2',
+				backend: 'backend2',
+				tags: ['backend2', ShapeName.SCALAR],
+			},
+			{
+				name: 'channel3',
+				backend: 'backend2',
+				tags: ['backend2', ShapeName.SCALAR],
+			},
 		])
 	})
 
@@ -155,13 +180,29 @@ describe('channelsearch selectors', () => {
 		const val = selectors.availableTags(state1)
 		expect(val)
 			.to.be.an('array')
-			.that.includes.members(['backend1', 'backend2', 'backend3'])
+			.that.includes.members([
+				'backend1',
+				'backend2',
+				'backend3',
+				ShapeName.SCALAR,
+				ShapeName.WAVEFORM,
+				ShapeName.IMAGE,
+			])
 	})
 
 	it('availableTags are sorted', () => {
 		const state1 = EXAMPLE_STATE_WITH_ENTITIES
 		const val = selectors.availableTags(state1)
-		expect(val).to.deep.equal(['backend1', 'backend2', 'backend3'])
+		expect(val).to.deep.equal(
+			[
+				ShapeName.SCALAR,
+				ShapeName.WAVEFORM,
+				ShapeName.IMAGE,
+				'backend1',
+				'backend2',
+				'backend3',
+			].sort()
+		)
 	})
 
 	it('retrieves available backends', () => {
