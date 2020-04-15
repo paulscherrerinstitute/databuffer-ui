@@ -60,7 +60,7 @@
 		"@material/mwc-icon-button": "^0.14.1",
 		"@material/mwc-snackbar": "^0.14.1",
 		"@material/mwc-textfield": "^0.14.1",
-		"@psi/databuffer-query-js": "^0.5.0",
+		"@psi/databuffer-query-js": "^0.6.0",
 		"@psi/databuffer-web-components": "^1.0.0",
 		"date-fns": "^2.11.1",
 		"highcharts": "^8.0.4",
