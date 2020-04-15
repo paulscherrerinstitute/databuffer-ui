@@ -1,17 +1,9 @@
 import { createSelector } from 'reselect'
 
-import { ChannelConfig, getShapeName } from './model'
+import { ChannelConfig, getShapeName, compareNameThenBackend } from './model'
 import { RootState } from '../reducer'
 
 const getState = (state: RootState) => state.channelSearch
-
-const compareNameThenBackend = (a: ChannelConfig, b: ChannelConfig): number => {
-	if (a.name < b.name) return -1
-	if (a.name > b.name) return 1
-	if (a.backend < b.backend) return -1
-	if (a.backend > b.backend) return 1
-	return 0
-}
 
 export const pattern = createSelector([getState], state => state.pattern)
 

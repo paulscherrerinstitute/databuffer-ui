@@ -21,4 +21,15 @@ export const getShapeName = (c: ChannelConfig): ShapeName => {
 	return ShapeName.WAVEFORM
 }
 
+export const compareNameThenBackend = (
+	a: ChannelConfig,
+	b: ChannelConfig
+): number => {
+	if (a.name < b.name) return -1
+	if (a.name > b.name) return 1
+	if (a.backend < b.backend) return -1
+	if (a.backend > b.backend) return 1
+	return 0
+}
+
 export type IdToChannelMap = { [id: string]: ChannelConfig }
