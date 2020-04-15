@@ -19,12 +19,60 @@ const EXAMPLE_STATE_WITH_ENTITIES = {
 	channelSearch: {
 		...BASE_STATE.channelSearch,
 		entities: {
-			'backend2/channel2': { name: 'channel2', backend: 'backend2' },
-			'backend2/channel3': { name: 'channel3', backend: 'backend2' },
-			'backend2/channel1': { name: 'channel1', backend: 'backend2' },
-			'backend1/channel2': { name: 'channel2', backend: 'backend1' },
-			'backend3/channel1': { name: 'channel1', backend: 'backend3' },
-			'backend1/channel1': { name: 'channel1', backend: 'backend1' },
+			'backend2/channel2': {
+				name: 'channel2',
+				backend: 'backend2',
+				description: 'a',
+				source: 'tcp://localhost:1001',
+				unit: 'A',
+				shape: [1],
+				type: 'uint16',
+			},
+			'backend2/channel3': {
+				name: 'channel3',
+				backend: 'backend2',
+				description: 'b',
+				source: 'tcp://localhost:1002',
+				unit: 'B',
+				shape: [1],
+				type: 'float32',
+			},
+			'backend2/channel1': {
+				name: 'channel1',
+				backend: 'backend2',
+				description: 'c',
+				source: 'tcp://localhost:1003',
+				unit: 'C',
+				shape: [10],
+				type: 'uint16',
+			},
+			'backend1/channel2': {
+				name: 'channel2',
+				backend: 'backend1',
+				description: 'd',
+				source: 'tcp://localhost:1004',
+				unit: 'D',
+				shape: [20],
+				type: 'float32',
+			},
+			'backend3/channel1': {
+				name: 'channel1',
+				backend: 'backend3',
+				description: 'e',
+				source: 'tcp://localhost:1005',
+				unit: 'E',
+				shape: [10, 20],
+				type: 'uint16',
+			},
+			'backend1/channel1': {
+				name: 'channel1',
+				backend: 'backend1',
+				description: 'f',
+				source: 'tcp://localhost:1006',
+				unit: 'F',
+				shape: [20, 10],
+				type: 'uint16',
+			},
 		},
 	},
 }
@@ -75,7 +123,9 @@ describe('channelsearch selectors', () => {
 
 	it('results are sorted by name, then backend', () => {
 		const state1 = EXAMPLE_STATE_WITH_ENTITIES
-		expect(selectors.results(state1)).to.deep.equal([
+		expect(
+			selectors.results(state1).map(x => ({ name: x.name, backend: x.backend }))
+		).to.deep.equal([
 			{ name: 'channel1', backend: 'backend1' },
 			{ name: 'channel1', backend: 'backend2' },
 			{ name: 'channel1', backend: 'backend3' },
@@ -87,7 +137,9 @@ describe('channelsearch selectors', () => {
 
 	it('resultsWithTags include the backend as a tag', () => {
 		const state1 = EXAMPLE_STATE_WITH_ENTITIES
-		const val = selectors.resultsWithTags(state1)
+		const val = selectors
+			.resultsWithTags(state1)
+			.map(x => ({ name: x.name, backend: x.backend, tags: x.tags }))
 		expect(val).to.deep.equal([
 			{ name: 'channel1', backend: 'backend1', tags: ['backend1'] },
 			{ name: 'channel1', backend: 'backend2', tags: ['backend2'] },

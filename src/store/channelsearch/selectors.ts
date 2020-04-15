@@ -1,11 +1,11 @@
 import { createSelector } from 'reselect'
 
-import { Channel } from './model'
+import { ChannelConfig } from './model'
 import { RootState } from '../reducer'
 
 const getState = (state: RootState) => state.channelSearch
 
-const compareNameThenBackend = (a: Channel, b: Channel): number => {
+const compareNameThenBackend = (a: ChannelConfig, b: ChannelConfig): number => {
 	if (a.name < b.name) return -1
 	if (a.name > b.name) return 1
 	if (a.backend < b.backend) return -1

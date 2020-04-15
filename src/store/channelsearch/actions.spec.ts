@@ -58,18 +58,32 @@ describe('ChannelSearchActions', () => {
 	})
 
 	it('should create CHANNEL_SEARCH_SUCCESS', () => {
-		const action = ChannelSearchActions.searchChannelSuccess(['ch1', 'ch2'], {
-			ch1: { name: 'ch1', description: 'channel 1', backend: 'b1' },
-			ch2: { name: 'ch2', backend: 'b1' },
-		})
+		const ids = ['b1/ch1', 'b1/ch2']
+		const entities = {
+			'b1/ch1': {
+				name: 'ch1',
+				description: 'channel 1',
+				backend: 'b1',
+				source: 's1',
+				type: 't1',
+				shape: [1],
+				unit: 'mA',
+			},
+			'b1/ch2': {
+				name: 'ch2',
+				backend: 'b1',
+				source: 's2',
+				type: 't2',
+				shape: [1024, 512],
+				unit: '',
+			},
+		}
+		const action = ChannelSearchActions.searchChannelSuccess(ids, entities)
 		const expected = {
 			type: ChannelTypes.CHANNEL_SEARCH_SUCCESS,
 			payload: {
-				ids: ['ch1', 'ch2'],
-				entities: {
-					ch1: { name: 'ch1', description: 'channel 1', backend: 'b1' },
-					ch2: { name: 'ch2', backend: 'b1' },
-				},
+				ids,
+				entities,
 			},
 		}
 		expect(action).to.deep.equal(expected)

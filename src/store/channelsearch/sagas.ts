@@ -5,7 +5,7 @@ import * as ChannelSearchSelectors from './selectors'
 import { channelToId } from '@psi/databuffer-query-js/channel'
 
 import { queryRestApi } from '../../api/queryrest'
-import { QueryOptions } from '@psi/databuffer-query-js/query-channel-names'
+import type { ChannelConfigsQuery } from '@psi/databuffer-query-js'
 
 export default [searchChannelListener]
 
@@ -20,14 +20,14 @@ function* channelSearchSaga(
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const backends = yield select(ChannelSearchSelectors.selectedBackends)
 
-	const options: QueryOptions = {
+	const query: ChannelConfigsQuery = {
 		regex: pattern,
 		// backends,
 	}
 
 	yield put(ChannelSearchActions.searchChannelRequest(pattern))
 	try {
-		const { ids, entities } = yield call(searchChannel, options)
+		const { ids, entities } = yield call(searchChannel, query)
 		yield put(ChannelSearchActions.searchChannelSuccess(ids, entities))
 	} catch (err) {
 		console.error(err)
@@ -35,17 +35,17 @@ function* channelSearchSaga(
 	}
 }
 
-export async function searchChannel(options: QueryOptions) {
-	const response = await queryRestApi.queryChannelNames(options)
+export async function searchChannel(query: ChannelConfigsQuery) {
+	const response = await queryRestApi.queryChannelConfigs(query)
 
 	const result = { ids: [], entities: {} }
 
 	for (const x of response) {
-		for (const name of x.channels) {
-			const ch = { backend: x.backend, name }
-			const id = channelToId(ch)
+		for (const chConfig of x.channels) {
+			const { backend, name } = chConfig
+			const id = channelToId({ backend, name })
 			result.ids.push(id)
-			result.entities[id] = ch
+			result.entities[id] = chConfig
 		}
 	}
 

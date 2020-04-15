@@ -7,8 +7,20 @@ import { ChannelSearchActions } from './actions'
 // some fixtures
 const EXAMPLE_ERROR = new Error('example error')
 const EXAMPLE_CHANNELS = {
-	'b1/ch1': { name: 'ch1', backend: 'b1' },
-	'b2/ch2': { name: 'ch2', backend: 'b2' },
+	'b1/ch1': {
+		name: 'ch1',
+		backend: 'b1',
+		source: 'tcp://localhost:1234',
+		type: 'uint16',
+		shape: [1024],
+	},
+	'b2/ch2': {
+		name: 'ch2',
+		backend: 'b2',
+		source: 'archives',
+		type: 'float32',
+		shape: [1],
+	},
 }
 const EXAMPLE_IDS = Object.keys(EXAMPLE_CHANNELS).sort()
 const EXAMPLE_PATTERN = 'abc'

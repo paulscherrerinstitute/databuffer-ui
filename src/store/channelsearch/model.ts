@@ -1,17 +1,8 @@
-// import { Channel } from '@psi/databuffer-query-js/channel'
+import type { ChannelConfig } from '@psi/databuffer-query-js/query-channel-configs'
+export type { ChannelConfig }
 
-export interface Channel {
-	backend: string
-	name: string
-	description?: string
-}
-
-export interface ChannelWithTags extends Channel {
+export interface ChannelWithTags extends ChannelConfig {
 	tags: string[]
 }
 
-// export {
-//   QueryResponse,
-// } from '@psi/databuffer-query-js/query-channel-names'
-
-export type IdToChannelMap = { [id: string]: Channel }
+export type IdToChannelMap = { [id: string]: ChannelConfig }
