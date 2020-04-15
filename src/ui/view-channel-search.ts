@@ -30,11 +30,8 @@ import {
 } from '@psi/databuffer-web-components/daq-pill-list'
 
 import { store, RootState, RoutingActions } from '../store'
-import {
-	ChannelSearchSelectors,
-	Channel,
-	ChannelWithTags,
-} from '../store/channelsearch'
+import { ChannelSearchSelectors } from '../store/channelsearch'
+import type { ChannelConfig, ChannelWithTags } from '../store/channelsearch'
 import { nothing, TemplateResult } from 'lit-html'
 import { PlotActions, PlotSelectors } from '../store/plot'
 
@@ -42,14 +39,14 @@ const MAX_NUM_RESULTS = 100
 
 @customElement('view-channel-search')
 export class ChannelSearchElement extends connect(store, LitElement) {
-	@property({ type: String }) pattern: string
-	@property({ type: Array }) searchResults: Channel[]
-	@property({ type: Array }) resultsForDisplay: ChannelWithTags[]
-	@property({ type: Boolean }) fetching: boolean
-	@property({ type: Object }) error: Error
-	@property({ type: Array }) availableFilters: string[] = []
-	@property({ type: Array }) activeFilters: string[] = []
-	@property({ attribute: false }) selectedChannels: Channel[] = []
+	@property({ attribute: false }) pattern: string
+	@property({ attribute: false }) searchResults: ChannelWithTags[]
+	@property({ attribute: false }) resultsForDisplay: ChannelWithTags[]
+	@property({ attribute: false }) fetching: boolean
+	@property({ attribute: false }) error: Error
+	@property({ attribute: false }) availableFilters: string[] = []
+	@property({ attribute: false }) activeFilters: string[] = []
+	@property({ attribute: false }) selectedChannels: ChannelConfig[] = []
 
 	@query('#query')
 	private __query!: TextField
@@ -176,9 +173,7 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 
 	private __filtersTemplate(): TemplateResult {
 		return this.availableFilters.length === 0
-			? html`
-					<span class="nofilters">No filters available</span>
-			  `
+			? html` <span class="nofilters">No filters available</span> `
 			: html`
 					<daq-pill-list
 						id="filterlist"
@@ -193,9 +188,7 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 	private __resultsTemplate(): TemplateResult {
 		if (!this.pattern) return html``
 		if (this.fetching)
-			return html`
-				<wl-progress-spinner></wl-progress-spinner>
-			`
+			return html` <wl-progress-spinner></wl-progress-spinner> `
 		if (this.error)
 			return html`
 				<div class="error">
@@ -217,9 +210,7 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 		return html`
 			${pluralize('result', this.resultsForDisplay.length, true)}
 			${this.resultsForDisplay.length < this.searchResults.length
-				? html`
-						(of ${this.searchResults.length})
-				  `
+				? html` (of ${this.searchResults.length}) `
 				: nothing}
 			for '${this.pattern}'
 		`
