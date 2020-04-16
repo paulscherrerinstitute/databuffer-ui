@@ -124,26 +124,7 @@
 		<script src="https://unpkg.com/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
 		<script src="https://polyfill.io/v3/polyfill.min.js?flags=gated&features=WebAnimations,requestIdleCallback"></script>
 
-		<!-- Put local development configuration here -->
-		<script>
-			window.DatabufferUi = {
-				QUERY_API: 'https://localhost:8080',
-				DISPATCHER_API: 'https://localhost:8081',
-			}
-		</script>
-		<!--
-      Have server generate a script tag with configuration
-      from its environment in a script tag here.
-
-      **Key idea:**
-      The app should be just copied around from different stages
-      (dev, integration, production, A/B testing) without having
-      to be modified (by a build / bundling step).
-      It should just pick up the environment.
-
-      See also: https://12factor.net
-     -->
-
+		<script src="/config/databuffer-ui.config.js"></script>
 		<script async src="/scripts/databuffer-ui.min.js"></script>
 	</head>
 
