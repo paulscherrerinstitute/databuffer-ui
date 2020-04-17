@@ -5,6 +5,7 @@
 	"scripts": {
 		"build": "rollup -c",
 		"build:watch": "rollup -c -w",
+		"clean": "rm -rf public/scripts/ node_modules/.cache/ .nyc_output",
 		"source": "source-map-explorer public/scripts/databuffer-ui.min.js",
 		"lint:eslint": "eslint 'src/**/*.ts'",
 		"lint:prettier": "prettier 'src/**/*.ts' --list-different || ( echo '↑↑↑  these files are not well formatted  ↑↑↑' && exit 1 )",
