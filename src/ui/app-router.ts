@@ -11,6 +11,7 @@ import {
 import { unsafeHTML } from 'lit-html/directives/unsafe-html'
 import { connect } from '@captaincodeman/redux-connect-element'
 import { store, RootState, RoutingSelectors } from '../store'
+import { baseStyles } from './shared-styles'
 
 @customElement('app-router')
 export class AppRouterElement extends connect(store, LitElement) {
@@ -60,16 +61,17 @@ export class AppRouterElement extends connect(store, LitElement) {
 	}
 
 	render() {
-		return html`
-			${unsafeHTML(this.view)}
-		`
+		return html`${unsafeHTML(this.view)}`
 	}
 
 	static get styles(): CSSResultArray {
 		return [
+			baseStyles,
 			css`
 				:host {
 					display: block;
+					height: 100%;
+					padding: 4px;
 				}
 			`,
 		]

@@ -20,3 +20,11 @@ export const debugNesting = css`
 		background-color: #ff00ff;
 	}
 `
+
+export const baseStyles = css`
+	:host {
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+	}
+`

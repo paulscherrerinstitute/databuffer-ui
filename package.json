@@ -77,6 +77,6 @@
 		"reselect-tools": "0.0.7",
 		"tslib": "^1.10.0",
 		"universal-router": "^8.3.0",
-		"weightless": "0.0.34"
+		"weightless": "0.0.37"
 	}
 }
