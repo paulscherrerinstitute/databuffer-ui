@@ -10,30 +10,23 @@ import {
 import { connect } from '@captaincodeman/redux-connect-element'
 
 import 'weightless/expansion'
-import 'weightless/list-item'
 import 'weightless/progress-spinner'
 
 import '@material/mwc-button'
 import '@material/mwc-snackbar'
-import { Snackbar } from '@material/mwc-snackbar'
+import type { Snackbar } from '@material/mwc-snackbar'
 import '@material/mwc-textfield'
-import { TextField } from '@material/mwc-textfield'
-
-import pluralize from 'pluralize'
-
-import '@psi/databuffer-web-components/daq-pill'
-import { DaqPillSelectedEvent } from '@psi/databuffer-web-components/daq-pill'
-import '@psi/databuffer-web-components/daq-pill-list'
-import {
-	DaqPillListElement,
-	DaqPillListSelectedEvent,
-} from '@psi/databuffer-web-components/daq-pill-list'
+import type { TextField } from '@material/mwc-textfield'
 
 import { store, RootState, RoutingActions } from '../store'
 import { ChannelSearchSelectors } from '../store/channelsearch'
-import type { ChannelConfig, ChannelWithTags } from '../store/channelsearch'
-import { nothing, TemplateResult } from 'lit-html'
-import { PlotActions, PlotSelectors } from '../store/plot'
+import type { ChannelWithTags } from '../store/channelsearch'
+import { PlotActions } from '../store/plot'
+import { TemplateResult } from 'lit-html'
+
+import './channel-search-result-list'
+import './channel-search-selected-list'
+import { baseStyles } from './shared-styles'
 
 const MAX_NUM_RESULTS = 100
 
@@ -41,12 +34,8 @@ const MAX_NUM_RESULTS = 100
 export class ChannelSearchElement extends connect(store, LitElement) {
 	@property({ attribute: false }) pattern: string
 	@property({ attribute: false }) searchResults: ChannelWithTags[]
-	@property({ attribute: false }) resultsForDisplay: ChannelWithTags[]
 	@property({ attribute: false }) fetching: boolean
 	@property({ attribute: false }) error: Error
-	@property({ attribute: false }) availableFilters: string[] = []
-	@property({ attribute: false }) activeFilters: string[] = []
-	@property({ attribute: false }) selectedChannels: ChannelConfig[] = []
 
 	@query('#query')
 	private __query!: TextField
@@ -54,17 +43,12 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 	@query('#notify-cutoff')
 	private __notifyCutoff!: Snackbar
 
-	@query('#filterlist')
-	private __filterList!: DaqPillListElement
-
 	mapState(state: RootState) {
 		return {
 			pattern: ChannelSearchSelectors.pattern(state),
 			searchResults: ChannelSearchSelectors.resultsWithTags(state),
 			fetching: ChannelSearchSelectors.fetching(state),
 			error: ChannelSearchSelectors.error(state),
-			availableFilters: ChannelSearchSelectors.availableTags(state),
-			selectedChannels: PlotSelectors.channels(state),
 		}
 	}
 
@@ -74,16 +58,6 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 				RoutingActions.push(
 					`/search?q=${encodeURIComponent(e.detail.pattern)}`
 				),
-			'channel-remove': (e: CustomEvent) =>
-				PlotActions.unselectChannel(e.detail.index),
-			'channel-select': (e: CustomEvent) =>
-				PlotActions.selectChannel(e.detail.channel),
-			'channel-plot-direct': (e: CustomEvent) =>
-				RoutingActions.push(
-					`/plot/${e.detail.channel.backend}/${e.detail.channel.name}`
-				),
-			'channel-plot': () => RoutingActions.push(`/plot`),
-			'clear-selection': () => PlotActions.setSelectedChannels([]),
 		}
 	}
 
@@ -94,13 +68,6 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 	}
 
 	updated(changedProperties): void {
-		// re-calculate resultsForDisplay when either the search results or the filters have changed
-		if (
-			changedProperties.has('activeFilters') ||
-			changedProperties.has('searchResults')
-		) {
-			this.__recalcResultsForDisplay()
-		}
 		// show notification if cut-off is done
 		if (
 			changedProperties.has('searchResults') &&
@@ -108,15 +75,6 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 		) {
 			this.__notifyCutoff.open()
 		}
-	}
-
-	private __recalcResultsForDisplay() {
-		this.resultsForDisplay = (this.activeFilters.length === 0
-			? this.searchResults
-			: this.searchResults.filter(x =>
-					this.activeFilters.every(f => x.tags.indexOf(f) >= 0)
-			  )
-		).slice(0, MAX_NUM_RESULTS)
 	}
 
 	private __search(): void {
@@ -129,10 +87,6 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 		this.dispatchEvent(e)
 	}
 
-	private __onActiveFiltersChanged(e: DaqPillListSelectedEvent): void {
-		this.activeFilters = e.detail.selected
-	}
-
 	private __plotSelected(): void {
 		const e = new CustomEvent('channel-plot')
 		this.dispatchEvent(e)
@@ -140,7 +94,7 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 
 	render(): TemplateResult {
 		return html`
-			<div id="search-top">
+			<div id="search">
 				<mwc-textfield
 					id="query"
 					label="Search for EPICS channels"
@@ -154,15 +108,10 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 					>Search</mwc-button
 				>
 			</div>
-			<div id="filter">
-				<h3>Filters</h3>
-				${this.__filtersTemplate()}
-			</div>
 			<div id="results">
-				<h3>Results</h3>
 				${this.__resultsTemplate()}
 			</div>
-			${this.__selectedTemplate()}
+			<channel-search-selected-list></channel-search-selected-list>
 			<mwc-snackbar
 				id="notify-cutoff"
 				labelText="Showing first ${MAX_NUM_RESULTS} results. Refine your
@@ -171,24 +120,9 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 		`
 	}
 
-	private __filtersTemplate(): TemplateResult {
-		return this.availableFilters.length === 0
-			? html` <span class="nofilters">No filters available</span> `
-			: html`
-					<daq-pill-list
-						id="filterlist"
-						selectable
-						.selected=${this.activeFilters}
-						.value=${this.availableFilters}
-						@daq-pill-list-selected=${this.__onActiveFiltersChanged}
-					></daq-pill-list>
-			  `
-	}
-
 	private __resultsTemplate(): TemplateResult {
 		if (!this.pattern) return html``
-		if (this.fetching)
-			return html` <wl-progress-spinner></wl-progress-spinner> `
+		if (this.fetching) return html`<wl-progress-spinner></wl-progress-spinner>`
 		if (this.error)
 			return html`
 				<div class="error">
@@ -196,182 +130,48 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 					<p>${this.error.message}</p>
 				</div>
 			`
-		return html`
-			<p>
-				${this.__numResultsTemplate()}
-			</p>
-			<div id="result-list">
-				${this.resultsForDisplay.map(x => this.__resultItemTemplate(x))}
-			</div>
-		`
-	}
-
-	private __numResultsTemplate(): TemplateResult {
-		return html`
-			${pluralize('result', this.resultsForDisplay.length, true)}
-			${this.resultsForDisplay.length < this.searchResults.length
-				? html` (of ${this.searchResults.length}) `
-				: nothing}
-			for '${this.pattern}'
-		`
-	}
-
-	private __resultItemTemplate(item: ChannelWithTags): TemplateResult {
-		return html`
-			<wl-list-item class="hide-buttons-until-hover">
-				<div class="item-stuff" slot="after">
-					<daq-pill-list
-						selectable
-						.selected=${this.activeFilters.filter(x => item.tags.includes(x))}
-						.value=${item.tags}
-						@daq-pill-selected=${this.__itemTagSelected}
-						>${item.backend}</daq-pill-list
-					>
-					<mwc-icon-button
-						class="small"
-						icon="add"
-						@click=${() =>
-							this.dispatchEvent(
-								new CustomEvent('channel-select', {
-									detail: {
-										// remove item.tags
-										channel: { backend: item.backend, name: item.name },
-									},
-								})
-							)}
-						label="add channel to selection"
-					></mwc-icon-button>
-					<mwc-icon-button
-						class="small"
-						icon="show_chart"
-						@click=${() =>
-							this.dispatchEvent(
-								new CustomEvent('channel-plot-direct', {
-									detail: { channel: item },
-								})
-							)}
-						label="plot channel directly without selecting"
-					></mwc-icon-button>
-				</div>
-				<div class="channel-name">${item.name}</div>
-				<div class="channel-description">${item.description}</div>
-			</wl-list-item>
-		`
-	}
-
-	private __itemTagSelected(e: DaqPillSelectedEvent): void {
-		if (e.detail.selected) {
-			this.__filterList.selectItem(e.detail.value)
-		} else {
-			this.__filterList.deselectItem(e.detail.value)
-		}
-	}
-
-	private __selectedTemplate(): TemplateResult {
-		return html`
-			<div id="selected">
-				<h3>Selected</h3>
-				<div style="display:flex;margin-bottom:4px;align-items:center;">
-					<span style="flex-grow:1"
-						>Number: ${this.selectedChannels.length}</span
-					><mwc-button
-						icon="clear"
-						@click=${() =>
-							this.dispatchEvent(new CustomEvent('clear-selection'))}
-						.disabled=${this.selectedChannels.length === 0}
-						>Clear selection</mwc-button
-					>
-					<mwc-button
-						icon="show_chart"
-						raised
-						@click=${this.__plotSelected}
-						.disabled=${this.selectedChannels.length === 0}
-						>Plot selected</mwc-button
-					>
-				</div>
-				<div id="selected-list">
-					${this.selectedChannels.map(
-						(ch, idx) =>
-							html`
-								<wl-list-item class="hide-buttons-until-hover">
-									<span slot="after">
-										<mwc-icon-button
-											class="small"
-											icon="clear"
-											@click=${() =>
-												this.dispatchEvent(
-													new CustomEvent('channel-remove', {
-														detail: { index: idx },
-													})
-												)}
-										></mwc-icon-button>
-									</span>
-									${ch.backend}/${ch.name} DEFAULT
-								</wl-list-item>
-							`
-					)}
-				</div>
-			</div>
-		`
+		return html`<channel-search-result-list
+			.maxResults=${MAX_NUM_RESULTS}
+		></channel-search-result-list>`
 	}
 
 	static get styles(): CSSResultArray {
 		return [
-			// debugNesting,
+			baseStyles,
 			css`
 				:host {
-					display: flex;
-					flex-direction: column;
+					height: 100%;
+					overflow: hidden;
+					display: grid;
+					grid-template-columns: 100%;
+					grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr);
+					gap: 8px;
 					padding: 8px;
-					box-sizing: border-box;
-					height: 100vh;
 				}
 
-				#search-top {
+				#search {
+					grid-row: 1;
 					display: flex;
 					flex-direction: row;
 					flex-wrap: nowrap;
 					align-items: center;
 				}
 
-				#search-top mwc-textfield {
-					flex-grow: 1;
-					flex-shrink: 1;
+				#search mwc-textfield {
+					flex: 1 1 auto;
 				}
 
-				#search-top mwc-button {
+				#search mwc-button {
 					align-self: flex-end;
 					margin: auto 0 auto 8px;
 				}
 
 				#results {
-					flex-grow: 1;
-					overflow: hidden;
-					max-height: 50%;
-					display: flex;
-					flex-direction: column;
+					grid-row: 2;
 				}
-				#result-list {
-					border: 1px solid rgba(200, 200, 200, 0.3);
-					overflow-y: scroll;
-					flex-grow: 1;
-					flex-shrink: 1;
-				}
+
 				#selected {
-					flex-grow: 1;
-					overflow: hidden;
-					max-height: 50%;
-					display: flex;
-					flex-direction: column;
-				}
-				#selected mwc-button {
-					margin: auto 0 auto 8px;
-				}
-				#selected-list {
-					border: 1px solid rgba(200, 200, 200, 0.3);
-					overflow-y: scroll;
-					flex-grow: 1;
-					flex-shrink: 1;
+					grid-row: 3;
 				}
 
 				.error {
@@ -380,36 +180,6 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 					margin: 4px;
 					padding: 2rem;
 					background-color: rgba(255, 200, 200, 0.3);
-				}
-
-				.item-stuff {
-					display: flex;
-					align-items: center;
-				}
-
-				mwc-icon-button.small {
-					--mdc-icon-size: 16px;
-					--mdc-icon-button-size: 32px;
-				}
-
-				.hide-buttons-until-hover mwc-icon-button {
-					opacity: 0%;
-					margin-left: 8px;
-					transition-property: opacity;
-					transition-duration: 0.2s;
-				}
-
-				.hide-buttons-until-hover:hover mwc-icon-button {
-					opacity: 100%;
-					transition-property: opacity;
-					transition-duration: 0.4s;
-				}
-
-				.channel-name {
-					font-size: inherit;
-				}
-				.channel-description {
-					font-size: 75%;
 				}
 			`,
 		]
