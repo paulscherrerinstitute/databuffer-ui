@@ -20,10 +20,15 @@ I strongly recommend getting [nodejs] through [nvm], if possible.
 
 ### Building for production
 
-- Set `APP_VERSION` in the environment, e.g. `export APP_VERSION=9.12.3564-RC72.3-and-a-half`.
-- Run `npm build`.
-- Copy contents of `./public/` folder to web server.
-- **TODO**: Configuration needs to be picked up from environment on the web server. (See comment in `public/index.html`.)
+- Preview the release: `npm run release`
+- Create and tag the release: `npm run release:prod`
+- Create a packaged file for uploading to the web server: `./package-app.sh`
+- Copy the file to the web server and unpack it. **The configuration must be provided by the web server.** See notes in `./public/config/databuffer-ui.config.js`.
+
+### Deploying work in progress to beta
+
+- Create a packaged file for uploading to the web server: `./package-app.sh --skip-clean --skip-build`
+- Copy the file to the web server and unpack it. **The configuration must be provided by the web server.** See notes in `./public/config/databuffer-ui.config.js`.
 
 [nodejs]: https://nodejs.org/en/
 [nvm]: https://github.com/nvm-sh/nvm
