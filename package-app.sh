@@ -16,6 +16,7 @@ SCPDEST=""
 FLAG_FORCE=0
 FLAG_SUMMARY=0
 SKIP_CLEAN=0
+SKIP_MANUAL=0
 SKIP_TEST=0
 SKIP_BUILD=0
 SKIP_PACKAGE=0
@@ -32,6 +33,7 @@ skipped by an option:
   - Clean work area (i.e. clean caches and remove build outputs).
   - Run tests.
   - Run production build (i.e. minified).
+  - Create the online manual.
   - Create a package for deployment.
 
 
@@ -50,6 +52,9 @@ OPTIONS
                   Use this to package an existing development build.
 
   --skip-clean    Skip cleaning of work space.
+                  Use this to package an existing development build.
+
+  --skip-manual   Skip creating the online manual.
                   Use this to package an existing development build.
 
   --skip-package  Skip createing the package.
@@ -95,6 +100,9 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
     ;;
   --skip-clean )
     SKIP_CLEAN=1
+    ;;
+  --skip-manual )
+    SKIP_MANUAL=1
     ;;
   --skip-package )
     SKIP_PACKAGE=1
@@ -144,6 +152,14 @@ if [[ $SKIP_BUILD == 1 ]]; then
   echo "#         Skipping on user request..."
 else
 	npm run build || exit 1
+fi
+echo "#         Done."
+
+echo "## STEP:  BUILDING online manual"
+if [[ $SKIP_MANUAL == 1 ]]; then
+  echo "#         Skipping on user request..."
+else
+	pushd docs >/dev/null && mdbook build && popd >/dev/null || exit 1
 fi
 echo "#         Done."
 
