@@ -103,11 +103,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	mapEvents() {
 		return {
 			'draw-plot': (e: CustomEvent) =>
-				PlotActions.drawPlot(
-					e.detail.channels,
-					e.detail.startTime,
-					e.detail.endTime
-				),
+				PlotActions.drawPlot(e.detail.startTime, e.detail.endTime),
 		}
 	}
 
@@ -182,7 +178,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			composed: true,
 			bubbles: true,
 			detail: {
-				channels: this.channels,
 				startTime: this.startTime,
 				endTime: this.endTime,
 			},

@@ -21,9 +21,8 @@ export const PlotActions = {
 	setSelectedChannels: (channels: Channel[]) =>
 		createAction(PlotActionTypes.SET_SELECTED_CHANNELS, { channels }),
 
-	drawPlot: (channels: Channel[], startTime: number, endTime: number) =>
+	drawPlot: (startTime: number, endTime: number) =>
 		createAction(PlotActionTypes.DRAW_PLOT, {
-			channels,
 			startTime,
 			endTime,
 		}),

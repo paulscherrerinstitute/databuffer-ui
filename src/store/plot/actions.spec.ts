@@ -51,11 +51,10 @@ describe('PlotActions', () => {
 	})
 
 	it('should create DRAW_PLOT', () => {
-		const action = PlotActions.drawPlot(EXAMPLE_LIST_OF_CHANNELS, 100, 200)
+		const action = PlotActions.drawPlot(100, 200)
 		const expected = {
 			type: PlotActionTypes.DRAW_PLOT,
 			payload: {
-				channels: EXAMPLE_LIST_OF_CHANNELS,
 				startTime: 100,
 				endTime: 200,
 			},

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { call, put, select, takeLatest } from 'redux-saga/effects'
 import {
-	QueryRequest,
+	DataQuery,
 	EventField,
 	AggregationType,
 	AggregationOperation,
@@ -18,12 +18,11 @@ function* drawPlotListener() {
 }
 
 function* drawPlotSaga(action: ReturnType<typeof PlotActions.drawPlot>) {
-	const { channels } = action.payload
-
+	const channels = yield select(PlotSelectors.channels)
 	const start = yield select(PlotSelectors.startTime)
 	const end = yield select(PlotSelectors.endTime)
 
-	const options: QueryRequest = {
+	const options: DataQuery = {
 		channels,
 		range: {
 			startSeconds: start / 1000,
@@ -55,7 +54,7 @@ function* drawPlotSaga(action: ReturnType<typeof PlotActions.drawPlot>) {
 	}
 }
 
-async function queryData(options: QueryRequest) {
+async function queryData(options: DataQuery) {
 	const response = await queryRestApi.queryData(options)
 
 	return response
