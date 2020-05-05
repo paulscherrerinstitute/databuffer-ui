@@ -1,6 +1,7 @@
 import { LitElement, customElement, css, html, property } from 'lit-element'
-import 'weightless'
+import 'weightless/list-item'
 import '@material/mwc-icon-button'
+import '@psi/databuffer-web-components/daq-pill'
 
 @customElement('channel-search-selected-item')
 export class ChannelSearchSelectedItemElement extends LitElement {
@@ -9,6 +10,7 @@ export class ChannelSearchSelectedItemElement extends LitElement {
 
 	public render() {
 		return html`<wl-list-item class="hide-buttons-until-hover">
+			<daq-pill slot="after">${this.backend}</daq-pill>
 			<span slot="after">
 				<mwc-icon-button
 					class="small"
@@ -23,7 +25,7 @@ export class ChannelSearchSelectedItemElement extends LitElement {
 						)}
 				></mwc-icon-button>
 			</span>
-			${this.backend}/${this.name}
+			${this.name}
 		</wl-list-item>`
 	}
 
