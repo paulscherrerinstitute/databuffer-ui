@@ -59,7 +59,7 @@ export default (
 						yAxes: [
 							...state.yAxes,
 							{
-								title: channelToId(action.payload.channel),
+								title: action.payload.channel.name,
 								unit: '',
 								side: state.yAxes.length % 2 === 0 ? 'left' : 'right',
 							},
@@ -69,7 +69,7 @@ export default (
 							{
 								channelIndex: state.channels.length,
 								yAxisIndex: state.yAxes.length,
-								name: channelToId(action.payload.channel),
+								name: action.payload.channel.name,
 							},
 						],
 				  }
@@ -104,12 +104,12 @@ export default (
 				...state,
 				channels: action.payload.channels,
 				yAxes: action.payload.channels.map((ch, idx) => ({
-					title: channelToId(ch),
+					title: ch.name,
 					side: idx % 2 === 0 ? 'left' : 'right',
 					unit: '',
 				})),
 				dataSeries: action.payload.channels.map((ch, idx) => ({
-					name: channelToId(ch),
+					name: ch.name,
 					channelIndex: idx,
 					yAxisIndex: idx,
 				})),

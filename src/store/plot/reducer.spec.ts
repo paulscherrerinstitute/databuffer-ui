@@ -141,10 +141,13 @@ describe('plot reducer', () => {
 			expect(nextState.yAxes[3].side).to.equal('right')
 		})
 
-		it('should set the yAxes title to be the channel id', () => {
+		it('should set the yAxes title to be the channel name', () => {
 			for (let i = 0; i < nextState.yAxes.length; i++) {
 				const y = nextState.yAxes[i]
-				expect(y.title).to.equal(EXAMPLE_IDS[i], `title at index ${i} is wrong`)
+				expect(y.title).to.equal(
+					EXAMPLE_CHANNELS[i].name,
+					`title at index ${i} is wrong`
+				)
 			}
 		})
 
@@ -153,6 +156,23 @@ describe('plot reducer', () => {
 			expect(nextState.yAxes[1].unit).to.equal('')
 			expect(nextState.yAxes[2].unit).to.equal('')
 			expect(nextState.yAxes[3].unit).to.equal('')
+		})
+
+		it('should populate dataSeries', () => {
+			expect(nextState)
+				.to.have.property('dataSeries')
+				.be.an('array')
+				.of.length(4)
+		})
+
+		it('should set the dataSeries name to be the channel name', () => {
+			for (let i = 0; i < nextState.dataSeries.length; i++) {
+				const series = nextState.dataSeries[i]
+				expect(series.name).to.equal(
+					EXAMPLE_CHANNELS[i].name,
+					`name at index ${i} is wrong`
+				)
+			}
 		})
 	})
 
@@ -245,16 +265,16 @@ describe('plot reducer', () => {
 
 		it('should set yAxes', () => {
 			const expected: YAxis[] = [
-				{ title: EXAMPLE_IDS[0], unit: '', side: 'left' },
-				{ title: EXAMPLE_IDS[2], unit: '', side: 'right' },
+				{ title: EXAMPLE_CHANNELS[0].name, unit: '', side: 'left' },
+				{ title: EXAMPLE_CHANNELS[2].name, unit: '', side: 'right' },
 			]
 			expect(nextState.yAxes).to.deep.equal(expected)
 		})
 
 		it('should set dataSeries', () => {
 			const expected: DataSeries[] = [
-				{ name: EXAMPLE_IDS[0], channelIndex: 0, yAxisIndex: 0 },
-				{ name: EXAMPLE_IDS[2], channelIndex: 1, yAxisIndex: 1 },
+				{ name: EXAMPLE_CHANNELS[0].name, channelIndex: 0, yAxisIndex: 0 },
+				{ name: EXAMPLE_CHANNELS[2].name, channelIndex: 1, yAxisIndex: 1 },
 			]
 			expect(nextState.dataSeries).to.deep.equal(expected)
 		})
