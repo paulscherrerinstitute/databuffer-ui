@@ -20,7 +20,7 @@ import {
 
 @customElement('view-home')
 export class HomeElement extends connect(store, LitElement) {
-	@property({ type: String })
+	@property({ attribute: false })
 	pattern: string = ''
 
 	@query('#query')

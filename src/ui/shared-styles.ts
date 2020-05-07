@@ -23,6 +23,7 @@ export const debugNesting = css`
 
 export const baseStyles = css`
 	:host {
+		display: block;
 		box-sizing: border-box;
 		margin: 0;
 		padding: 0;

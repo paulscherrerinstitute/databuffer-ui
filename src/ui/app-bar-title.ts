@@ -7,15 +7,14 @@ import {
 	css,
 	PropertyValues,
 } from 'lit-element'
-import { unsafeHTML } from 'lit-html/directives/unsafe-html'
 import { connect } from '@captaincodeman/redux-connect-element'
 import { store, RootState, RoutingSelectors } from '../store'
 import { baseStyles } from './shared-styles'
 
-@customElement('app-router')
-export class AppRouterElement extends connect(store, LitElement) {
-	@property({ type: String }) pathname: string
-	@property({ type: String }) view: string
+@customElement('app-bar-title')
+export class AppBarTitleElement extends connect(store, LitElement) {
+	@property({ attribute: false }) pathname: string
+	@property({ attribute: false }) title: string
 
 	mapState(state: RootState) {
 		return {
@@ -33,15 +32,15 @@ export class AppRouterElement extends connect(store, LitElement) {
 	private routes = [
 		{
 			path: '/',
-			action: () => `<view-home></view-home>`,
+			action: () => `Databuffer UI`,
 		},
 		{
 			path: '/search',
-			action: () => `<view-channel-search></view-channel-search>`,
+			action: () => `Search`,
 		},
 		{
 			path: '/plot',
-			action: () => `<view-standard-plot></view-standard-plot>`,
+			action: () => `Plot`,
 		},
 	]
 
@@ -49,25 +48,21 @@ export class AppRouterElement extends connect(store, LitElement) {
 		if (changedProperties.has('pathname')) {
 			this.router
 				.resolve(this.pathname)
-				.then(html => (this.view = html))
-				.catch(error => (this.view = `<view-error>${error}</view-error>`))
+				.then(title => {
+					this.title = title
+				})
+				.catch(() => {
+					this.title = `Databuffer UI`
+				})
 		}
-		return changedProperties.has('view')
+		return changedProperties.has('title')
 	}
 
 	render() {
-		return html`${unsafeHTML(this.view)}`
+		return this.title
 	}
 
 	static get styles() {
-		return [
-			baseStyles,
-			css`
-				:host {
-					/* mwc-top-app-bar-fixed[dense] is 48px tall */
-					height: calc(100vh - 48px);
-				}
-			`,
-		]
+		return [baseStyles]
 	}
 }

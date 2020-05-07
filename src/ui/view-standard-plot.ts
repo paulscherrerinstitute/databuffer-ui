@@ -8,7 +8,6 @@ import {
 	CSSResult,
 	TemplateResult,
 } from 'lit-element'
-import { connect } from '@captaincodeman/redux-connect-element'
 
 import Highcharts from 'highcharts'
 import 'weightless/card'
@@ -28,12 +27,14 @@ import '@material/mwc-snackbar'
 import { Snackbar } from '@material/mwc-snackbar'
 
 import { formatDate } from '../util'
-import { store, RootState } from '../store'
+import { RootState, RoutingActions, store } from '../store'
 import { Channel, PlotActions, PlotSelectors } from '../store/plot/'
 import { channelToId } from '@psi/databuffer-query-js/channel'
 
 import * as datefns from 'date-fns'
 import type { DataResponse } from '../api/queryrest'
+import { baseStyles } from './shared-styles'
+import { connect } from '@captaincodeman/redux-connect-element'
 
 const TIMESTAMP_PATTERN = `^\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}\\.\\d{3}$`
 const TIMESTAMP_REGEX = new RegExp(TIMESTAMP_PATTERN)
@@ -107,6 +108,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				PlotActions.startTimeChange(e.detail.startTime),
 			'end-time-change': (e: CustomEvent<{ endTime: number }>) =>
 				PlotActions.endTimeChange(e.detail.endTime),
+			'nav-back': () => RoutingActions.push('/search'),
 		}
 	}
 
@@ -392,65 +394,68 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		`
 	}
 
-	static get styles(): CSSResult {
-		return css`
-			:host {
-				height: 100vh;
-				padding: 8px;
-				display: flex;
-				flex-direction: column;
-			}
-			#queryrange {
-				order: 0;
-				flex-grow: 0;
-				display: flex;
-				align-items: center;
-			}
-			#queryrange * {
-				margin-right: 8px;
-			}
-			#starttime,
-			#endtime {
-				flex-grow: 1;
-			}
-			#buttons {
-				margin: 8px 0;
-				display: inline;
-			}
-			wl-progress-spinner {
-				width: 5rem;
-				height: 5rem;
-				margin: 8px auto;
-			}
-			wl-progress-spinner[hidden] {
-				display: none;
-			}
-			wl-card[hidden] {
-				display: none;
-			}
-			#chart {
-				margin: 8px 0;
-			}
-			#meta {
-				flex-grow: 0;
-			}
-			#meta:empty {
-				display: none;
-			}
-			#chart {
-				flex-grow: 1;
-			}
-			#quickdial {
-				max-height: 80vh;
-				--list-item-border-radius: 0;
-			}
-			.error {
-				border: 2px solid rgba(127, 0, 0, 1);
-				border-radius: 4px;
-				margin: 4px;
-				padding: 2rem;
-				background-color: rgba(255, 200, 200, 0.3);
-			}
-		`
+	static get styles() {
+		return [
+			baseStyles,
+			css`
+				:host {
+					height: 100%;
+					padding: 8px;
+					display: flex;
+					flex-direction: column;
+				}
+				#queryrange {
+					order: 0;
+					flex-grow: 0;
+					display: flex;
+					align-items: center;
+				}
+				#queryrange * {
+					margin-right: 8px;
+				}
+				#starttime,
+				#endtime {
+					flex-grow: 1;
+				}
+				#buttons {
+					margin: 8px 0;
+					display: inline;
+				}
+				wl-progress-spinner {
+					width: 5rem;
+					height: 5rem;
+					margin: 8px auto;
+				}
+				wl-progress-spinner[hidden] {
+					display: none;
+				}
+				wl-card[hidden] {
+					display: none;
+				}
+				#chart {
+					margin: 8px 0;
+				}
+				#meta {
+					flex-grow: 0;
+				}
+				#meta:empty {
+					display: none;
+				}
+				#chart {
+					flex-grow: 1;
+				}
+				#quickdial {
+					max-height: 80vh;
+					--list-item-border-radius: 0;
+				}
+				.error {
+					border: 2px solid rgba(127, 0, 0, 1);
+					border-radius: 4px;
+					margin: 4px;
+					padding: 2rem;
+					background-color: rgba(255, 200, 200, 0.3);
+				}
+			`,
+		]
 	}
 }

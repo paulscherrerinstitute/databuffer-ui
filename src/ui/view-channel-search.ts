@@ -7,7 +7,6 @@ import {
 	query,
 	CSSResultArray,
 } from 'lit-element'
-import { connect } from '@captaincodeman/redux-connect-element'
 
 import 'weightless/expansion'
 import 'weightless/progress-spinner'
@@ -18,17 +17,18 @@ import type { Snackbar } from '@material/mwc-snackbar'
 import '@material/mwc-textfield'
 import type { TextField } from '@material/mwc-textfield'
 
-import { store, RootState } from '../store'
 import {
 	ChannelSearchSelectors,
 	ChannelSearchActions,
 } from '../store/channelsearch'
+import { RootState, RoutingActions, store } from '../store'
 import type { ChannelWithTags } from '../store/channelsearch'
 import { TemplateResult } from 'lit-html'
 
 import './channel-search-result-list'
 import './channel-search-selected-list'
 import { baseStyles } from './shared-styles'
+import { connect } from '@captaincodeman/redux-connect-element'
 
 const MAX_NUM_RESULTS = 100
 
@@ -59,6 +59,7 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 			'pattern-change': (e: CustomEvent) =>
 				ChannelSearchActions.patternChange(e.detail.pattern),
 			'search-click': () => ChannelSearchActions.searchChannel(),
+			'nav-back': () => RoutingActions.push('/'),
 		}
 	}
 
