@@ -1,5 +1,15 @@
 # Working with Regular Expressions
 
+<div style="padding:1em;border-color:var(--fg);border-width:4px;border-radius:8px;border-style:solid;">
+
+<p style="font-size:150%;font-weight:bold;text-align:center;">⚠️ WORK IN PROGRESS ⚠️</p>
+
+Please note, that this manual, just like version 4 of _databuffer UI_ itself, is still a work in progress.
+
+You'll find lots of places where the manual is yet incomplete, or only holds placeholder content.
+
+</div>
+
 Regular expressions are a way of describing one or more string values using some rules. Many associate regular expressions with the [Perl programming language](https://www.perl.org/), but many programming languages provide means to create and use regular expressions.
 
 ## Implementation specifics

@@ -8,6 +8,8 @@ This is the online manual for _databuffer UI_ version 4.
 
 Please note, that this manual, just like version 4 of _databuffer UI_ itself, is still a work in progress.
 
+You'll find lots of places where the manual is yet incomplete, or only holds placeholder content.
+
 </div>
 
 For your orientation the manual is broken down into these parts:
