@@ -1,4 +1,4 @@
-# Working with Query Strings
+# Working with URL Query Strings
 
 With HTTP there are two ways to pass information to a URL endpoint: One is in the payload (or "body") of a HTTP request, another is in the _query string_. Not all types of HTTP requests can use both methods, i.e. HTTP requests using the _GET method_ have no payload and can hence only use query strings.
 
