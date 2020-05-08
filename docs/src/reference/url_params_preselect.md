@@ -1,8 +1,6 @@
 # URL parameters for `/preselect`
 
-You can start databuffer UI with a preconfigured plot using the `/preselect` URL. You'll need to specify channels and other information in the [query string](https://en.wikipedia.org/wiki/Query_string).
-
-**Note that values in the query string need to be URI encoded correctly!** See [working with query strings](../topics/query_strings.md) for details.
+You can start _databuffer UI_ with a preconfigured plot using the `/preselect` URL. You'll need to specify all the configuration (i.e. which channels to plot and what time range) using the query string part of the URL. If you are not familiar with URL query strings and URL encoding values, you can read about it in the topic guide on [working with URL query strings](../topics/query_strings.md).
 
 Parameters are listed in alphabetical order.
 
@@ -23,7 +21,7 @@ Duration of the plot in **milliseconds**.
 
 Setting duration will will implicitly set [endTime](#endTime) to "now" and calculate [startTime](#startTime) by subtracting duration from [endTime](#endTime).
 
-**Note:** You **can't mix** the duration and [startTime](#startTime) or [endTime](#endTime) parameters. If parameters [startTime](#startTime) or [endTime](#endTime) are present, they will **take precedence**.
+**Note:** You **shouldn't mix** the duration and [startTime](#startTime) or [endTime](#endTime) parameters. If parameters [startTime](#startTime) or [endTime](#endTime) are present, they will **take precedence** and override the values calculated from duration.
 
 Examples:
 
@@ -37,7 +35,7 @@ Examples:
 End time of the plot as an absolute timestamp in one of those formats:
 
 - A **number value** defining the **milliseconds** elapsed since `1970-01-01T00:00:00.000Z` (UTC).
-- A **string value** holding a **ISO8601 compliant time string**, e.g. `2020-04-28T12:10:32.048+02:00`.
+- A **string value** holding a **ISO8601 time string**, e.g. `2020-04-28T12:10:32.048+02:00`.
 
 Examples:
 
@@ -51,6 +49,6 @@ Examples:
 Start time of the plot as an absolute timestamp in one of those formats:
 
 - A **number value** defining the **milliseconds** elapsed since `1970-01-01T00:00:00.000Z` (UTC).
-- A **string value** holding a **ISO8601 compliant time string**, e.g. `2020-04-28T12:10:32.048+02:00`.
+- A **string value** holding a **ISO8601 time string**, e.g. `2020-04-28T12:10:32.048+02:00`.
 
 Examples: See [endTime](#endtime).
