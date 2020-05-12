@@ -1,0 +1,41 @@
+:root {
+	/*
+	 * Databuffer UI color scheme
+	 *
+	 * Primary color: hsl(202, 100%, 30%) --> #006199
+	 * Secondary color: hsl(22, 100%, 60%) --> #ff7e33
+	 *
+	 * Variants -light and -dark obtained through material color tool:
+	 * https://material.io/resources/color/#!/?view.left=1&view.right=1&primary.color=006199&secondary.color=ff7e33
+	 *
+	 * --dui-primary-darkest obtained by converting --dui-primary-dark to HSL and setting L=10%
+	 */
+	--dui-primary-hue: 202;
+	--dui-secondary-hue: 22;
+
+	--dui-primary: hsl(var(--dui-primary-hue), 100%, 30%);
+	--dui-on-primary: #ffffff;
+	--dui-primary-light: #4e8eca;
+	--dui-on-primary-light: #000000;
+	--dui-primary-dark: #00386a;
+	--dui-on-primary-dark: #ffffff;
+	--dui-primary-darkest: #001a33;
+	--dui-on-primary-darkest: #ffffff;
+
+	--dui-secondary: hsl(var(--dui-secondary-hue), 100%, 60%);
+	--dui-on-secondary: #000000;
+	--dui-secondary-light: #ffaf62;
+	--dui-on-secondary-light: #000000;
+	--dui-secondary-dark: #c64f00;
+	--dui-on-secondary-dark: #ffffff;
+
+	/* mapping databuffer ui styles to material design */
+	--mdc-theme-primary: var(--dui-primary);
+	--mdc-theme-on-primary: var(--dui-on-primary);
+	--mdc-theme-secondary: var(--dui-secondary);
+	--mdc-theme-on-secondary: var(--dui-on-secondary);
+
+	/* mapping databuffer ui styles to weightless components */
+	--primary-hue: var(--dui-primary-hue);
+	--secondary-hue: var(--dui-secondary-hue);
+}
