@@ -69,7 +69,7 @@ export class HomeElement extends connect(store, LitElement) {
 			</div>
 			<div id="bottom">
 				<div id="footer" class="limit-width">
-					<mwc-icon>info_outline</mwc-icon>
+					<mwc-icon>info</mwc-icon>
 					<span>
 						This is databuffer UI APP_VERSION_STRING.
 						<a
