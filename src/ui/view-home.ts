@@ -87,6 +87,13 @@ export class HomeElement extends connect(store, LitElement) {
 						>
 						for details about this version.
 					</span>
+					<mwc-icon>help</mwc-icon>
+					<span>
+						If you are looking for instructions, have a look at the
+						<a target="_blank" href="./online-manual/index.html"
+							>online manual</a
+						>.
+					</span>
 					<mwc-icon>feedback</mwc-icon>
 					<span>
 						You can report issues or give feedback
