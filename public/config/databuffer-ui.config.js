@@ -22,8 +22,8 @@
 //
 ////////////////////////////////////////////////////////////////////////
 window.DatabufferUi = {
-	QUERY_API: 'https://localhost:8080',
-	DISPATCHER_API: 'https://localhost:8081',
+	QUERY_API: 'http://localhost:8080',
+	DISPATCHER_API: 'http://localhost:8081',
 }
 
 // ----8<--------8<--------8<--------8<--------8<--------8<--------8<----
