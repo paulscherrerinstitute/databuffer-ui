@@ -7,6 +7,9 @@ export enum PlotActionTypes {
 	UNSELECT_CHANNEL = 'daq-web-ui-app/UNSELECT_CHANNEL',
 	SET_SELECTED_CHANNELS = 'daq-web-ui-app/SET_SELECTED_CHANNELS',
 
+	START_TIME_CHANGE = 'daq-web-ui-app/START_TIME_CHANGE',
+	END_TIME_CHANGE = 'daq-web-ui-app/END_TIME_CHANGE',
+
 	DRAW_PLOT = 'daq-web-ui-app/DRAW_PLOT',
 	DRAW_PLOT_REQUEST = 'daq-web-ui-app/DRAW_PLOT_REQUEST',
 	DRAW_PLOT_SUCCESS = 'daq-web-ui-app/DRAW_PLOT_SUCCESS',
@@ -21,11 +24,12 @@ export const PlotActions = {
 	setSelectedChannels: (channels: Channel[]) =>
 		createAction(PlotActionTypes.SET_SELECTED_CHANNELS, { channels }),
 
-	drawPlot: (startTime: number, endTime: number) =>
-		createAction(PlotActionTypes.DRAW_PLOT, {
-			startTime,
-			endTime,
-		}),
+	startTimeChange: (startTime: number) =>
+		createAction(PlotActionTypes.START_TIME_CHANGE, { startTime }),
+	endTimeChange: (endTime: number) =>
+		createAction(PlotActionTypes.END_TIME_CHANGE, { endTime }),
+
+	drawPlot: () => createAction(PlotActionTypes.DRAW_PLOT),
 	drawPlotRequest: (timestamp: number) =>
 		createAction(PlotActionTypes.DRAW_PLOT_REQUEST, { timestamp }),
 	drawPlotSuccess: (timestamp: number, response: DataResponse) =>

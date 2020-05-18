@@ -55,6 +55,8 @@ export function* plotPreselectRoute(params, queries) {
 		channels.push(idToChannel(queries[paramName]))
 	}
 	yield put(PlotActions.setSelectedChannels(channels))
-	yield put(PlotActions.drawPlot(startTime, endTime))
+	yield put(PlotActions.endTimeChange(endTime))
+	yield put(PlotActions.startTimeChange(startTime))
+	yield put(PlotActions.drawPlot())
 	yield put(RoutingActions.replace('/plot'))
 }

@@ -2,7 +2,7 @@ import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import { plotPreselectRoute } from './routes'
 import { put, PutEffect } from 'redux-saga/effects'
-import { PlotActions, Channel, PlotActionTypes } from '../plot'
+import { PlotActions, Channel } from '../plot'
 import { channelToId } from '@psi/databuffer-query-js/channel'
 import { RoutingActions } from './actions'
 import { parseISO } from 'date-fns'
@@ -16,7 +16,12 @@ describe('routing routes sagas', () => {
 		// proximity (using .closeto).
 		// Otherwise the tests may be brittle, i.e. they may fail sometimes because
 		// of tiny differences in what `Date.now()` returns.
-		type DrawPlotEffect = PutEffect<ReturnType<typeof PlotActions.drawPlot>>
+		type StartTimeChangeEffect = PutEffect<
+			ReturnType<typeof PlotActions.startTimeChange>
+		>
+		type EndTimeChangeEffect = PutEffect<
+			ReturnType<typeof PlotActions.endTimeChange>
+		>
 
 		it('does the right steps with the right defaults', () => {
 			const gen = plotPreselectRoute(null, {})
@@ -24,21 +29,25 @@ describe('routing routes sagas', () => {
 				put(PlotActions.setSelectedChannels([]))
 			)
 
-			// step 2: draw plot
-			const step2 = gen.next().value as DrawPlotEffect
+			// step 2: set end time
+			const step2 = gen.next().value as EndTimeChangeEffect
 			expect(step2.payload.action.payload.endTime).to.be.closeTo(
 				Date.now(),
 				100
 			)
-			expect(step2.payload.action.payload.startTime).to.be.closeTo(
+			// step 3: set start time
+			const step3 = gen.next().value as StartTimeChangeEffect
+			expect(step3.payload.action.payload.startTime).to.be.closeTo(
 				Date.now() - 12 * 60 * 60 * 1000,
 				100
 			)
-			// step 3: set new route
+			// step 4: draw plot
+			expect(gen.next().value).to.deep.equal(put(PlotActions.drawPlot()))
+			// step 5: set new route
 			expect(gen.next().value).to.deep.equal(
 				put(RoutingActions.replace('/plot'))
 			)
-			// step 4: none. we must be done.
+			// step 6: none. we must be done.
 			expect(gen.next().done).to.be.true
 		})
 
@@ -107,42 +116,59 @@ describe('routing routes sagas', () => {
 			)
 		})
 
-		it('reads parameter startTime and endTime as ISO strings', () => {
+		it('reads parameter endTime as ISO string', () => {
 			const queryParams = {
-				startTime: '2020-05-04T11:07:45.123+02:00',
 				endTime: '2020-05-04T12:07:45.234+02:00',
 			}
-			const expectedStartTime = parseISO(queryParams.startTime).getTime()
 			const expectedEndTime = parseISO(queryParams.endTime).getTime()
 			const gen = plotPreselectRoute(null, queryParams)
 			gen.next().value // skip step1
-			const effect = gen.next().value as DrawPlotEffect
-			expect(effect.payload.action.payload.startTime).to.be.closeTo(
-				expectedStartTime,
-				100
-			)
+			const effect = gen.next().value as EndTimeChangeEffect
 			expect(effect.payload.action.payload.endTime).to.be.closeTo(
 				expectedEndTime,
 				100
 			)
 		})
 
-		it('reads parameter startTime and endTime as milliseconds', () => {
+		it('reads parameter startTime as ISO string', () => {
 			const queryParams = {
-				startTime: 100000,
-				endTime: 200000,
+				startTime: '2020-05-04T11:07:45.123+02:00',
 			}
-			const expectedStartTime = 100000
-			const expectedEndTime = 200000
+			const expectedStartTime = parseISO(queryParams.startTime).getTime()
 			const gen = plotPreselectRoute(null, queryParams)
 			gen.next().value // skip step1
-			const effect = gen.next().value as DrawPlotEffect
+			gen.next().value // skip step2
+			const effect = gen.next().value as StartTimeChangeEffect
 			expect(effect.payload.action.payload.startTime).to.be.closeTo(
 				expectedStartTime,
 				100
 			)
+		})
+
+		it('reads parameter endTime as milliseconds', () => {
+			const queryParams = {
+				endTime: 200000,
+			}
+			const expectedEndTime = 200000
+			const gen = plotPreselectRoute(null, queryParams)
+			gen.next().value // skip step1
+			const effect = gen.next().value as EndTimeChangeEffect
 			expect(effect.payload.action.payload.endTime).to.be.closeTo(
 				expectedEndTime,
+				100
+			)
+		})
+		it('reads parameter startTime as milliseconds', () => {
+			const queryParams = {
+				startTime: 100000,
+			}
+			const expectedStartTime = 100000
+			const gen = plotPreselectRoute(null, queryParams)
+			gen.next().value // skip step1
+			gen.next().value // skip step2
+			const effect = gen.next().value as StartTimeChangeEffect
+			expect(effect.payload.action.payload.startTime).to.be.closeTo(
+				expectedStartTime,
 				100
 			)
 		})
@@ -156,13 +182,14 @@ describe('routing routes sagas', () => {
 			const expectedStartTime = expectedEndTime - duration
 			const gen = plotPreselectRoute(null, queryParams)
 			gen.next().value // skip step1
-			const effect = gen.next().value as DrawPlotEffect
-			expect(effect.payload.action.payload.startTime).to.be.closeTo(
-				expectedStartTime,
+			const effect1 = gen.next().value as EndTimeChangeEffect
+			const effect2 = gen.next().value as StartTimeChangeEffect
+			expect(effect1.payload.action.payload.endTime).to.be.closeTo(
+				expectedEndTime,
 				100
 			)
-			expect(effect.payload.action.payload.endTime).to.be.closeTo(
-				expectedEndTime,
+			expect(effect2.payload.action.payload.startTime).to.be.closeTo(
+				expectedStartTime,
 				100
 			)
 		})
@@ -175,7 +202,8 @@ describe('routing routes sagas', () => {
 			const expectedStartTime = 100000
 			const gen = plotPreselectRoute(null, queryParams)
 			gen.next().value // skip step1
-			const effect = gen.next().value as DrawPlotEffect
+			gen.next().value // skip step2
+			const effect = gen.next().value as StartTimeChangeEffect
 			expect(effect.payload.action.payload.startTime).to.be.closeTo(
 				expectedStartTime,
 				100
@@ -190,7 +218,7 @@ describe('routing routes sagas', () => {
 			const expectedEndTime = 200000 // not Date.now()
 			const gen = plotPreselectRoute(null, queryParams)
 			gen.next().value // skip step1
-			const effect = gen.next().value as DrawPlotEffect
+			const effect = gen.next().value as EndTimeChangeEffect
 			expect(effect.payload.action.payload.endTime).to.be.closeTo(
 				expectedEndTime,
 				100

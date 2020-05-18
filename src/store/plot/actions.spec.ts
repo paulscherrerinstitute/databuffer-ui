@@ -50,14 +50,32 @@ describe('PlotActions', () => {
 		expect(action).to.deep.equal(expected)
 	})
 
+	it('should create START_TIME_CHANGE', () => {
+		const action = PlotActions.startTimeChange(12345)
+		const expected = {
+			type: PlotActionTypes.START_TIME_CHANGE,
+			payload: {
+				startTime: 12345,
+			},
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
+	it('should create END_TIME_CHANGE', () => {
+		const action = PlotActions.endTimeChange(12345)
+		const expected = {
+			type: PlotActionTypes.END_TIME_CHANGE,
+			payload: {
+				endTime: 12345,
+			},
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
 	it('should create DRAW_PLOT', () => {
-		const action = PlotActions.drawPlot(100, 200)
+		const action = PlotActions.drawPlot()
 		const expected = {
 			type: PlotActionTypes.DRAW_PLOT,
-			payload: {
-				startTime: 100,
-				endTime: 200,
-			},
 		}
 		expect(action).to.deep.equal(expected)
 	})

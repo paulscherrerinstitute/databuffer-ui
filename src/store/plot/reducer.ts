@@ -115,10 +115,15 @@ export default (
 				})),
 			}
 
-		case PlotActionTypes.DRAW_PLOT:
+		case PlotActionTypes.START_TIME_CHANGE:
 			return {
 				...state,
 				startTime: action.payload.startTime,
+			}
+
+		case PlotActionTypes.END_TIME_CHANGE:
+			return {
+				...state,
 				endTime: action.payload.endTime,
 			}
 

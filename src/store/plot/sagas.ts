@@ -17,7 +17,7 @@ function* drawPlotListener() {
 	yield takeLatest(PlotActionTypes.DRAW_PLOT, drawPlotSaga)
 }
 
-function* drawPlotSaga(action: ReturnType<typeof PlotActions.drawPlot>) {
+function* drawPlotSaga() {
 	const channels = yield select(PlotSelectors.channels)
 	const start = yield select(PlotSelectors.startTime)
 	const end = yield select(PlotSelectors.endTime)

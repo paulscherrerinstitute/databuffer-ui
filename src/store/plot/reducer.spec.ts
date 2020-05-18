@@ -280,12 +280,20 @@ describe('plot reducer', () => {
 		})
 	})
 
-	describe('on action of type DRAW_PLOT', () => {
-		it('should set startTime and endTime', () => {
+	describe('on action of type START_TIME_CHANGE', () => {
+		it('should set startTime', () => {
 			const previousState = { ...initialState }
-			const action = PlotActions.drawPlot(12345, 54321)
+			const action = PlotActions.startTimeChange(12345)
 			const nextState = reducer(previousState, action)
 			expect(nextState.startTime).to.equal(12345)
+		})
+	})
+
+	describe('on action of type END_TIME_CHANGE', () => {
+		it('should set endTime', () => {
+			const previousState = { ...initialState }
+			const action = PlotActions.endTimeChange(54321)
+			const nextState = reducer(previousState, action)
 			expect(nextState.endTime).to.equal(54321)
 		})
 	})

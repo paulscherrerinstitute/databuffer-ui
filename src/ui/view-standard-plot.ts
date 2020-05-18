@@ -102,8 +102,11 @@ export class StandardPlotElement extends connect(store, LitElement) {
 
 	mapEvents() {
 		return {
-			'draw-plot': (e: CustomEvent) =>
-				PlotActions.drawPlot(e.detail.startTime, e.detail.endTime),
+			'draw-plot': () => PlotActions.drawPlot(),
+			'start-time-change': (e: CustomEvent<{ startTime: number }>) =>
+				PlotActions.startTimeChange(e.detail.startTime),
+			'end-time-change': (e: CustomEvent<{ endTime: number }>) =>
+				PlotActions.endTimeChange(e.detail.endTime),
 		}
 	}
 
@@ -161,9 +164,19 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	}
 
 	private __quickDialClicked(e: Event) {
-		this.endTime = Date.now()
-		this.startTime =
-			this.endTime - 1000 * Number.parseInt((e.target as ListItem).value)
+		const t = Date.now()
+		this.dispatchEvent(
+			new CustomEvent<{ endTime: number }>('end-time-change', {
+				detail: { endTime: t },
+			})
+		)
+		this.dispatchEvent(
+			new CustomEvent<{ startTime: number }>('start-time-change', {
+				detail: {
+					startTime: t - 1000 * Number.parseInt((e.target as ListItem).value),
+				},
+			})
+		)
 	}
 
 	private __quickDialToday() {
@@ -194,7 +207,11 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			this.canPlot = false
 			return
 		}
-		this.startTime = d
+		this.dispatchEvent(
+			new CustomEvent<{ startTime: number }>('start-time-change', {
+				detail: { startTime: d },
+			})
+		)
 	}
 
 	private __onEndTimeChanged(e: Event) {
@@ -206,7 +223,11 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			this.canPlot = false
 			return
 		}
-		this.endTime = d
+		this.dispatchEvent(
+			new CustomEvent<{ endTime: number }>('end-time-change', {
+				detail: { endTime: d },
+			})
+		)
 	}
 
 	render() {
