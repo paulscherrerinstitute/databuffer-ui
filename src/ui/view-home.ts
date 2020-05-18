@@ -11,9 +11,12 @@ import '@material/mwc-button'
 import '@material/mwc-textfield'
 import { TextField } from '@material/mwc-textfield'
 
-import { store, RootState, RoutingActions } from '../store'
+import { store, RootState } from '../store'
 
-import { ChannelSearchSelectors } from '../store/channelsearch'
+import {
+	ChannelSearchSelectors,
+	ChannelSearchActions,
+} from '../store/channelsearch'
 
 @customElement('view-home')
 export class HomeElement extends connect(store, LitElement) {
@@ -31,10 +34,9 @@ export class HomeElement extends connect(store, LitElement) {
 
 	mapEvents() {
 		return {
-			'search-click': (e: CustomEvent) =>
-				RoutingActions.push(
-					`/search?q=${encodeURIComponent(e.detail.pattern)}`
-				),
+			'search-click': () => ChannelSearchActions.searchChannel(),
+			'pattern-change': (e: CustomEvent<{ pattern: string }>) =>
+				ChannelSearchActions.patternChange(e.detail.pattern),
 		}
 	}
 
@@ -57,6 +59,12 @@ export class HomeElement extends connect(store, LitElement) {
 						id="query"
 						label="Search for EPICS channels"
 						helper="Search supports regular expressions"
+						@change=${() =>
+							this.dispatchEvent(
+								new CustomEvent('pattern-change', {
+									detail: { pattern: this.__query.value },
+								})
+							)}
 						@keyup=${(e: KeyboardEvent): void => {
 							if (e.key === 'Enter') this.__search()
 						}}
@@ -98,9 +106,7 @@ export class HomeElement extends connect(store, LitElement) {
 
 	private __search(): void {
 		if (!this.__query.value) return
-		const e = new CustomEvent('search-click', {
-			detail: { pattern: this.__query.value },
-		})
+		const e = new CustomEvent('search-click')
 		this.dispatchEvent(e)
 	}
 

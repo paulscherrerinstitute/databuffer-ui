@@ -24,12 +24,10 @@ const EXAMPLE_CHANNELS = {
 }
 const EXAMPLE_IDS = Object.keys(EXAMPLE_CHANNELS).sort()
 const EXAMPLE_PATTERN = 'abc'
-const EXAMPLE_ACTION_CHANNEL_SEARCH = ChannelSearchActions.searchChannel(
+const EXAMPLE_ACTION_PATTERN_CHANGE = ChannelSearchActions.patternChange(
 	EXAMPLE_PATTERN
 )
-const EXAMPLE_ACTION_CHANNEL_SEARCH_REQUEST = ChannelSearchActions.searchChannelRequest(
-	'abc'
-)
+const EXAMPLE_ACTION_CHANNEL_SEARCH_REQUEST = ChannelSearchActions.searchChannelRequest()
 const EXAMPLE_ACTION_CHANNEL_SEARCH_FAILURE = ChannelSearchActions.searchChannelFailure(
 	EXAMPLE_ERROR
 )
@@ -59,13 +57,13 @@ describe('channelsearch reducer', () => {
 		})
 	})
 
-	describe('on action of type CHANNEL_SEARCH', () => {
+	describe('on action of type PATTERN_CHANGE', () => {
 		it('should set pattern', () => {
 			const previousState = {
 				...initialState,
 				pattern: '',
 			}
-			const action = EXAMPLE_ACTION_CHANNEL_SEARCH
+			const action = EXAMPLE_ACTION_PATTERN_CHANGE
 			const nextState = reducer(previousState, action)
 			expect(nextState).to.have.own.property('pattern', EXAMPLE_PATTERN)
 		})

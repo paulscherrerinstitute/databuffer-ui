@@ -6,6 +6,8 @@ import { channelToId } from '@psi/databuffer-query-js/channel'
 
 import { queryRestApi } from '../../api/queryrest'
 import type { ChannelConfigsQuery } from '@psi/databuffer-query-js'
+import { RoutingActions, RoutingSelectors } from '../routing'
+import { current } from '../routing/selectors'
 
 export default [searchChannelListener]
 
@@ -13,10 +15,8 @@ function* searchChannelListener() {
 	yield takeLatest(ChannelTypes.CHANNEL_SEARCH, channelSearchSaga)
 }
 
-function* channelSearchSaga(
-	action: ReturnType<typeof ChannelSearchActions.searchChannel>
-) {
-	const { pattern } = action.payload
+function* channelSearchSaga() {
+	const pattern = yield select(ChannelSearchSelectors.pattern)
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const backends = yield select(ChannelSearchSelectors.selectedBackends)
 
@@ -25,7 +25,11 @@ function* channelSearchSaga(
 		// backends,
 	}
 
-	yield put(ChannelSearchActions.searchChannelRequest(pattern))
+	const currentView = yield select(RoutingSelectors.pathname)
+	if (currentView !== '/search') {
+		yield put(RoutingActions.push('/search'))
+	}
+	yield put(ChannelSearchActions.searchChannelRequest())
 	try {
 		const { ids, entities } = yield call(searchChannel, query)
 		yield put(ChannelSearchActions.searchChannelSuccess(ids, entities))

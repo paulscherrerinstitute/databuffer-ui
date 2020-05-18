@@ -1,11 +1,4 @@
-import {
-	LitElement,
-	css,
-	customElement,
-	html,
-	property,
-	query,
-} from 'lit-element'
+import { LitElement, css, customElement, html, property } from 'lit-element'
 import { connect } from '@captaincodeman/redux-connect-element'
 import pluralize from 'pluralize'
 
@@ -40,7 +33,7 @@ export class ChannelSearchSelectedListElement extends connect(
 		return {
 			'clear-selection': () => PlotActions.setSelectedChannels([]),
 			'channel-plot': () => RoutingActions.push(`/plot`),
-			'channel-remove': (e: CustomEvent) =>
+			'channel-remove': (e: CustomEvent<{ index: number }>) =>
 				PlotActions.unselectChannel(e.detail.index),
 		}
 	}

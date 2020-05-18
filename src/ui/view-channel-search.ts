@@ -18,10 +18,12 @@ import type { Snackbar } from '@material/mwc-snackbar'
 import '@material/mwc-textfield'
 import type { TextField } from '@material/mwc-textfield'
 
-import { store, RootState, RoutingActions } from '../store'
-import { ChannelSearchSelectors } from '../store/channelsearch'
+import { store, RootState } from '../store'
+import {
+	ChannelSearchSelectors,
+	ChannelSearchActions,
+} from '../store/channelsearch'
 import type { ChannelWithTags } from '../store/channelsearch'
-import { PlotActions } from '../store/plot'
 import { TemplateResult } from 'lit-html'
 
 import './channel-search-result-list'
@@ -54,10 +56,9 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 
 	mapEvents() {
 		return {
-			'search-click': (e: CustomEvent) =>
-				RoutingActions.push(
-					`/search?q=${encodeURIComponent(e.detail.pattern)}`
-				),
+			'pattern-change': (e: CustomEvent) =>
+				ChannelSearchActions.patternChange(e.detail.pattern),
+			'search-click': () => ChannelSearchActions.searchChannel(),
 		}
 	}
 
@@ -80,15 +81,7 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 	private __search(): void {
 		const q = this.__query.value
 		if (!q) return
-		if (q === this.pattern) return
-		const e = new CustomEvent('search-click', {
-			detail: { pattern: q },
-		})
-		this.dispatchEvent(e)
-	}
-
-	private __plotSelected(): void {
-		const e = new CustomEvent('channel-plot')
+		const e = new CustomEvent('search-click')
 		this.dispatchEvent(e)
 	}
 
@@ -103,6 +96,12 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 					@keyup=${(e: KeyboardEvent): void => {
 						if (e.key === 'Enter') this.__search()
 					}}
+					@change=${() =>
+						this.dispatchEvent(
+							new CustomEvent('pattern-change', {
+								detail: { pattern: this.__query.value },
+							})
+						)}
 				></mwc-textfield
 				><mwc-button icon="search" raised @click=${this.__search}
 					>Search</mwc-button

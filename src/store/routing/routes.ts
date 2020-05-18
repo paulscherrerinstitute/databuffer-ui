@@ -17,7 +17,10 @@ export const routes = [
 
 function* channelSearchRoute(params, queries) {
 	const { q } = queries
-	yield put(ChannelSearchActions.searchChannel(q))
+	if (q) {
+		yield put(ChannelSearchActions.patternChange(q))
+		yield put(ChannelSearchActions.searchChannel())
+	}
 }
 
 function* plotSingleChannelRoute(params, queries) {

@@ -26,7 +26,7 @@ export default (
 	action: ChannelSearchActions
 ): ChannelSearchState => {
 	switch (action.type) {
-		case ChannelTypes.CHANNEL_SEARCH:
+		case ChannelTypes.PATTERN_CHANGE:
 			return {
 				...state,
 				pattern: action.payload.pattern,

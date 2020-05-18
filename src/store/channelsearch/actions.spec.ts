@@ -18,24 +18,28 @@ describe('ChannelSearchActions', () => {
 		expect(action).to.deep.equal(expected)
 	})
 
-	it('should create CHANNEL_SEARCH', () => {
-		const action = ChannelSearchActions.searchChannel(EXAMPLE_PATTERN)
+	it('should create PATTERN_CHANGE', () => {
+		const action = ChannelSearchActions.patternChange(EXAMPLE_PATTERN)
 		const expected = {
-			type: ChannelTypes.CHANNEL_SEARCH,
+			type: ChannelTypes.PATTERN_CHANGE,
 			payload: {
 				pattern: EXAMPLE_PATTERN,
 			},
 		}
 		expect(action).to.deep.equal(expected)
 	})
+	it('should create CHANNEL_SEARCH', () => {
+		const action = ChannelSearchActions.searchChannel()
+		const expected = {
+			type: ChannelTypes.CHANNEL_SEARCH,
+		}
+		expect(action).to.deep.equal(expected)
+	})
 
 	it('should create CHANNEL_SEARCH_REQUEST', () => {
-		const action = ChannelSearchActions.searchChannelRequest(EXAMPLE_PATTERN)
+		const action = ChannelSearchActions.searchChannelRequest()
 		const expected = {
 			type: ChannelTypes.CHANNEL_SEARCH_REQUEST,
-			payload: {
-				pattern: EXAMPLE_PATTERN,
-			},
 		}
 		expect(action).to.deep.equal(expected)
 	})
