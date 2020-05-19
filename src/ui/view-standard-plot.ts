@@ -29,7 +29,6 @@ import { Snackbar } from '@material/mwc-snackbar'
 import { formatDate } from '../util'
 import { RootState, RoutingActions, store } from '../store'
 import { Channel, PlotActions, PlotSelectors } from '../store/plot/'
-import { channelToId } from '@psi/databuffer-query-js/channel'
 
 import * as datefns from 'date-fns'
 import type { DataResponse } from '../api/queryrest'
@@ -274,7 +273,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				<p>${this.error ? this.error.message : ''}</p>
 			</div>
 			<wl-card id="chart" ?hidden="${!this.shouldDisplayChart}"></wl-card>
-			<div id="meta">${this.__renderMeta()}</div>
 			<mwc-snackbar
 				id="badtimeformat"
 				labelText="Date format invalid! Correct format is: yyyy-mm-dd HH:MM:DD.SSS"
@@ -357,43 +355,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		`
 	}
 
-	private __renderMeta(): TemplateResult {
-		if (this.requestDuration === undefined) return html``
-		return html`
-			<wl-expansion>
-				<span slot="title">Meta</span>
-				<span slot="description">Information about the query</span>
-				<ul>
-					<li>Number of channels in request: ${this.channels.length}</li>
-					<li>Number of channels in response: ${this.response.length}</li>
-					<li>
-						Number of channels in response without data points:
-						${this.channelsWithoutData.length}
-					</li>
-					<li>Duration of request: ${this.requestDuration / 1000} seconds</li>
-					<li>
-						Number of data points:
-						<table>
-							<tr>
-								<th>Channel</th>
-								<th>Data points</th>
-							</tr>
-							${this.response.map(
-								item =>
-									html`
-										<tr>
-											<td>${channelToId(item.channel)}</td>
-											<td>${item.data.length}</td>
-										</tr>
-									`
-							)}
-						</table>
-					</li>
-				</ul>
-			</wl-expansion>
-		`
-	}
-
 	static get styles() {
 		return [
 			baseStyles,
@@ -434,12 +395,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				}
 				#chart {
 					margin: 8px 0;
-				}
-				#meta {
-					flex-grow: 0;
-				}
-				#meta:empty {
-					display: none;
 				}
 				#chart {
 					flex-grow: 1;

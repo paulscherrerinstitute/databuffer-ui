@@ -27,10 +27,8 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 
 	mapEvents() {
 		return {
-			// 'plot:daterange': () => alert('plot:daterange'),
-			// 'plot:share': () => PlotActions.sharePlot(),
-			// 'plot:more': () => PlotActions.toggleMoreMenu(),
-			// 'search:more': () => SearchActions.toggleMoreMenu(),
+			// 'plot:daterange': () => PlotActions.toggleQueryRange(),
+			'plot:info': () => RoutingActions.push('/query-meta'),
 		}
 	}
 
@@ -62,16 +60,8 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 							this.dispatchEvent(new CustomEvent('plot:daterange'))}
 					></mwc-icon-button
 					><mwc-icon-button
-						icon="print"
-						@click=${() => this.dispatchEvent(new CustomEvent('plot:print'))}
-					></mwc-icon-button
-					><mwc-icon-button
-						icon="share"
-						@click=${() => this.dispatchEvent(new CustomEvent('plot:share'))}
-					></mwc-icon-button
-					><mwc-icon-button
-						icon="more_vert"
-						@click=${() => this.dispatchEvent(new CustomEvent('plot:more'))}
+						icon="info_outline"
+						@click=${() => this.dispatchEvent(new CustomEvent('plot:info'))}
 					></mwc-icon-button>`,
 		},
 	]

@@ -51,6 +51,10 @@ export class AppBarNavIconElement extends connect(store, LitElement) {
 			path: '/plot',
 			action: () => `/search`,
 		},
+		{
+			path: '/query-meta',
+			action: () => `/plot`,
+		},
 	]
 
 	shouldUpdate(changedProperties: PropertyValues) {

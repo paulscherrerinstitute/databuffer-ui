@@ -42,6 +42,10 @@ export class AppBarTitleElement extends connect(store, LitElement) {
 			path: '/plot',
 			action: () => `Plot`,
 		},
+		{
+			path: '/query-meta',
+			action: () => `About data query`,
+		},
 	]
 
 	shouldUpdate(changedProperties: PropertyValues) {
