@@ -139,9 +139,9 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		}
 		if (changedProperties.has('channelsWithoutData')) {
 			if (this.channelsWithoutData.length === this.channels.length) {
-				this.__snackNoData.open()
+				this.__snackNoData.show()
 			} else if (this.channelsWithoutData.length > 0) {
-				this.__snackPartialData.open()
+				this.__snackPartialData.show()
 			}
 		}
 		if (changedProperties.has('requestFinishedAt')) {
@@ -205,7 +205,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		const d = datefns.parseISO(txt.value).getTime()
 		if (isNaN(d)) {
 			txt.focus()
-			this.__snackBadTimeFormat.open()
+			this.__snackBadTimeFormat.show()
 			this.canPlot = false
 			return
 		}
@@ -221,7 +221,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		const d = datefns.parseISO(txt.value).getTime()
 		if (isNaN(d)) {
 			txt.focus()
-			this.__snackBadTimeFormat.open()
+			this.__snackBadTimeFormat.show()
 			this.canPlot = false
 			return
 		}

@@ -75,7 +75,7 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 			changedProperties.has('searchResults') &&
 			this.searchResults.length > MAX_NUM_RESULTS
 		) {
-			this.__notifyCutoff.open()
+			this.__notifyCutoff.show()
 		}
 	}
 
