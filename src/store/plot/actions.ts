@@ -14,6 +14,10 @@ export enum PlotActionTypes {
 	DRAW_PLOT_REQUEST = 'daq-web-ui-app/DRAW_PLOT_REQUEST',
 	DRAW_PLOT_SUCCESS = 'daq-web-ui-app/DRAW_PLOT_SUCCESS',
 	DRAW_PLOT_FAILURE = 'daq-web-ui-app/DRAW_PLOT_FAILURE',
+
+	TOGGLE_QUERY_RANGE = 'daq-web-ui-app/PLOT/TOGGLE_QUERY_RANGE',
+	SHOW_QUERY_RANGE = 'daq-web-ui-app/PLOT/SHOW_QUERY_RANGE',
+	HIDE_QUERY_RANGE = 'daq-web-ui-app/PLOT/HIDE_QUERY_RANGE',
 }
 
 export const PlotActions = {
@@ -39,6 +43,10 @@ export const PlotActions = {
 		}),
 	drawPlotFailure: (timestamp: number, error: Error) =>
 		createAction(PlotActionTypes.DRAW_PLOT_FAILURE, { timestamp, error }),
+
+	toggleQueryRange: () => createAction(PlotActionTypes.TOGGLE_QUERY_RANGE),
+	showQueryRange: () => createAction(PlotActionTypes.SHOW_QUERY_RANGE),
+	hideQueryRange: () => createAction(PlotActionTypes.HIDE_QUERY_RANGE),
 }
 
 export type PlotActions = ActionsUnion<typeof PlotActions>

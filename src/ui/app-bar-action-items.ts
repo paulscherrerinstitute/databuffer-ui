@@ -4,7 +4,6 @@ import {
 	customElement,
 	html,
 	property,
-	css,
 	PropertyValues,
 } from 'lit-element'
 import { connect } from '@captaincodeman/redux-connect-element'
@@ -13,6 +12,7 @@ import { baseStyles } from './shared-styles'
 import { nothing, TemplateResult } from 'lit-html'
 
 import '@material/mwc-icon-button'
+import { PlotActions } from '../store/plot'
 
 @customElement('app-bar-action-items')
 export class AppBarActionItemsElement extends connect(store, LitElement) {
@@ -27,7 +27,7 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 
 	mapEvents() {
 		return {
-			// 'plot:daterange': () => PlotActions.toggleQueryRange(),
+			'plot:daterange': () => PlotActions.toggleQueryRange(),
 			'plot:info': () => RoutingActions.push('/query-meta'),
 		}
 	}

@@ -122,4 +122,28 @@ describe('PlotActions', () => {
 		}
 		expect(action).to.deep.equal(expected)
 	})
+
+	it('should create TOGGLE_QUERY_RANGE', () => {
+		const action = PlotActions.toggleQueryRange()
+		const expected = {
+			type: PlotActionTypes.TOGGLE_QUERY_RANGE,
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
+	it('should create SHOW_QUERY_RANGE', () => {
+		const action = PlotActions.showQueryRange()
+		const expected = {
+			type: PlotActionTypes.SHOW_QUERY_RANGE,
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
+	it('should create HIDE_QUERY_RANGE', () => {
+		const action = PlotActions.hideQueryRange()
+		const expected = {
+			type: PlotActionTypes.HIDE_QUERY_RANGE,
+		}
+		expect(action).to.deep.equal(expected)
+	})
 })

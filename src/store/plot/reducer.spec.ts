@@ -67,6 +67,7 @@ describe('plot reducer', () => {
 				response: [],
 				yAxes: [],
 				dataSeries: [],
+				queryRangeShowing: false,
 			})
 
 			// give it 5 seconds of jitter, because sometimes the startup time
@@ -402,6 +403,54 @@ describe('plot reducer', () => {
 
 		it('should set response', () => {
 			expect(nextState.response).to.deep.equal(EXAMPLE_RESPONSE)
+		})
+	})
+
+	describe('on action of type TOGGLE_QUERY_RANGE', () => {
+		it('should re-set queryRangeShowing, if it is shown', () => {
+			const previousState = { ...initialState, queryRangeShowing: true }
+			const action = PlotActions.toggleQueryRange()
+			const nextState = reducer(previousState, action)
+			expect(nextState.queryRangeShowing).to.be.false
+		})
+
+		it('should set queryRangeShowing, if it is not shown', () => {
+			const previousState = { ...initialState, queryRangeShowing: false }
+			const action = PlotActions.toggleQueryRange()
+			const nextState = reducer(previousState, action)
+			expect(nextState.queryRangeShowing).to.be.true
+		})
+	})
+
+	describe('on action of type SHOW_QUERY_RANGE', () => {
+		it('should set queryRangeShowing, if it is shown', () => {
+			const previousState = { ...initialState, queryRangeShowing: true }
+			const action = PlotActions.showQueryRange()
+			const nextState = reducer(previousState, action)
+			expect(nextState.queryRangeShowing).to.be.true
+		})
+
+		it('should set queryRangeShowing, if it is not shown', () => {
+			const previousState = { ...initialState, queryRangeShowing: false }
+			const action = PlotActions.showQueryRange()
+			const nextState = reducer(previousState, action)
+			expect(nextState.queryRangeShowing).to.be.true
+		})
+	})
+
+	describe('on action of type HIDE_QUERY_RANGE', () => {
+		it('should re-set queryRangeShowing, if it is shown', () => {
+			const previousState = { ...initialState, queryRangeShowing: true }
+			const action = PlotActions.hideQueryRange()
+			const nextState = reducer(previousState, action)
+			expect(nextState.queryRangeShowing).to.be.false
+		})
+
+		it('should re-set queryRangeShowing, if it is not shown', () => {
+			const previousState = { ...initialState, queryRangeShowing: false }
+			const action = PlotActions.hideQueryRange()
+			const nextState = reducer(previousState, action)
+			expect(nextState.queryRangeShowing).to.be.false
 		})
 	})
 })

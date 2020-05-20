@@ -153,3 +153,8 @@ export const highchartsOptions = createSelector(
 		series,
 	})
 )
+
+export const queryRangeShowing = createSelector(
+	[getState],
+	state => state.queryRangeShowing
+)

@@ -86,6 +86,7 @@ const EXAMPLE_STATE_WITH_DATA: RootState = {
 		dataSeries: [
 			//
 		],
+		queryRangeShowing: false,
 	},
 }
 
@@ -564,19 +565,18 @@ describe('plot selectors', () => {
 					...BASE_STATE.plot,
 					channels: EXAMPLE_CHANNELS,
 					response: EXAMPLE_RESPONSE,
-					dataSeries:
-						[
-							{
-								name: 'a',
-								channelIndex: 0,
-								yAxisIndex: 0,
-							},
-							{
-								name: 'b',
-								channelIndex: 1,
-								yAxisIndex: 1,
-							},
-						] as DataSeries[],
+					dataSeries: [
+						{
+							name: 'a',
+							channelIndex: 0,
+							yAxisIndex: 0,
+						},
+						{
+							name: 'b',
+							channelIndex: 1,
+							yAxisIndex: 1,
+						},
+					] as DataSeries[],
 				},
 			}
 		})
@@ -721,5 +721,24 @@ describe('plot selectors', () => {
 			}
 			expect(selectors.highchartsOptions(state)).to.deep.equal(expected)
 		})
+	})
+
+	it('retrieves queryRangeShowing', () => {
+		const state1 = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				queryRangeShowing: false,
+			},
+		}
+		const state2 = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				queryRangeShowing: true,
+			},
+		}
+		expect(selectors.queryRangeShowing(state1)).to.be.false
+		expect(selectors.queryRangeShowing(state2)).to.be.true
 	})
 })

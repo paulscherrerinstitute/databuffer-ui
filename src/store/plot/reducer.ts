@@ -19,6 +19,7 @@ export interface PlotState {
 	response: DataResponse
 	yAxes: YAxis[]
 	dataSeries: DataSeries[]
+	queryRangeShowing: boolean
 }
 
 export const initialState: PlotState = {
@@ -37,6 +38,7 @@ export const initialState: PlotState = {
 	response: [],
 	yAxes: [],
 	dataSeries: [],
+	queryRangeShowing: false,
 }
 
 const findIndexOfChannel = (state: PlotState, ch: Channel): number =>
@@ -159,6 +161,24 @@ export default (
 					finishedAt: action.payload.timestamp,
 				},
 				error: action.payload.error,
+			}
+
+		case PlotActionTypes.TOGGLE_QUERY_RANGE:
+			return {
+				...state,
+				queryRangeShowing: !state.queryRangeShowing,
+			}
+
+		case PlotActionTypes.HIDE_QUERY_RANGE:
+			return {
+				...state,
+				queryRangeShowing: false,
+			}
+
+		case PlotActionTypes.SHOW_QUERY_RANGE:
+			return {
+				...state,
+				queryRangeShowing: true,
 			}
 
 		default:

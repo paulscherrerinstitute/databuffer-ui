@@ -52,6 +52,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@property({ type: Array }) channelsWithoutData: Channel[]
 	@property({ type: Boolean }) canPlot: boolean = false
 	@property({ attribute: false }) highchartsOptions: Highcharts.Options
+	@property({ attribute: false }) queryRangeShowing: boolean = false
 
 	private __calcCanPlot(): boolean {
 		if (this.__txtStartTime === null) return false
@@ -62,6 +63,9 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	}
 
 	private __chart: Highcharts.Chart
+
+	@query('#queryrange')
+	private __queryRange!: Popover
 
 	@query('#quickdial')
 	private __quickDial!: Popover
@@ -97,6 +101,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			requestFinishedAt: PlotSelectors.requestFinishedAt(state),
 			shouldDisplayChart: PlotSelectors.shouldDisplayChart(state),
 			channelsWithoutData: PlotSelectors.channelsWithoutData(state),
+			queryRangeShowing: PlotSelectors.queryRangeShowing(state),
 		}
 	}
 
@@ -233,46 +238,13 @@ export class StandardPlotElement extends connect(store, LitElement) {
 
 	render() {
 		return html`
-			<div id="queryrange">
-				<mwc-textfield
-					id="starttime"
-					label="Start"
-					value="${formatDate(this.startTime)}"
-					pattern="${TIMESTAMP_PATTERN}"
-					@change=${this.__onStartTimeChanged}
-					helper="yyyy-mm-dd HH:MM:DD.SSS"
-				></mwc-textfield>
-				<mwc-textfield
-					id="endtime"
-					label="End"
-					value="${formatDate(this.endTime)}"
-					pattern="${TIMESTAMP_PATTERN}"
-					@change=${this.__onEndTimeChanged}
-					helper="yyyy-mm-dd HH:MM:DD.SSS"
-				></mwc-textfield>
-				${this.__renderQuickDial()}
-				<div id="buttons">
-					<mwc-icon-button
-						id="btnQuickDial"
-						@click="${this.__showQuickDial}"
-						icon="more_horiz"
-						label="quick-dial"
-					></mwc-icon-button>
-					<mwc-button
-						@click="${this.__plot}"
-						?disabled=${!this.canPlot}
-						icon="show_chart"
-						label="plot"
-						raised
-					></mwc-button>
-				</div>
-			</div>
+			${this.__renderQueryRange()} ${this.__renderQuickDial()}
 			<wl-progress-spinner ?hidden=${!this.fetching}></wl-progress-spinner>
 			<div class="error" ?hidden=${!this.error}>
 				There was an error:
 				<p>${this.error ? this.error.message : ''}</p>
 			</div>
-			<wl-card id="chart" ?hidden="${!this.shouldDisplayChart}"></wl-card>
+			<div id="chart" ?hidden="${!this.shouldDisplayChart}"></div>
 			<mwc-snackbar
 				id="badtimeformat"
 				labelText="Date format invalid! Correct format is: yyyy-mm-dd HH:MM:DD.SSS"
@@ -288,6 +260,46 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					.length} channels had no data in the given range."
 			>
 			</mwc-snackbar>
+		`
+	}
+
+	private __renderQueryRange(): TemplateResult {
+		return html`
+			<div id="queryrange" ?hidden=${!this.queryRangeShowing}>
+				<div id="queryrangecontainer">
+					<mwc-textfield
+						id="starttime"
+						label="Start"
+						value="${formatDate(this.startTime)}"
+						pattern="${TIMESTAMP_PATTERN}"
+						@change=${this.__onStartTimeChanged}
+						helper="yyyy-mm-dd HH:MM:DD.SSS"
+					></mwc-textfield>
+					<mwc-textfield
+						id="endtime"
+						label="End"
+						value="${formatDate(this.endTime)}"
+						pattern="${TIMESTAMP_PATTERN}"
+						@change=${this.__onEndTimeChanged}
+						helper="yyyy-mm-dd HH:MM:DD.SSS"
+					></mwc-textfield>
+					<div id="buttons">
+						<mwc-icon-button
+							id="btnQuickDial"
+							@click="${this.__showQuickDial}"
+							icon="more_horiz"
+							label="quick-dial"
+						></mwc-icon-button>
+						<mwc-button
+							@click="${this.__plot}"
+							?disabled=${!this.canPlot}
+							icon="show_chart"
+							label="plot"
+							raised
+						></mwc-button>
+					</div>
+				</div>
+			</div>
 		`
 	}
 
@@ -362,16 +374,26 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				:host {
 					height: 100%;
 					padding: 8px;
-					display: flex;
-					flex-direction: column;
+					display: block;
 				}
 				#queryrange {
-					order: 0;
-					flex-grow: 0;
-					display: flex;
-					align-items: center;
+					position: absolute;
+					width: calc(100% - 16px);
+					z-index: 1;
+					background-color: white;
+					box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px,
+						rgba(0, 0, 0, 0.14) 0px 4px 5px 0px,
+						rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
+					border-radius: 2px;
 				}
-				#queryrange * {
+				#queryrangecontainer {
+					margin: 8px 0 8px 8px;
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					gap: 8px;
+				}
+				#queryrangecontainer * {
 					margin-right: 8px;
 				}
 				#starttime,
@@ -383,21 +405,15 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					display: inline;
 				}
 				wl-progress-spinner {
-					width: 5rem;
-					height: 5rem;
+					width: 96px;
+					height: 96px;
 					margin: 8px auto;
 				}
-				wl-progress-spinner[hidden] {
-					display: none;
-				}
-				wl-card[hidden] {
+				[hidden] {
 					display: none;
 				}
 				#chart {
-					margin: 8px 0;
-				}
-				#chart {
-					flex-grow: 1;
+					height: 100%;
 				}
 				#quickdial {
 					max-height: 80vh;
