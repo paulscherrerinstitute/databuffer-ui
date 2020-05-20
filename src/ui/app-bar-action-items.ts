@@ -29,6 +29,7 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 		return {
 			'plot:daterange': () => PlotActions.toggleQueryRange(),
 			'plot:info': () => RoutingActions.push('/query-meta'),
+			'plot:share': () => PlotActions.showShareLink(),
 		}
 	}
 
@@ -58,6 +59,10 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 						icon="date_range"
 						@click=${() =>
 							this.dispatchEvent(new CustomEvent('plot:daterange'))}
+					></mwc-icon-button
+					><mwc-icon-button
+						icon="share"
+						@click=${() => this.dispatchEvent(new CustomEvent('plot:share'))}
 					></mwc-icon-button
 					><mwc-icon-button
 						icon="info_outline"

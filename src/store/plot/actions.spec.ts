@@ -146,4 +146,36 @@ describe('PlotActions', () => {
 		}
 		expect(action).to.deep.equal(expected)
 	})
+
+	it('should create SHOW_SHARE_LINK', () => {
+		const action = PlotActions.showShareLink()
+		const expected = {
+			type: PlotActionTypes.SHOW_SHARE_LINK,
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
+	it('should create HIDE_SHARE_LINK', () => {
+		const action = PlotActions.hideShareLink()
+		const expected = {
+			type: PlotActionTypes.HIDE_SHARE_LINK,
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
+	it('should create SHARE_ABSOLUTE_TIMES', () => {
+		const action = PlotActions.shareAbsoluteTimes()
+		const expected = {
+			type: PlotActionTypes.SHARE_ABSOLUTE_TIMES,
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
+	it('should create SHARE_RELATIVE_TIME', () => {
+		const action = PlotActions.shareRelativeTime()
+		const expected = {
+			type: PlotActionTypes.SHARE_RELATIVE_TIME,
+		}
+		expect(action).to.deep.equal(expected)
+	})
 })

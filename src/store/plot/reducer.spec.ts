@@ -68,6 +68,8 @@ describe('plot reducer', () => {
 				yAxes: [],
 				dataSeries: [],
 				queryRangeShowing: false,
+				dialogShareLinkAbsoluteTimes: true,
+				dialogShareLinkShowing: false,
 			})
 
 			// give it 5 seconds of jitter, because sometimes the startup time
@@ -451,6 +453,82 @@ describe('plot reducer', () => {
 			const action = PlotActions.hideQueryRange()
 			const nextState = reducer(previousState, action)
 			expect(nextState.queryRangeShowing).to.be.false
+		})
+	})
+
+	describe('on action of type SHOW_SHARE_LINK', () => {
+		it('should set dialogShareLinkShowing, if it is shown', () => {
+			const previousState = { ...initialState, dialogShareLinkShowing: true }
+			const action = PlotActions.showShareLink()
+			const nextState = reducer(previousState, action)
+			expect(nextState.dialogShareLinkShowing).to.be.true
+		})
+
+		it('should set dialogShareLinkShowing, if it is not shown', () => {
+			const previousState = { ...initialState, dialogShareLinkShowing: false }
+			const action = PlotActions.showShareLink()
+			const nextState = reducer(previousState, action)
+			expect(nextState.dialogShareLinkShowing).to.be.true
+		})
+	})
+
+	describe('on action of type HIDE_SHARE_LINK', () => {
+		it('should re-set dialogShareLinkShowing, if it is shown', () => {
+			const previousState = { ...initialState, dialogShareLinkShowing: true }
+			const action = PlotActions.hideShareLink()
+			const nextState = reducer(previousState, action)
+			expect(nextState.dialogShareLinkShowing).to.be.false
+		})
+
+		it('should re-set dialogShareLinkShowing, if it is not shown', () => {
+			const previousState = { ...initialState, dialogShareLinkShowing: false }
+			const action = PlotActions.hideShareLink()
+			const nextState = reducer(previousState, action)
+			expect(nextState.dialogShareLinkShowing).to.be.false
+		})
+	})
+
+	describe('on action of type SHARE_ABSOLUTE_TIMES', () => {
+		it('should set dialogShareLinkAbsoluteTimes, if it is true', () => {
+			const previousState = {
+				...initialState,
+				dialogShareLinkAbsoluteTimes: true,
+			}
+			const action = PlotActions.shareAbsoluteTimes()
+			const nextState = reducer(previousState, action)
+			expect(nextState.dialogShareLinkAbsoluteTimes).to.be.true
+		})
+
+		it('should set dialogShareLinkAbsoluteTimes, if it is false', () => {
+			const previousState = {
+				...initialState,
+				dialogShareLinkAbsoluteTimes: false,
+			}
+			const action = PlotActions.shareAbsoluteTimes()
+			const nextState = reducer(previousState, action)
+			expect(nextState.dialogShareLinkAbsoluteTimes).to.be.true
+		})
+	})
+
+	describe('on action of type SHARE_RELATIVE_TIME', () => {
+		it('should re-set dialogShareLinkAbsoluteTimes, if it is true', () => {
+			const previousState = {
+				...initialState,
+				dialogShareLinkAbsoluteTimes: true,
+			}
+			const action = PlotActions.shareRelativeTime()
+			const nextState = reducer(previousState, action)
+			expect(nextState.dialogShareLinkAbsoluteTimes).to.be.false
+		})
+
+		it('should re-set dialogShareLinkAbsoluteTimes, if it is false', () => {
+			const previousState = {
+				...initialState,
+				dialogShareLinkAbsoluteTimes: false,
+			}
+			const action = PlotActions.shareRelativeTime()
+			const nextState = reducer(previousState, action)
+			expect(nextState.dialogShareLinkAbsoluteTimes).to.be.false
 		})
 	})
 })

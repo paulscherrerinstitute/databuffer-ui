@@ -18,6 +18,12 @@ export enum PlotActionTypes {
 	TOGGLE_QUERY_RANGE = 'daq-web-ui-app/PLOT/TOGGLE_QUERY_RANGE',
 	SHOW_QUERY_RANGE = 'daq-web-ui-app/PLOT/SHOW_QUERY_RANGE',
 	HIDE_QUERY_RANGE = 'daq-web-ui-app/PLOT/HIDE_QUERY_RANGE',
+
+	HIDE_SHARE_LINK = 'daq-web-ui-app/PLOT/HIDE_SHARE_LINK',
+	SHOW_SHARE_LINK = 'daq-web-ui-app/PLOT/SHOW_SHARE_LINK',
+
+	SHARE_ABSOLUTE_TIMES = 'daq-web-ui-app/PLOT/SHARE_ABSOLUTE_TIMES',
+	SHARE_RELATIVE_TIME = 'daq-web-ui-app/PLOT/SHARE_RELATIVE_TIME',
 }
 
 export const PlotActions = {
@@ -47,6 +53,12 @@ export const PlotActions = {
 	toggleQueryRange: () => createAction(PlotActionTypes.TOGGLE_QUERY_RANGE),
 	showQueryRange: () => createAction(PlotActionTypes.SHOW_QUERY_RANGE),
 	hideQueryRange: () => createAction(PlotActionTypes.HIDE_QUERY_RANGE),
+
+	hideShareLink: () => createAction(PlotActionTypes.HIDE_SHARE_LINK),
+	showShareLink: () => createAction(PlotActionTypes.SHOW_SHARE_LINK),
+
+	shareAbsoluteTimes: () => createAction(PlotActionTypes.SHARE_ABSOLUTE_TIMES),
+	shareRelativeTime: () => createAction(PlotActionTypes.SHARE_RELATIVE_TIME),
 }
 
 export type PlotActions = ActionsUnion<typeof PlotActions>

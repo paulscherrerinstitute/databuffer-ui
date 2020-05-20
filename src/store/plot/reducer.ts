@@ -20,6 +20,8 @@ export interface PlotState {
 	yAxes: YAxis[]
 	dataSeries: DataSeries[]
 	queryRangeShowing: boolean
+	dialogShareLinkShowing: boolean
+	dialogShareLinkAbsoluteTimes: boolean
 }
 
 export const initialState: PlotState = {
@@ -39,6 +41,8 @@ export const initialState: PlotState = {
 	yAxes: [],
 	dataSeries: [],
 	queryRangeShowing: false,
+	dialogShareLinkShowing: false,
+	dialogShareLinkAbsoluteTimes: true,
 }
 
 const findIndexOfChannel = (state: PlotState, ch: Channel): number =>
@@ -179,6 +183,30 @@ export default (
 			return {
 				...state,
 				queryRangeShowing: true,
+			}
+
+		case PlotActionTypes.SHOW_SHARE_LINK:
+			return {
+				...state,
+				dialogShareLinkShowing: true,
+			}
+
+		case PlotActionTypes.HIDE_SHARE_LINK:
+			return {
+				...state,
+				dialogShareLinkShowing: false,
+			}
+
+		case PlotActionTypes.SHARE_ABSOLUTE_TIMES:
+			return {
+				...state,
+				dialogShareLinkAbsoluteTimes: true,
+			}
+
+		case PlotActionTypes.SHARE_RELATIVE_TIME:
+			return {
+				...state,
+				dialogShareLinkAbsoluteTimes: false,
 			}
 
 		default:

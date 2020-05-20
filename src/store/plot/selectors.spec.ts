@@ -12,6 +12,7 @@ import type {
 	AggregationResult,
 } from '@psi/databuffer-query-js/query-data'
 import { YAxis, DataSeries } from './models'
+import { channelToId } from '@psi/databuffer-query-js/channel'
 
 const BASE_STATE: RootState = {
 	channelSearch: {} as ChannelSearchState,
@@ -740,5 +741,187 @@ describe('plot selectors', () => {
 		}
 		expect(selectors.queryRangeShowing(state1)).to.be.false
 		expect(selectors.queryRangeShowing(state2)).to.be.true
+	})
+
+	it('retrieves dialogShareLinkShowing', () => {
+		const state1 = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				dialogShareLinkShowing: false,
+			},
+		}
+		const state2 = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				dialogShareLinkShowing: true,
+			},
+		}
+		expect(selectors.dialogShareLinkShowing(state1)).to.be.false
+		expect(selectors.dialogShareLinkShowing(state2)).to.be.true
+	})
+
+	it('retrieves dialogShareLinkAbsoluteTimes', () => {
+		const state1 = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				dialogShareLinkAbsoluteTimes: false,
+			},
+		}
+		const state2 = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				dialogShareLinkAbsoluteTimes: true,
+			},
+		}
+		expect(selectors.dialogShareLinkAbsoluteTimes(state1)).to.be.false
+		expect(selectors.dialogShareLinkAbsoluteTimes(state2)).to.be.true
+	})
+
+	it('retrieves dialogShareLinkChannelsTruncated', () => {
+		let state1 = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				channels: [],
+			},
+		}
+		for (let i = 1; i <= 16; i++) {
+			// need to create a new state object because of memoization in selector
+			state1 = {
+				...state1,
+				plot: {
+					...state1.plot,
+					channels: [
+						...state1.plot.channels,
+						{ backend: 'bbb', name: `chan-${i}` },
+					],
+				},
+			}
+			expect(selectors.dialogShareLinkChannelsTruncated(state1)).to.be.false
+		}
+		// need to create a new state object because of memoization in selector
+		state1 = {
+			...state1,
+			plot: {
+				...state1.plot,
+				channels: [
+					...state1.plot.channels,
+					{ backend: 'bbb', name: `chan-17` },
+				],
+			},
+		}
+		expect(state1.plot.channels.length).to.equal(17)
+		expect(selectors.dialogShareLinkChannelsTruncated(state1)).to.be.true
+	})
+
+	describe('it retrieves dialogShareLinkUrl', () => {
+		let state: RootState
+		beforeEach(() => {
+			state = {
+				...BASE_STATE,
+				plot: {
+					...BASE_STATE.plot,
+					channels: EXAMPLE_CHANNELS,
+					startTime: 100000,
+					endTime: 300000,
+					dialogShareLinkAbsoluteTimes: true,
+				},
+			}
+		})
+
+		it('is goes to /preselect', () => {
+			expect(selectors.dialogShareLinkUrl(state))
+				.to.be.a('string')
+				.that.contains('/preselect?')
+		})
+
+		it('sets uses startTime and endTime when absolute times are used', () => {
+			state.plot.dialogShareLinkAbsoluteTimes = true
+			const url = selectors.dialogShareLinkUrl(state)
+			const params = new URLSearchParams(url.split('?', 2)[1])
+			expect(params.has('startTime')).to.be.true
+			expect(params.has('endTime')).to.be.true
+			expect(params.has('duration')).to.be.false
+		})
+
+		it('sets uses duration when relative time is used', () => {
+			state.plot.dialogShareLinkAbsoluteTimes = false
+			const url = selectors.dialogShareLinkUrl(state)
+			const params = new URLSearchParams(url.split('?', 2)[1])
+			expect(params.has('startTime')).to.be.false
+			expect(params.has('endTime')).to.be.false
+			expect(params.has('duration')).to.be.true
+		})
+
+		it('sets parameter startTime correctly', () => {
+			const url = selectors.dialogShareLinkUrl(state)
+			const params = new URLSearchParams(url.split('?', 2)[1])
+			expect(params.has('startTime')).to.be.true
+			expect(params.get('startTime')).to.equal('100000')
+		})
+
+		it('sets parameter endTime correctly', () => {
+			const url = selectors.dialogShareLinkUrl(state)
+			const params = new URLSearchParams(url.split('?', 2)[1])
+			expect(params.has('endTime')).to.be.true
+			expect(params.get('endTime')).to.equal('300000')
+		})
+
+		it('sets parameter duration correctly', () => {
+			state.plot.dialogShareLinkAbsoluteTimes = false
+			const url = selectors.dialogShareLinkUrl(state)
+			const params = new URLSearchParams(url.split('?', 2)[1])
+			expect(params.has('duration')).to.be.true
+			expect(params.get('duration')).to.equal('200000')
+		})
+
+		it('sets parameters c1...c6 correctly', () => {
+			const url = selectors.dialogShareLinkUrl(state)
+			const params = new URLSearchParams(url.split('?', 2)[1])
+			const expectedValues = state.plot.channels.map(c => channelToId(c))
+			for (let i = 0; i < expectedValues.length; i++) {
+				expect(params.has(`c${i + 1}`)).to.be.true
+				expect(params.get(`c${i + 1}`)).to.equal(expectedValues[i])
+			}
+		})
+
+		it('supports only up to 16 channels', () => {
+			// populate state with 20 channels
+			// that would be c1...c20, if it didn't cut off
+			state.plot.channels = [
+				{ backend: 'my-backend', name: 'chan01' },
+				{ backend: 'my-backend', name: 'chan02' },
+				{ backend: 'my-backend', name: 'chan03' },
+				{ backend: 'my-backend', name: 'chan04' },
+				{ backend: 'my-backend', name: 'chan05' },
+				{ backend: 'my-backend', name: 'chan06' },
+				{ backend: 'my-backend', name: 'chan07' },
+				{ backend: 'my-backend', name: 'chan08' },
+				{ backend: 'my-backend', name: 'chan09' },
+				{ backend: 'my-backend', name: 'chan10' },
+				{ backend: 'my-backend', name: 'chan11' },
+				{ backend: 'my-backend', name: 'chan12' },
+				{ backend: 'my-backend', name: 'chan13' },
+				{ backend: 'my-backend', name: 'chan14' },
+				{ backend: 'my-backend', name: 'chan15' },
+				{ backend: 'my-backend', name: 'chan16' },
+				{ backend: 'my-backend', name: 'chan17' },
+				{ backend: 'my-backend', name: 'chan18' },
+				{ backend: 'my-backend', name: 'chan19' },
+				{ backend: 'my-backend', name: 'chan20' },
+			]
+			const url = selectors.dialogShareLinkUrl(state)
+			const params = new URLSearchParams(url.split('?', 2)[1])
+			for (let i = 1; i <= 16; i++) {
+				expect(params.has(`c${i}`)).to.be.true
+			}
+			for (let i = 17; i <= 20; i++) {
+				expect(params.has(`c${i}`)).to.be.false
+			}
+		})
 	})
 })

@@ -158,3 +158,34 @@ export const queryRangeShowing = createSelector(
 	[getState],
 	state => state.queryRangeShowing
 )
+
+export const dialogShareLinkShowing = createSelector(
+	[getState],
+	state => state.dialogShareLinkShowing
+)
+
+export const dialogShareLinkAbsoluteTimes = createSelector(
+	[getState],
+	state => state.dialogShareLinkAbsoluteTimes
+)
+
+export const dialogShareLinkUrl = createSelector(
+	[dialogShareLinkAbsoluteTimes, channels, startTime, endTime],
+	(absTimes, channels, startTime, endTime) => {
+		const params = channels
+			.slice(0, 16)
+			.map((ch, i) => `c${i + 1}=${encodeURIComponent(channelToId(ch))}`)
+		if (absTimes) {
+			params.push(`startTime=${startTime}`)
+			params.push(`endTime=${endTime}`)
+		} else {
+			params.push(`duration=${endTime - startTime}`)
+		}
+		return `${window.location.origin}/preselect?${params.join('&')}`
+	}
+)
+
+export const dialogShareLinkChannelsTruncated = createSelector(
+	[channels],
+	channels => channels.length > 16
+)

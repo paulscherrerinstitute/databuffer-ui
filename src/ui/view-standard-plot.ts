@@ -20,7 +20,10 @@ import { Popover } from 'weightless/popover'
 import 'weightless/popover-card'
 import 'weightless/progress-spinner'
 import '@material/mwc-button'
+import '@material/mwc-dialog'
+import '@material/mwc-formfield'
 import '@material/mwc-icon-button'
+import '@material/mwc-radio'
 import '@material/mwc-textfield'
 import { TextField } from '@material/mwc-textfield'
 import '@material/mwc-snackbar'
@@ -53,6 +56,11 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@property({ type: Boolean }) canPlot: boolean = false
 	@property({ attribute: false }) highchartsOptions: Highcharts.Options
 	@property({ attribute: false }) queryRangeShowing: boolean = false
+	@property({ attribute: false }) dialogShareLinkShowing: boolean = false
+	@property({ attribute: false }) dialogShareLinkAbsoluteTimes: boolean = false
+	@property({ attribute: false }) dialogShareLinkUrl: string
+	@property({ attribute: false })
+	dialogShareLinkChannelsTruncated: boolean = false
 
 	private __calcCanPlot(): boolean {
 		if (this.__txtStartTime === null) return false
@@ -88,6 +96,15 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@query('#partialdata')
 	private __snackPartialData!: Snackbar
 
+	@query('#linkcopied')
+	private __snackLinkCopied!: Snackbar
+
+	@query('#linkcopyfailed')
+	private __snackLinkCopyFailed!: Snackbar
+
+	@query('#linkchannelstruncated')
+	private __snackLinkChannelsTruncated!: Snackbar
+
 	mapState(state: RootState) {
 		return {
 			error: PlotSelectors.error(state),
@@ -102,6 +119,14 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			shouldDisplayChart: PlotSelectors.shouldDisplayChart(state),
 			channelsWithoutData: PlotSelectors.channelsWithoutData(state),
 			queryRangeShowing: PlotSelectors.queryRangeShowing(state),
+			dialogShareLinkShowing: PlotSelectors.dialogShareLinkShowing(state),
+			dialogShareLinkAbsoluteTimes: PlotSelectors.dialogShareLinkAbsoluteTimes(
+				state
+			),
+			dialogShareLinkUrl: PlotSelectors.dialogShareLinkUrl(state),
+			dialogShareLinkChannelsTruncated: PlotSelectors.dialogShareLinkChannelsTruncated(
+				state
+			),
 		}
 	}
 
@@ -112,7 +137,11 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				PlotActions.startTimeChange(e.detail.startTime),
 			'end-time-change': (e: CustomEvent<{ endTime: number }>) =>
 				PlotActions.endTimeChange(e.detail.endTime),
-			'nav-back': () => RoutingActions.push('/search'),
+			'dialog-share:closed': () => PlotActions.hideShareLink(),
+			'dialog-share:absolute-times': e =>
+				e.detail.absTimes
+					? PlotActions.shareAbsoluteTimes()
+					: PlotActions.shareRelativeTime(),
 		}
 	}
 
@@ -239,6 +268,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	render() {
 		return html`
 			${this.__renderQueryRange()} ${this.__renderQuickDial()}
+			${this.__renderShare()}
 			<wl-progress-spinner ?hidden=${!this.fetching}></wl-progress-spinner>
 			<div class="error" ?hidden=${!this.error}>
 				There was an error:
@@ -260,6 +290,18 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					.length} channels had no data in the given range."
 			>
 			</mwc-snackbar>
+			<mwc-snackbar
+				id="linkcopied"
+				labelText="Link copied to clipboard"
+			></mwc-snackbar>
+			<mwc-snackbar
+				id="linkcopyfailed"
+				labelText="Could not copy link to clipboard. Please copy it yourself."
+			></mwc-snackbar>
+			<mwc-snackbar
+				id="linkchannelstruncated"
+				labelText="Only the first 16 channels are linked. The others are truncated."
+			></mwc-snackbar>
 		`
 	}
 
@@ -367,6 +409,67 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		`
 	}
 
+	private __renderShare() {
+		return html` <mwc-dialog
+			id="dialog-share"
+			heading="Share link to plot"
+			?open=${this.dialogShareLinkShowing}
+			@closed=${() =>
+				this.dispatchEvent(new CustomEvent('dialog-share:closed'))}
+			@opened=${() => {
+				if (this.dialogShareLinkChannelsTruncated)
+					this.__snackLinkChannelsTruncated.show()
+			}}
+		>
+			<div>
+				<mwc-formfield label="Use absolute times">
+					<mwc-radio
+						name="a"
+						?checked=${this.dialogShareLinkAbsoluteTimes}
+						@change=${e =>
+							this.dispatchEvent(
+								new CustomEvent('dialog-share:absolute-times', {
+									detail: { absTimes: e.target.checked },
+								})
+							)}
+					></mwc-radio>
+				</mwc-formfield>
+				<mwc-formfield label="Use relative time span (e.g. last 1h)">
+					<mwc-radio
+						name="a"
+						?checked=${!this.dialogShareLinkAbsoluteTimes}
+						@change=${e =>
+							this.dispatchEvent(
+								new CustomEvent('dialog-share:absolute-times', {
+									detail: { absTimes: !e.target.checked },
+								})
+							)}
+					></mwc-radio>
+				</mwc-formfield>
+				<div>
+					<mwc-textfield
+						label="Link URL"
+						readOnly
+						.value=${this.dialogShareLinkUrl}
+					></mwc-textfield>
+					<mwc-icon-button
+						icon="content_copy"
+						@click=${async () => {
+							try {
+								await navigator.clipboard.writeText(this.dialogShareLinkUrl)
+								this.__snackLinkCopied.show()
+							} catch (e) {
+								this.__snackLinkCopyFailed.show()
+								console.error(e)
+							}
+						}}
+					></mwc-icon-button>
+				</div>
+			</div>
+			<mwc-button slot="primaryAction" dialogAction="close">close</mwc-button>
+		</mwc-dialog>`
+	}
+
 	static get styles() {
 		return [
 			baseStyles,
@@ -425,6 +528,16 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					margin: 4px;
 					padding: 2rem;
 					background-color: rgba(255, 200, 200, 0.3);
+				}
+				#dialog-share div,
+				#dialog-share mwc-radio {
+					display: flex;
+				}
+				#dialog-share mwc-textfield {
+					flex: 1;
+				}
+				#dialog-share > div {
+					flex-direction: column;
 				}
 			`,
 		]
