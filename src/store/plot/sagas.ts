@@ -45,6 +45,7 @@ function* drawPlotSaga() {
 		},
 	}
 
+	yield put(PlotActions.hideQueryRange())
 	yield put(PlotActions.drawPlotRequest(Date.now()))
 	try {
 		const response = yield call(queryData, options)

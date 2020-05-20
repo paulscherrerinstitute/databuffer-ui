@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { put } from 'redux-saga/effects'
+import { put, select } from 'redux-saga/effects'
 
 import { ChannelSearchActions } from '../channelsearch'
 import { PlotActions } from '../plot/actions'
@@ -8,9 +8,11 @@ import { Channel } from '../plot/models'
 import { RoutingActions } from './actions'
 import { idToChannel } from '@psi/databuffer-query-js/channel'
 import { parseISO } from 'date-fns'
+import { PlotSelectors } from '../plot'
 
 export const routes = [
 	{ path: '/search', route: channelSearchRoute },
+	{ path: '/plot', route: plotRoute },
 	{ path: '/plot/:backend/:name', route: plotSingleChannelRoute },
 	{ path: '/preselect', route: plotPreselectRoute },
 ]
@@ -20,6 +22,14 @@ function* channelSearchRoute(params, queries) {
 	if (q) {
 		yield put(ChannelSearchActions.patternChange(q))
 		yield put(ChannelSearchActions.searchChannel())
+	}
+}
+function* plotRoute(params, queries) {
+	// automatically display the query range pop up,
+	// but only if we haven't already drawn a plot
+	const shouldDisplay = yield select(PlotSelectors.shouldDisplayChart)
+	if (!shouldDisplay) {
+		yield put(PlotActions.showQueryRange())
 	}
 }
 
