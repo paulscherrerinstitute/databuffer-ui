@@ -42,17 +42,6 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 
 	private routes = [
 		{
-			path: '/',
-			action: () => nothing,
-		},
-		{
-			path: '/search',
-			action: () => html`<mwc-icon-button
-				icon="more_vert"
-				@click=${() => this.dispatchEvent(new CustomEvent('search:more'))}
-			></mwc-icon-button>`,
-		},
-		{
 			path: '/plot',
 			action: () =>
 				html`<mwc-icon-button
