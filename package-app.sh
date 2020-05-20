@@ -32,7 +32,7 @@ skipped by an option:
   - Clean work area (i.e. clean caches and remove build outputs).
   - Run tests.
   - Run production build (i.e. minified).
-  - Creata a package for deployment.
+  - Create a package for deployment.
 
 
 OPTIONS
