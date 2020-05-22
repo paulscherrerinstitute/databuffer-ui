@@ -52,6 +52,7 @@ describe('plot reducer', () => {
 	describe('initial state', () => {
 		it('should have correct initial state', () => {
 			expect(initialState).to.deep.equal({
+				plotTitle: '',
 				startTime: initialState.startTime, // will be checked separately below
 				endTime: initialState.endTime, // will be checked separately below
 				startPulse: 1,
@@ -280,6 +281,52 @@ describe('plot reducer', () => {
 				{ name: EXAMPLE_CHANNELS[2].name, channelIndex: 1, yAxisIndex: 1 },
 			]
 			expect(nextState.dataSeries).to.deep.equal(expected)
+		})
+	})
+
+	describe('on action of type PLOT_TITLE_CHANGE', () => {
+		it('should set plotTitle', () => {
+			const previousState = { ...initialState }
+			const action = PlotActions.plotTitleChange('Hello')
+			const nextState = reducer(previousState, action)
+			expect(nextState.plotTitle).to.equal('Hello')
+		})
+	})
+
+	describe('on action of type DATA_SERIES_LABEL_CHANGE', () => {
+		it('should set name of dataSeries item', () => {
+			const previousState = {
+				...initialState,
+				dataSeries: [
+					{ name: 'series 1', channelIndex: 0, yAxisIndex: 10 },
+					{ name: 'series 2', channelIndex: 1, yAxisIndex: 11 },
+					{ name: 'series 3', channelIndex: 2, yAxisIndex: 12 },
+				],
+			} as PlotState
+			const action = PlotActions.dataSeriesLabelChange(1, 'Hello')
+			const nextState = reducer(previousState, action)
+			expect(nextState.dataSeries[1]).to.deep.equal({
+				name: 'Hello',
+				channelIndex: 1,
+				yAxisIndex: 11,
+			})
+		})
+		it('should set title of yAxes item', () => {
+			const previousState = {
+				...initialState,
+				yAxes: [
+					{ title: 'series 1', unit: 'A', side: 'left' },
+					{ title: 'series 2', unit: 'V', side: 'right' },
+					{ title: 'series 3', unit: 'mJ', side: 'left' },
+				],
+			} as PlotState
+			const action = PlotActions.dataSeriesLabelChange(1, 'Hello')
+			const nextState = reducer(previousState, action)
+			expect(nextState.yAxes[1]).to.deep.equal({
+				title: 'Hello',
+				unit: 'V',
+				side: 'right',
+			})
 		})
 	})
 

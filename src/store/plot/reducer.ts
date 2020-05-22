@@ -4,6 +4,7 @@ import { YAxis, DataSeries, Channel } from './models'
 import { channelToId } from '@psi/databuffer-query-js/channel'
 
 export interface PlotState {
+	plotTitle: string
 	startTime: number
 	endTime: number
 	startPulse: number
@@ -25,6 +26,7 @@ export interface PlotState {
 }
 
 export const initialState: PlotState = {
+	plotTitle: '',
 	startTime: Date.now() - 1000,
 	endTime: Date.now(),
 	startPulse: 1,
@@ -119,6 +121,27 @@ export default (
 					channelIndex: idx,
 					yAxisIndex: idx,
 				})),
+			}
+
+		case PlotActionTypes.PLOT_TITLE_CHANGE:
+			return {
+				...state,
+				plotTitle: action.payload.plotTitle,
+			}
+
+		case PlotActionTypes.DATA_SERIES_LABEL_CHANGE:
+			return {
+				...state,
+				dataSeries: state.dataSeries.map((series, idx) =>
+					idx !== action.payload.index
+						? series
+						: { ...series, name: action.payload.label }
+				),
+				yAxes: state.yAxes.map((axis, idx) =>
+					idx !== action.payload.index
+						? axis
+						: { ...axis, title: action.payload.label }
+				),
 			}
 
 		case PlotActionTypes.START_TIME_CHANGE:

@@ -50,6 +50,29 @@ describe('PlotActions', () => {
 		expect(action).to.deep.equal(expected)
 	})
 
+	it('should create PLOT_TITLE_CHANGE', () => {
+		const action = PlotActions.plotTitleChange('Hello')
+		const expected = {
+			type: PlotActionTypes.PLOT_TITLE_CHANGE,
+			payload: {
+				plotTitle: 'Hello',
+			},
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
+	it('should create DATA_SERIES_LABEL_CHANGE', () => {
+		const action = PlotActions.dataSeriesLabelChange(5, 'Hello')
+		const expected = {
+			type: PlotActionTypes.DATA_SERIES_LABEL_CHANGE,
+			payload: {
+				index: 5,
+				label: 'Hello',
+			},
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
 	it('should create START_TIME_CHANGE', () => {
 		const action = PlotActions.startTimeChange(12345)
 		const expected = {

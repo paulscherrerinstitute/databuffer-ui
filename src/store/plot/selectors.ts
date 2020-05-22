@@ -8,6 +8,7 @@ import type {
 } from '@psi/databuffer-query-js/query-data'
 
 import { RootState } from '../reducer'
+import { formatDate } from '../../util'
 
 const getState = (state: RootState) => state.plot
 
@@ -54,6 +55,7 @@ const TOOLTIP_FORMAT_WITH_BINNING =
 const TOOLTIP_FORMAT_WITHOUT_BINNING =
 	'bin size: {point.eventCount}<br/><b>value: {point.mean}</b>'
 
+export const plotTitle = createSelector([getState], state => state.plotTitle)
 export const startTime = createSelector([getState], state => state.startTime)
 export const endTime = createSelector([getState], state => state.endTime)
 export const channels = createSelector([getState], state => state.channels)
@@ -146,11 +148,26 @@ export const highchartsDataSeries = createSelector(
 		}))
 )
 
+export const highchartsTitle = createSelector([plotTitle], plotTitle => ({
+	text: plotTitle,
+}))
+
+export const highchartsSubTitle = createSelector(
+	[requestFinishedAt],
+	requestFinishedAt => ({
+		text: requestFinishedAt
+			? `Data retrieved ${formatDate(requestFinishedAt)}`
+			: '',
+	})
+)
+
 export const highchartsOptions = createSelector(
-	[highchartsYAxes, highchartsDataSeries],
-	(yAxis, series) => ({
+	[highchartsYAxes, highchartsDataSeries, highchartsTitle, highchartsSubTitle],
+	(yAxis, series, title, subtitle) => ({
 		yAxis,
 		series,
+		title,
+		subtitle,
 	})
 )
 

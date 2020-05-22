@@ -7,6 +7,8 @@ export enum PlotActionTypes {
 	UNSELECT_CHANNEL = 'daq-web-ui-app/UNSELECT_CHANNEL',
 	SET_SELECTED_CHANNELS = 'daq-web-ui-app/SET_SELECTED_CHANNELS',
 
+	PLOT_TITLE_CHANGE = 'daq-web-ui-app/PLOT_TITLE_CHANGE',
+	DATA_SERIES_LABEL_CHANGE = 'daq-web-ui-app/DATA_SERIES_LABEL_CHANGE',
 	START_TIME_CHANGE = 'daq-web-ui-app/START_TIME_CHANGE',
 	END_TIME_CHANGE = 'daq-web-ui-app/END_TIME_CHANGE',
 
@@ -34,6 +36,10 @@ export const PlotActions = {
 	setSelectedChannels: (channels: Channel[]) =>
 		createAction(PlotActionTypes.SET_SELECTED_CHANNELS, { channels }),
 
+	plotTitleChange: (plotTitle: string) =>
+		createAction(PlotActionTypes.PLOT_TITLE_CHANGE, { plotTitle }),
+	dataSeriesLabelChange: (index: number, label: string) =>
+		createAction(PlotActionTypes.DATA_SERIES_LABEL_CHANGE, { index, label }),
 	startTimeChange: (startTime: number) =>
 		createAction(PlotActionTypes.START_TIME_CHANGE, { startTime }),
 	endTimeChange: (endTime: number) =>
