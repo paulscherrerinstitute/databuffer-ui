@@ -52,6 +52,10 @@ export class AppBarNavIconElement extends connect(store, LitElement) {
 			action: () => `/search`,
 		},
 		{
+			path: '/plot-settings',
+			action: () => `/plot`,
+		},
+		{
 			path: '/query-meta',
 			action: () => `/plot`,
 		},

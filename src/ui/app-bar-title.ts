@@ -43,6 +43,10 @@ export class AppBarTitleElement extends connect(store, LitElement) {
 			action: () => `Plot`,
 		},
 		{
+			path: '/plot-settings',
+			action: () => `Plot settings`,
+		},
+		{
 			path: '/query-meta',
 			action: () => `About data query`,
 		},
