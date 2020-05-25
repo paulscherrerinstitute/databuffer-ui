@@ -201,4 +201,18 @@ describe('PlotActions', () => {
 		}
 		expect(action).to.deep.equal(expected)
 	})
+
+	it('should create SET_AXIS_SCALE', () => {
+		const action = PlotActions.setAxisScale(3, false, 20, 50)
+		const expected = {
+			type: PlotActionTypes.SET_AXIS_SCALE,
+			payload: {
+				index: 3,
+				auto: false,
+				min: 20,
+				max: 50,
+			},
+		}
+		expect(action).to.deep.equal(expected)
+	})
 })

@@ -26,6 +26,8 @@ export enum PlotActionTypes {
 
 	SHARE_ABSOLUTE_TIMES = 'daq-web-ui-app/PLOT/SHARE_ABSOLUTE_TIMES',
 	SHARE_RELATIVE_TIME = 'daq-web-ui-app/PLOT/SHARE_RELATIVE_TIME',
+
+	SET_AXIS_SCALE = 'daq-web-ui-app/PLOT/SET_AXIS_SCALE',
 }
 
 export const PlotActions = {
@@ -65,6 +67,14 @@ export const PlotActions = {
 
 	shareAbsoluteTimes: () => createAction(PlotActionTypes.SHARE_ABSOLUTE_TIMES),
 	shareRelativeTime: () => createAction(PlotActionTypes.SHARE_RELATIVE_TIME),
+
+	setAxisScale: (index: number, auto: boolean, min: number, max: number) =>
+		createAction(PlotActionTypes.SET_AXIS_SCALE, {
+			index,
+			auto,
+			min,
+			max,
+		}),
 }
 
 export type PlotActions = ActionsUnion<typeof PlotActions>
