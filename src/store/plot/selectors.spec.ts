@@ -579,6 +579,26 @@ describe('plot selectors', () => {
 				labelColors[1]
 			)
 		})
+
+		it('sets min and max correctly', () => {
+			console.log(JSON.stringify(selectors.highchartsYAxes(state)))
+			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
+				'[0].min',
+				null
+			)
+			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
+				'[0].max',
+				null
+			)
+			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
+				'[1].min',
+				3
+			)
+			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
+				'[1].max',
+				7
+			)
+		})
 	})
 
 	describe('it retrieves highchartsDataSeries', () => {

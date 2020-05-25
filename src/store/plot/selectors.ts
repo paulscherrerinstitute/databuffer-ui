@@ -130,6 +130,8 @@ export const highchartsYAxes = createSelector([yAxes], yAxes =>
 			style: { color: Highcharts.getOptions().colors[idx] },
 		},
 		opposite: yaxis.side !== 'left',
+		min: yaxis.min,
+		max: yaxis.max,
 	}))
 )
 
