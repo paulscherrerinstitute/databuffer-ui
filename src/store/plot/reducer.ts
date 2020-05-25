@@ -70,6 +70,11 @@ export default (
 								title: action.payload.channel.name,
 								unit: '',
 								side: state.yAxes.length % 2 === 0 ? 'left' : 'right',
+								scale: {
+									auto: true,
+									min: 0,
+									max: 0,
+								},
 							},
 						],
 						dataSeries: [
@@ -115,6 +120,11 @@ export default (
 					title: ch.name,
 					side: idx % 2 === 0 ? 'left' : 'right',
 					unit: '',
+					scale: {
+						auto: true,
+						min: 0,
+						max: 0,
+					},
 				})),
 				dataSeries: action.payload.channels.map((ch, idx) => ({
 					name: ch.name,

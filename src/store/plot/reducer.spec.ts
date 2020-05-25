@@ -269,8 +269,18 @@ describe('plot reducer', () => {
 
 		it('should set yAxes', () => {
 			const expected: YAxis[] = [
-				{ title: EXAMPLE_CHANNELS[0].name, unit: '', side: 'left' },
-				{ title: EXAMPLE_CHANNELS[2].name, unit: '', side: 'right' },
+				{
+					title: EXAMPLE_CHANNELS[0].name,
+					unit: '',
+					side: 'left',
+					scale: { auto: true, min: 0, max: 0 },
+				},
+				{
+					title: EXAMPLE_CHANNELS[2].name,
+					unit: '',
+					side: 'right',
+					scale: { auto: true, min: 0, max: 0 },
+				},
 			]
 			expect(nextState.yAxes).to.deep.equal(expected)
 		})
