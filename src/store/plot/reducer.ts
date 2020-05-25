@@ -242,6 +242,16 @@ export default (
 				dialogShareLinkAbsoluteTimes: false,
 			}
 
+		case PlotActionTypes.SET_AXIS_SCALE:
+			return {
+				...state,
+				yAxes: state.yAxes.map((axis, index) =>
+					index !== action.payload.index
+						? axis
+						: { ...axis, scale: action.payload.scale }
+				),
+			}
+
 		default:
 			return state
 	}

@@ -1,5 +1,5 @@
 import { createAction, ActionsUnion } from '../actions'
-import { Channel } from './models'
+import { Channel, YAxisScale } from './models'
 import type { DataResponse } from '../../api/queryrest'
 
 export enum PlotActionTypes {
@@ -68,12 +68,10 @@ export const PlotActions = {
 	shareAbsoluteTimes: () => createAction(PlotActionTypes.SHARE_ABSOLUTE_TIMES),
 	shareRelativeTime: () => createAction(PlotActionTypes.SHARE_RELATIVE_TIME),
 
-	setAxisScale: (index: number, auto: boolean, min: number, max: number) =>
+	setAxisScale: (index: number, scale: YAxisScale) =>
 		createAction(PlotActionTypes.SET_AXIS_SCALE, {
 			index,
-			auto,
-			min,
-			max,
+			scale,
 		}),
 }
 

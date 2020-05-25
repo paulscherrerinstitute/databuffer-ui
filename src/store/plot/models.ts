@@ -32,12 +32,14 @@ export interface YAxis {
 	/** side defines where on the plot the axis should be put */
 	side: 'left' | 'right'
 	/** axis scaling */
-	scale: {
-		/** automatic scaling */
-		auto: boolean
-		/** lowest value */
-		min: number
-		/** highest value */
-		max: number
-	}
+	scale: YAxisScale
+}
+
+export interface YAxisScale {
+	/** automatic scaling */
+	auto: boolean
+	/** lowest value */
+	min: number
+	/** highest value */
+	max: number
 }

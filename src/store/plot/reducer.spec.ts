@@ -588,4 +588,65 @@ describe('plot reducer', () => {
 			expect(nextState.dialogShareLinkAbsoluteTimes).to.be.false
 		})
 	})
+
+	describe('on action of type SET_AXIS_SCALE', () => {
+		it('should only change the axis scale at the index', () => {
+			const previousState: PlotState = {
+				...initialState,
+				yAxes: [
+					{
+						title: 'a',
+						unit: 'AA',
+						side: 'left',
+						scale: {
+							auto: true,
+							min: 10,
+							max: 20,
+						},
+					},
+					{
+						title: 'b',
+						unit: 'BB',
+						side: 'left',
+						scale: {
+							auto: true,
+							min: 100,
+							max: 200,
+						},
+					},
+					{
+						title: 'c',
+						unit: 'CC',
+						side: 'left',
+						scale: {
+							auto: true,
+							min: 1000,
+							max: 2000,
+						},
+					},
+				],
+			}
+			const action = PlotActions.setAxisScale(1, {
+				auto: false,
+				min: 4,
+				max: 5,
+			})
+			const nextState = reducer(previousState, action)
+			expect(nextState.yAxes[0].scale).to.deep.equal({
+				auto: true,
+				min: 10,
+				max: 20,
+			})
+			expect(nextState.yAxes[1].scale).to.deep.equal({
+				auto: false,
+				min: 4,
+				max: 5,
+			})
+			expect(nextState.yAxes[2].scale).to.deep.equal({
+				auto: true,
+				min: 1000,
+				max: 2000,
+			})
+		})
+	})
 })
