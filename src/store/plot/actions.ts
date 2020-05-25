@@ -1,5 +1,5 @@
 import { createAction, ActionsUnion } from '../actions'
-import { Channel, YAxisScale } from './models'
+import { Channel } from './models'
 import type { DataResponse } from '../../api/queryrest'
 
 export enum PlotActionTypes {
@@ -27,7 +27,8 @@ export enum PlotActionTypes {
 	SHARE_ABSOLUTE_TIMES = 'daq-web-ui-app/PLOT/SHARE_ABSOLUTE_TIMES',
 	SHARE_RELATIVE_TIME = 'daq-web-ui-app/PLOT/SHARE_RELATIVE_TIME',
 
-	SET_AXIS_SCALE = 'daq-web-ui-app/PLOT/SET_AXIS_SCALE',
+	SET_AXIS_MIN = 'daq-web-ui-app/PLOT/SET_AXIS_MIN',
+	SET_AXIS_MAX = 'daq-web-ui-app/PLOT/SET_AXIS_MAX',
 }
 
 export const PlotActions = {
@@ -68,11 +69,10 @@ export const PlotActions = {
 	shareAbsoluteTimes: () => createAction(PlotActionTypes.SHARE_ABSOLUTE_TIMES),
 	shareRelativeTime: () => createAction(PlotActionTypes.SHARE_RELATIVE_TIME),
 
-	setAxisScale: (index: number, scale: YAxisScale) =>
-		createAction(PlotActionTypes.SET_AXIS_SCALE, {
-			index,
-			scale,
-		}),
+	setAxisMin: (index: number, min: number | null) =>
+		createAction(PlotActionTypes.SET_AXIS_MIN, { index, min }),
+	setAxisMax: (index: number, max: number | null) =>
+		createAction(PlotActionTypes.SET_AXIS_MAX, { index, max }),
 }
 
 export type PlotActions = ActionsUnion<typeof PlotActions>

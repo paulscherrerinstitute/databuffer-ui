@@ -403,11 +403,8 @@ describe('plot selectors', () => {
 						title: 'a',
 						unit: 'mA',
 						side: 'left',
-						scale: {
-							auto: true,
-							min: 0,
-							max: 0,
-						},
+						min: 10,
+						max: 20,
 					} as YAxis,
 				],
 			},
@@ -418,11 +415,8 @@ describe('plot selectors', () => {
 				title: 'a',
 				unit: 'mA',
 				side: 'left',
-				scale: {
-					auto: true,
-					min: 0,
-					max: 0,
-				},
+				min: 10,
+				max: 20,
 			},
 		])
 	})
@@ -515,19 +509,15 @@ describe('plot selectors', () => {
 							title: 'a',
 							unit: 'mA',
 							side: 'left',
-							scale: {
-								auto: true,
-							},
+							min: null,
+							max: null,
 						} as YAxis,
 						{
 							title: 'b',
 							unit: '', // just a number, no unit
 							side: 'right',
-							scale: {
-								auto: false,
-								min: 3,
-								max: 7,
-							},
+							min: 3,
+							max: 7,
 						} as YAxis,
 					],
 				},
@@ -775,13 +765,15 @@ describe('plot selectors', () => {
 							title: 'Axis 1',
 							unit: 'mA',
 							side: 'left',
-							scale: { auto: true, min: 0, max: 0 },
+							min: null,
+							max: null,
 						},
 						{
 							title: 'Axis 2',
 							unit: 'V',
 							side: 'right',
-							scale: { auto: true, min: 0, max: 0 },
+							min: null,
+							max: null,
 						},
 					],
 					dataSeries: [

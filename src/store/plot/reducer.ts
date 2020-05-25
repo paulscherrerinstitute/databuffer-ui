@@ -1,7 +1,6 @@
 import { PlotActions, PlotActionTypes } from './actions'
 import type { DataResponse } from '../../api/queryrest'
 import { YAxis, DataSeries, Channel } from './models'
-import { channelToId } from '@psi/databuffer-query-js/channel'
 
 export interface PlotState {
 	plotTitle: string
@@ -70,11 +69,8 @@ export default (
 								title: action.payload.channel.name,
 								unit: '',
 								side: state.yAxes.length % 2 === 0 ? 'left' : 'right',
-								scale: {
-									auto: true,
-									min: 0,
-									max: 0,
-								},
+								min: null,
+								max: null,
 							},
 						],
 						dataSeries: [
@@ -120,11 +116,8 @@ export default (
 					title: ch.name,
 					side: idx % 2 === 0 ? 'left' : 'right',
 					unit: '',
-					scale: {
-						auto: true,
-						min: 0,
-						max: 0,
-					},
+					min: null,
+					max: null,
 				})),
 				dataSeries: action.payload.channels.map((ch, idx) => ({
 					name: ch.name,
@@ -242,13 +235,23 @@ export default (
 				dialogShareLinkAbsoluteTimes: false,
 			}
 
-		case PlotActionTypes.SET_AXIS_SCALE:
+		case PlotActionTypes.SET_AXIS_MIN:
 			return {
 				...state,
 				yAxes: state.yAxes.map((axis, index) =>
 					index !== action.payload.index
 						? axis
-						: { ...axis, scale: action.payload.scale }
+						: { ...axis, min: action.payload.min }
+				),
+			}
+
+		case PlotActionTypes.SET_AXIS_MAX:
+			return {
+				...state,
+				yAxes: state.yAxes.map((axis, index) =>
+					index !== action.payload.index
+						? axis
+						: { ...axis, max: action.payload.max }
 				),
 			}
 

@@ -31,15 +31,8 @@ export interface YAxis {
 	unit: string
 	/** side defines where on the plot the axis should be put */
 	side: 'left' | 'right'
-	/** axis scaling */
-	scale: YAxisScale
-}
-
-export interface YAxisScale {
-	/** automatic scaling */
-	auto: boolean
-	/** lowest value */
-	min: number
-	/** highest value */
-	max: number
+	/** lowest allowed value. set to null for automatic minimum. */
+	min: number | null
+	/** highest value. set to null for automatic maximum. */
+	max: number | null
 }

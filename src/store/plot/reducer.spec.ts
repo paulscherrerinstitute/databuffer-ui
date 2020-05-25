@@ -273,13 +273,15 @@ describe('plot reducer', () => {
 					title: EXAMPLE_CHANNELS[0].name,
 					unit: '',
 					side: 'left',
-					scale: { auto: true, min: 0, max: 0 },
+					min: null,
+					max: null,
 				},
 				{
 					title: EXAMPLE_CHANNELS[2].name,
 					unit: '',
 					side: 'right',
-					scale: { auto: true, min: 0, max: 0 },
+					min: null,
+					max: null,
 				},
 			]
 			expect(nextState.yAxes).to.deep.equal(expected)
@@ -589,8 +591,8 @@ describe('plot reducer', () => {
 		})
 	})
 
-	describe('on action of type SET_AXIS_SCALE', () => {
-		it('should only change the axis scale at the index', () => {
+	describe('on action of type SET_AXIS_MIN', () => {
+		it('should only change the axis min at the index', () => {
 			const previousState: PlotState = {
 				...initialState,
 				yAxes: [
@@ -598,55 +600,65 @@ describe('plot reducer', () => {
 						title: 'a',
 						unit: 'AA',
 						side: 'left',
-						scale: {
-							auto: true,
-							min: 10,
-							max: 20,
-						},
+						min: 10,
+						max: 20,
 					},
 					{
 						title: 'b',
 						unit: 'BB',
 						side: 'left',
-						scale: {
-							auto: true,
-							min: 100,
-							max: 200,
-						},
+						min: 100,
+						max: 200,
 					},
 					{
 						title: 'c',
 						unit: 'CC',
 						side: 'left',
-						scale: {
-							auto: true,
-							min: 1000,
-							max: 2000,
-						},
+						min: 1000,
+						max: 2000,
 					},
 				],
 			}
-			const action = PlotActions.setAxisScale(1, {
-				auto: false,
-				min: 4,
-				max: 5,
-			})
+			const action = PlotActions.setAxisMin(1, 4)
 			const nextState = reducer(previousState, action)
-			expect(nextState.yAxes[0].scale).to.deep.equal({
-				auto: true,
-				min: 10,
-				max: 20,
-			})
-			expect(nextState.yAxes[1].scale).to.deep.equal({
-				auto: false,
-				min: 4,
-				max: 5,
-			})
-			expect(nextState.yAxes[2].scale).to.deep.equal({
-				auto: true,
-				min: 1000,
-				max: 2000,
-			})
+			expect(nextState.yAxes[0].min).to.equal(10)
+			expect(nextState.yAxes[1].min).to.equal(4)
+			expect(nextState.yAxes[2].min).to.equal(1000)
+		})
+	})
+	describe('on action of type SET_AXIS_MAX', () => {
+		it('should only change the axis max at the index', () => {
+			const previousState: PlotState = {
+				...initialState,
+				yAxes: [
+					{
+						title: 'a',
+						unit: 'AA',
+						side: 'left',
+						min: 10,
+						max: 20,
+					},
+					{
+						title: 'b',
+						unit: 'BB',
+						side: 'left',
+						min: 100,
+						max: 200,
+					},
+					{
+						title: 'c',
+						unit: 'CC',
+						side: 'left',
+						min: 1000,
+						max: 2000,
+					},
+				],
+			}
+			const action = PlotActions.setAxisMax(1, 4)
+			const nextState = reducer(previousState, action)
+			expect(nextState.yAxes[0].max).to.equal(20)
+			expect(nextState.yAxes[1].max).to.equal(4)
+			expect(nextState.yAxes[2].max).to.equal(2000)
 		})
 	})
 })
