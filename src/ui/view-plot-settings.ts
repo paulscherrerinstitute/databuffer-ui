@@ -70,7 +70,6 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 					<th>Label</th>
 					<th>Axis type</th>
 					<th>Scaling</th>
-					<th>Color</th>
 				</tr>
 				${this.dataSeriesConfig.map((series, idx) => {
 					const ch = this.channels[series.channelIndex]
@@ -153,7 +152,6 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 										)}
 								></mwc-textfield>
 							</td>
-							<td>auto</td>
 						</tr>
 					`
 				})}
