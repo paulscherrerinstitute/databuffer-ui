@@ -7,10 +7,13 @@ import {
 	PlotActions,
 	DataSeries,
 	YAxis,
+	YAxisType,
 } from '../store/plot'
 
 import { baseStyles } from './shared-styles'
 import { connect } from '@captaincodeman/redux-connect-element'
+import '@material/mwc-list/mwc-list-item'
+import '@material/mwc-select'
 import '@material/mwc-textfield'
 
 @customElement('view-plot-settings')
@@ -41,6 +44,8 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 			'axis:scale:max': (
 				e: CustomEvent<{ index: number; max: number | null }>
 			) => PlotActions.setAxisMax(e.detail.index, e.detail.max),
+			'axis:type': (e: CustomEvent<{ index: number; type: YAxisType }>) =>
+				PlotActions.setAxisType(e.detail.index, e.detail.type),
 		}
 	}
 
@@ -88,7 +93,30 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 										)}
 								></mwc-textfield>
 							</td>
-							<td>linear</td>
+							<td>
+								<mwc-select
+									@change=${e =>
+										this.dispatchEvent(
+											new CustomEvent('axis:type', {
+												detail: {
+													index: series.yAxisIndex,
+													type: e.target.value,
+												},
+											})
+										)}
+								>
+									<mwc-list-item
+										?selected=${yAxis.type === 'linear'}
+										value="linear"
+										>linear</mwc-list-item
+									>
+									<mwc-list-item
+										?selected=${yAxis.type === 'logarithmic'}
+										value="logarithmic"
+										>logarithmic</mwc-list-item
+									>
+								</mwc-select>
+							</td>
 							<td>
 								<mwc-textfield
 									label="Min"
