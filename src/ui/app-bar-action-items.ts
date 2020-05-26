@@ -46,19 +46,23 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 			path: '/plot',
 			action: () =>
 				html`<mwc-icon-button
+						title="select plot range"
 						icon="date_range"
 						@click=${() =>
 							this.dispatchEvent(new CustomEvent('plot:daterange'))}
 					></mwc-icon-button
 					><mwc-icon-button
+						title="share a link to this plot"
 						icon="share"
 						@click=${() => this.dispatchEvent(new CustomEvent('plot:share'))}
 					></mwc-icon-button
 					><mwc-icon-button
+						title="change plot settings"
 						icon="settings"
 						@click=${() => this.dispatchEvent(new CustomEvent('plot:settings'))}
 					></mwc-icon-button
 					><mwc-icon-button
+						title="view query information"
 						icon="info_outline"
 						@click=${() => this.dispatchEvent(new CustomEvent('plot:info'))}
 					></mwc-icon-button>`,
