@@ -1,9 +1,9 @@
 import { PlotActions, PlotActionTypes } from './actions'
 import type { DataResponse } from '../../api/queryrest'
 import { YAxis, DataSeries, Channel } from './models'
-import { channelToId } from '@psi/databuffer-query-js/channel'
 
 export interface PlotState {
+	plotTitle: string
 	startTime: number
 	endTime: number
 	startPulse: number
@@ -25,6 +25,7 @@ export interface PlotState {
 }
 
 export const initialState: PlotState = {
+	plotTitle: '',
 	startTime: Date.now() - 1000,
 	endTime: Date.now(),
 	startPulse: 1,
@@ -68,6 +69,9 @@ export default (
 								title: action.payload.channel.name,
 								unit: '',
 								side: state.yAxes.length % 2 === 0 ? 'left' : 'right',
+								min: null,
+								max: null,
+								type: 'linear',
 							},
 						],
 						dataSeries: [
@@ -113,12 +117,36 @@ export default (
 					title: ch.name,
 					side: idx % 2 === 0 ? 'left' : 'right',
 					unit: '',
+					min: null,
+					max: null,
+					type: 'linear',
 				})),
 				dataSeries: action.payload.channels.map((ch, idx) => ({
 					name: ch.name,
 					channelIndex: idx,
 					yAxisIndex: idx,
 				})),
+			}
+
+		case PlotActionTypes.PLOT_TITLE_CHANGE:
+			return {
+				...state,
+				plotTitle: action.payload.plotTitle,
+			}
+
+		case PlotActionTypes.DATA_SERIES_LABEL_CHANGE:
+			return {
+				...state,
+				dataSeries: state.dataSeries.map((series, idx) =>
+					idx !== action.payload.index
+						? series
+						: { ...series, name: action.payload.label }
+				),
+				yAxes: state.yAxes.map((axis, idx) =>
+					idx !== action.payload.index
+						? axis
+						: { ...axis, title: action.payload.label }
+				),
 			}
 
 		case PlotActionTypes.START_TIME_CHANGE:
@@ -207,6 +235,36 @@ export default (
 			return {
 				...state,
 				dialogShareLinkAbsoluteTimes: false,
+			}
+
+		case PlotActionTypes.SET_AXIS_MIN:
+			return {
+				...state,
+				yAxes: state.yAxes.map((axis, index) =>
+					index !== action.payload.index
+						? axis
+						: { ...axis, min: action.payload.min }
+				),
+			}
+
+		case PlotActionTypes.SET_AXIS_MAX:
+			return {
+				...state,
+				yAxes: state.yAxes.map((axis, index) =>
+					index !== action.payload.index
+						? axis
+						: { ...axis, max: action.payload.max }
+				),
+			}
+
+		case PlotActionTypes.SET_AXIS_TYPE:
+			return {
+				...state,
+				yAxes: state.yAxes.map((axis, index) =>
+					index !== action.payload.index
+						? axis
+						: { ...axis, type: action.payload.type }
+				),
 			}
 
 		default:

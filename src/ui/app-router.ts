@@ -44,6 +44,10 @@ export class AppRouterElement extends connect(store, LitElement) {
 			action: () => `<view-standard-plot></view-standard-plot>`,
 		},
 		{
+			path: '/plot-settings',
+			action: () => `<view-plot-settings></view-plot-settings>`,
+		},
+		{
 			path: '/query-meta',
 			action: () => `<view-query-meta></view-query-meta>`,
 		},

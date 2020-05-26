@@ -13,6 +13,7 @@ import type {
 } from '@psi/databuffer-query-js/query-data'
 import { YAxis, DataSeries } from './models'
 import { channelToId } from '@psi/databuffer-query-js/channel'
+import { formatDate } from '../../util'
 
 const BASE_STATE: RootState = {
 	channelSearch: {} as ChannelSearchState,
@@ -92,6 +93,22 @@ const EXAMPLE_STATE_WITH_DATA: RootState = {
 }
 
 describe('plot selectors', () => {
+	it('retrieves plotTitle', () => {
+		const state1 = {
+			...BASE_STATE,
+			plot: { ...BASE_STATE.plot, plotTitle: '' },
+		}
+		const state2 = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				plotTitle: 'Hello, world!',
+			},
+		}
+		expect(selectors.plotTitle(state1)).to.equal('')
+		expect(selectors.plotTitle(state2)).to.equal('Hello, world!')
+	})
+
 	it('retrieves startTime', () => {
 		const state1 = {
 			...BASE_STATE,
@@ -386,6 +403,9 @@ describe('plot selectors', () => {
 						title: 'a',
 						unit: 'mA',
 						side: 'left',
+						min: 10,
+						max: 20,
+						type: 'linear',
 					} as YAxis,
 				],
 			},
@@ -396,6 +416,9 @@ describe('plot selectors', () => {
 				title: 'a',
 				unit: 'mA',
 				side: 'left',
+				min: 10,
+				max: 20,
+				type: 'linear',
 			},
 		])
 	})
@@ -488,12 +511,18 @@ describe('plot selectors', () => {
 							title: 'a',
 							unit: 'mA',
 							side: 'left',
-						} as YAxis,
+							min: null,
+							max: null,
+							type: 'linear',
+						},
 						{
 							title: 'b',
 							unit: '', // just a number, no unit
 							side: 'right',
-						} as YAxis,
+							min: 3,
+							max: 7,
+							type: 'logarithmic',
+						},
 					],
 				},
 			}
@@ -552,6 +581,39 @@ describe('plot selectors', () => {
 			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
 				'[1].title.style.color',
 				labelColors[1]
+			)
+		})
+
+		it('sets min correctly', () => {
+			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
+				'[0].min',
+				null
+			)
+			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
+				'[1].min',
+				3
+			)
+		})
+
+		it('sets max correctly', () => {
+			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
+				'[0].max',
+				null
+			)
+			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
+				'[1].max',
+				7
+			)
+		})
+
+		it('sets type correctly', () => {
+			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
+				'[0].type',
+				'linear'
+			)
+			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
+				'[1].type',
+				'logarithmic'
 			)
 		})
 	})
@@ -675,6 +737,56 @@ describe('plot selectors', () => {
 		})
 	})
 
+	describe('it retrieves highchartsTitle', () => {
+		it('uses plotTitle selector', () => {
+			const state = {
+				...BASE_STATE,
+				plot: {
+					...BASE_STATE.plot,
+					channels: EXAMPLE_CHANNELS,
+					response: EXAMPLE_RESPONSE,
+					plotTitle: 'example plot',
+				},
+			}
+			const expected = { text: selectors.plotTitle(state) }
+			expect(selectors.highchartsTitle(state)).to.deep.equal(expected)
+		})
+	})
+
+	describe('it retrieves highchartsSubTitle', () => {
+		let state: RootState
+
+		beforeEach(() => {
+			state = {
+				...BASE_STATE,
+				plot: {
+					...BASE_STATE.plot,
+					channels: EXAMPLE_CHANNELS,
+					response: EXAMPLE_RESPONSE,
+					request: {
+						sentAt: 1590153856725,
+						finishedAt: 1590153857725,
+					},
+				},
+			}
+		})
+
+		it('uses requestFinishedAt selector', () => {
+			const expected = {
+				text:
+					'Data retrieved ' + formatDate(selectors.requestFinishedAt(state)),
+			}
+			expect(selectors.highchartsSubTitle(state)).to.deep.equal(expected)
+		})
+
+		it('is empty, when request is not finished yet', () => {
+			const state1 = { ...state }
+			state1.plot.request.finishedAt = undefined
+			const expected = { text: '' }
+			expect(selectors.highchartsSubTitle(state1)).to.deep.equal(expected)
+		})
+	})
+
 	describe('it retrieves highchartsOptions', () => {
 		let state: RootState
 		beforeEach(() => {
@@ -684,9 +796,24 @@ describe('plot selectors', () => {
 					...BASE_STATE.plot,
 					channels: EXAMPLE_CHANNELS,
 					response: EXAMPLE_RESPONSE,
+					plotTitle: 'Hello',
 					yAxes: [
-						{ title: 'Axis 1', unit: 'mA', side: 'left' },
-						{ title: 'Axis 2', unit: 'V', side: 'right' },
+						{
+							title: 'Axis 1',
+							unit: 'mA',
+							side: 'left',
+							min: null,
+							max: null,
+							type: 'linear',
+						},
+						{
+							title: 'Axis 2',
+							unit: 'V',
+							side: 'right',
+							min: null,
+							max: null,
+							type: 'linear',
+						},
 					],
 					dataSeries: [
 						{
@@ -710,17 +837,37 @@ describe('plot selectors', () => {
 				plot: { ...BASE_STATE.plot, yAxes: [], dataSeries: [] },
 			}
 			expect(selectors.highchartsOptions(state1)).to.deep.equal({
+				title: {
+					text: '',
+				},
+				subtitle: {
+					text: '',
+				},
 				yAxis: [],
 				series: [],
 			})
 		})
 
-		it('uses series and yAxis from other selectors', () => {
-			const expected = {
-				yAxis: selectors.highchartsYAxes(state),
-				series: selectors.highchartsDataSeries(state),
-			}
-			expect(selectors.highchartsOptions(state)).to.deep.equal(expected)
+		it('uses title from other selectors', () => {
+			const expected = selectors.highchartsTitle(state)
+			expect(selectors.highchartsOptions(state).title).to.deep.equal(expected)
+		})
+
+		it('uses subtitle from other selectors', () => {
+			const expected = selectors.highchartsSubTitle(state)
+			expect(selectors.highchartsOptions(state).subtitle).to.deep.equal(
+				expected
+			)
+		})
+
+		it('uses series from other selectors', () => {
+			const expected = selectors.highchartsDataSeries(state)
+			expect(selectors.highchartsOptions(state).series).to.deep.equal(expected)
+		})
+
+		it('uses yAxis from other selectors', () => {
+			const expected = selectors.highchartsYAxes(state)
+			expect(selectors.highchartsOptions(state).yAxis).to.deep.equal(expected)
 		})
 	})
 

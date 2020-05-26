@@ -1,5 +1,5 @@
 import { createAction, ActionsUnion } from '../actions'
-import { Channel } from './models'
+import { Channel, YAxisType } from './models'
 import type { DataResponse } from '../../api/queryrest'
 
 export enum PlotActionTypes {
@@ -7,6 +7,8 @@ export enum PlotActionTypes {
 	UNSELECT_CHANNEL = 'daq-web-ui-app/UNSELECT_CHANNEL',
 	SET_SELECTED_CHANNELS = 'daq-web-ui-app/SET_SELECTED_CHANNELS',
 
+	PLOT_TITLE_CHANGE = 'daq-web-ui-app/PLOT_TITLE_CHANGE',
+	DATA_SERIES_LABEL_CHANGE = 'daq-web-ui-app/DATA_SERIES_LABEL_CHANGE',
 	START_TIME_CHANGE = 'daq-web-ui-app/START_TIME_CHANGE',
 	END_TIME_CHANGE = 'daq-web-ui-app/END_TIME_CHANGE',
 
@@ -24,6 +26,10 @@ export enum PlotActionTypes {
 
 	SHARE_ABSOLUTE_TIMES = 'daq-web-ui-app/PLOT/SHARE_ABSOLUTE_TIMES',
 	SHARE_RELATIVE_TIME = 'daq-web-ui-app/PLOT/SHARE_RELATIVE_TIME',
+
+	SET_AXIS_MIN = 'daq-web-ui-app/PLOT/SET_AXIS_MIN',
+	SET_AXIS_MAX = 'daq-web-ui-app/PLOT/SET_AXIS_MAX',
+	SET_AXIS_TYPE = 'daq-web-ui-app/PLOT/SET_AXIS_TYPE',
 }
 
 export const PlotActions = {
@@ -34,6 +40,10 @@ export const PlotActions = {
 	setSelectedChannels: (channels: Channel[]) =>
 		createAction(PlotActionTypes.SET_SELECTED_CHANNELS, { channels }),
 
+	plotTitleChange: (plotTitle: string) =>
+		createAction(PlotActionTypes.PLOT_TITLE_CHANGE, { plotTitle }),
+	dataSeriesLabelChange: (index: number, label: string) =>
+		createAction(PlotActionTypes.DATA_SERIES_LABEL_CHANGE, { index, label }),
 	startTimeChange: (startTime: number) =>
 		createAction(PlotActionTypes.START_TIME_CHANGE, { startTime }),
 	endTimeChange: (endTime: number) =>
@@ -59,6 +69,13 @@ export const PlotActions = {
 
 	shareAbsoluteTimes: () => createAction(PlotActionTypes.SHARE_ABSOLUTE_TIMES),
 	shareRelativeTime: () => createAction(PlotActionTypes.SHARE_RELATIVE_TIME),
+
+	setAxisMin: (index: number, min: number | null) =>
+		createAction(PlotActionTypes.SET_AXIS_MIN, { index, min }),
+	setAxisMax: (index: number, max: number | null) =>
+		createAction(PlotActionTypes.SET_AXIS_MAX, { index, max }),
+	setAxisType: (index: number, type: YAxisType) =>
+		createAction(PlotActionTypes.SET_AXIS_TYPE, { index, type }),
 }
 
 export type PlotActions = ActionsUnion<typeof PlotActions>

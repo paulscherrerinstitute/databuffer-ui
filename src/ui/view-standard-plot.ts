@@ -150,9 +150,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			chart: {
 				type: 'line',
 			},
-			title: {
-				text: 'The plot',
-			},
 			series: [],
 			xAxis: {
 				type: 'datetime',
@@ -176,15 +173,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			} else if (this.channelsWithoutData.length > 0) {
 				this.__snackPartialData.show()
 			}
-		}
-		if (changedProperties.has('requestFinishedAt')) {
-			this.__chart.update({
-				subtitle: {
-					text: this.requestFinishedAt
-						? `Data retrieved ${formatDate(this.requestFinishedAt)}`
-						: '',
-				},
-			})
 		}
 		if (
 			changedProperties.has('startTime') ||

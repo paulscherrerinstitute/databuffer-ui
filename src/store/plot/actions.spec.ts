@@ -50,6 +50,29 @@ describe('PlotActions', () => {
 		expect(action).to.deep.equal(expected)
 	})
 
+	it('should create PLOT_TITLE_CHANGE', () => {
+		const action = PlotActions.plotTitleChange('Hello')
+		const expected = {
+			type: PlotActionTypes.PLOT_TITLE_CHANGE,
+			payload: {
+				plotTitle: 'Hello',
+			},
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
+	it('should create DATA_SERIES_LABEL_CHANGE', () => {
+		const action = PlotActions.dataSeriesLabelChange(5, 'Hello')
+		const expected = {
+			type: PlotActionTypes.DATA_SERIES_LABEL_CHANGE,
+			payload: {
+				index: 5,
+				label: 'Hello',
+			},
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
 	it('should create START_TIME_CHANGE', () => {
 		const action = PlotActions.startTimeChange(12345)
 		const expected = {
@@ -175,6 +198,42 @@ describe('PlotActions', () => {
 		const action = PlotActions.shareRelativeTime()
 		const expected = {
 			type: PlotActionTypes.SHARE_RELATIVE_TIME,
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
+	it('should create SET_AXIS_MIN', () => {
+		const action = PlotActions.setAxisMin(3, 20)
+		const expected = {
+			type: PlotActionTypes.SET_AXIS_MIN,
+			payload: {
+				index: 3,
+				min: 20,
+			},
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
+	it('should create SET_AXIS_MAX', () => {
+		const action = PlotActions.setAxisMax(3, 20)
+		const expected = {
+			type: PlotActionTypes.SET_AXIS_MAX,
+			payload: {
+				index: 3,
+				max: 20,
+			},
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
+	it('should create SET_AXIS_TYPE', () => {
+		const action = PlotActions.setAxisType(3, 'linear')
+		const expected = {
+			type: PlotActionTypes.SET_AXIS_TYPE,
+			payload: {
+				index: 3,
+				type: 'linear',
+			},
 		}
 		expect(action).to.deep.equal(expected)
 	})
