@@ -275,6 +275,7 @@ describe('plot reducer', () => {
 					side: 'left',
 					min: null,
 					max: null,
+					type: 'linear',
 				},
 				{
 					title: EXAMPLE_CHANNELS[2].name,
@@ -282,6 +283,7 @@ describe('plot reducer', () => {
 					side: 'right',
 					min: null,
 					max: null,
+					type: 'linear',
 				},
 			]
 			expect(nextState.yAxes).to.deep.equal(expected)
@@ -602,6 +604,7 @@ describe('plot reducer', () => {
 						side: 'left',
 						min: 10,
 						max: 20,
+						type: 'linear',
 					},
 					{
 						title: 'b',
@@ -609,6 +612,7 @@ describe('plot reducer', () => {
 						side: 'left',
 						min: 100,
 						max: 200,
+						type: 'linear',
 					},
 					{
 						title: 'c',
@@ -616,6 +620,7 @@ describe('plot reducer', () => {
 						side: 'left',
 						min: 1000,
 						max: 2000,
+						type: 'linear',
 					},
 				],
 			}
@@ -637,6 +642,7 @@ describe('plot reducer', () => {
 						side: 'left',
 						min: 10,
 						max: 20,
+						type: 'linear',
 					},
 					{
 						title: 'b',
@@ -644,6 +650,7 @@ describe('plot reducer', () => {
 						side: 'left',
 						min: 100,
 						max: 200,
+						type: 'linear',
 					},
 					{
 						title: 'c',
@@ -651,6 +658,7 @@ describe('plot reducer', () => {
 						side: 'left',
 						min: 1000,
 						max: 2000,
+						type: 'linear',
 					},
 				],
 			}

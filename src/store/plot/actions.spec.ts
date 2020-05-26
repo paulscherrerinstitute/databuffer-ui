@@ -225,4 +225,16 @@ describe('PlotActions', () => {
 		}
 		expect(action).to.deep.equal(expected)
 	})
+
+	it('should create SET_AXIS_TYPE', () => {
+		const action = PlotActions.setAxisType(3, 'linear')
+		const expected = {
+			type: PlotActionTypes.SET_AXIS_TYPE,
+			payload: {
+				index: 3,
+				type: 'linear',
+			},
+		}
+		expect(action).to.deep.equal(expected)
+	})
 })

@@ -132,6 +132,7 @@ export const highchartsYAxes = createSelector([yAxes], yAxes =>
 		opposite: yaxis.side !== 'left',
 		min: yaxis.min,
 		max: yaxis.max,
+		type: yaxis.type,
 	}))
 )
 

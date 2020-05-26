@@ -405,6 +405,7 @@ describe('plot selectors', () => {
 						side: 'left',
 						min: 10,
 						max: 20,
+						type: 'linear',
 					} as YAxis,
 				],
 			},
@@ -417,6 +418,7 @@ describe('plot selectors', () => {
 				side: 'left',
 				min: 10,
 				max: 20,
+				type: 'linear',
 			},
 		])
 	})
@@ -511,14 +513,16 @@ describe('plot selectors', () => {
 							side: 'left',
 							min: null,
 							max: null,
-						} as YAxis,
+							type: 'linear',
+						},
 						{
 							title: 'b',
 							unit: '', // just a number, no unit
 							side: 'right',
 							min: 3,
 							max: 7,
-						} as YAxis,
+							type: 'logarithmic',
+						},
 					],
 				},
 			}
@@ -580,23 +584,36 @@ describe('plot selectors', () => {
 			)
 		})
 
-		it('sets min and max correctly', () => {
-			console.log(JSON.stringify(selectors.highchartsYAxes(state)))
+		it('sets min correctly', () => {
 			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
 				'[0].min',
-				null
-			)
-			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
-				'[0].max',
 				null
 			)
 			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
 				'[1].min',
 				3
 			)
+		})
+
+		it('sets max correctly', () => {
+			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
+				'[0].max',
+				null
+			)
 			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
 				'[1].max',
 				7
+			)
+		})
+
+		it('sets type correctly', () => {
+			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
+				'[0].type',
+				'linear'
+			)
+			expect(selectors.highchartsYAxes(state)).to.have.nested.property(
+				'[1].type',
+				'logarithmic'
 			)
 		})
 	})
@@ -787,6 +804,7 @@ describe('plot selectors', () => {
 							side: 'left',
 							min: null,
 							max: null,
+							type: 'linear',
 						},
 						{
 							title: 'Axis 2',
@@ -794,6 +812,7 @@ describe('plot selectors', () => {
 							side: 'right',
 							min: null,
 							max: null,
+							type: 'linear',
 						},
 					],
 					dataSeries: [

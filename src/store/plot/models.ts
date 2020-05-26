@@ -23,6 +23,9 @@ export interface DataSeries {
 	yAxisIndex: number
 }
 
+/** type of YAxis */
+export type YAxisType = 'linear' | 'logarithmic'
+
 /** YAxis is a value axis of the chart */
 export interface YAxis {
 	/** title defines the label next to the axis */
@@ -35,4 +38,6 @@ export interface YAxis {
 	min: number | null
 	/** highest value. set to null for automatic maximum. */
 	max: number | null
+	/** type of axis */
+	type: YAxisType
 }

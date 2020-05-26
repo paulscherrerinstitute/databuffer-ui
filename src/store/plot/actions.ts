@@ -1,5 +1,5 @@
 import { createAction, ActionsUnion } from '../actions'
-import { Channel } from './models'
+import { Channel, YAxisType } from './models'
 import type { DataResponse } from '../../api/queryrest'
 
 export enum PlotActionTypes {
@@ -29,6 +29,7 @@ export enum PlotActionTypes {
 
 	SET_AXIS_MIN = 'daq-web-ui-app/PLOT/SET_AXIS_MIN',
 	SET_AXIS_MAX = 'daq-web-ui-app/PLOT/SET_AXIS_MAX',
+	SET_AXIS_TYPE = 'daq-web-ui-app/PLOT/SET_AXIS_TYPE',
 }
 
 export const PlotActions = {
@@ -73,6 +74,8 @@ export const PlotActions = {
 		createAction(PlotActionTypes.SET_AXIS_MIN, { index, min }),
 	setAxisMax: (index: number, max: number | null) =>
 		createAction(PlotActionTypes.SET_AXIS_MAX, { index, max }),
+	setAxisType: (index: number, type: YAxisType) =>
+		createAction(PlotActionTypes.SET_AXIS_TYPE, { index, type }),
 }
 
 export type PlotActions = ActionsUnion<typeof PlotActions>

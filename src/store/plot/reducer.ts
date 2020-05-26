@@ -71,6 +71,7 @@ export default (
 								side: state.yAxes.length % 2 === 0 ? 'left' : 'right',
 								min: null,
 								max: null,
+								type: 'linear',
 							},
 						],
 						dataSeries: [
@@ -118,6 +119,7 @@ export default (
 					unit: '',
 					min: null,
 					max: null,
+					type: 'linear',
 				})),
 				dataSeries: action.payload.channels.map((ch, idx) => ({
 					name: ch.name,
@@ -252,6 +254,16 @@ export default (
 					index !== action.payload.index
 						? axis
 						: { ...axis, max: action.payload.max }
+				),
+			}
+
+		case PlotActionTypes.SET_AXIS_TYPE:
+			return {
+				...state,
+				yAxes: state.yAxes.map((axis, index) =>
+					index !== action.payload.index
+						? axis
+						: { ...axis, type: action.payload.type }
 				),
 			}
 
