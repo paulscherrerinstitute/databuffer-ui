@@ -10,6 +10,7 @@ import {
 } from 'lit-element'
 
 import Highcharts from 'highcharts'
+import highchartsMore from 'highcharts/highcharts-more'
 import 'weightless/card'
 import 'weightless/divider'
 import 'weightless/expansion'
@@ -40,6 +41,9 @@ import { connect } from '@captaincodeman/redux-connect-element'
 
 const TIMESTAMP_PATTERN = `^\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}\\.\\d{3}$`
 const TIMESTAMP_REGEX = new RegExp(TIMESTAMP_PATTERN)
+
+// see https://www.highcharts.com/forum/viewtopic.php?t=35113
+highchartsMore(Highcharts)
 
 @customElement('view-standard-plot')
 export class StandardPlotElement extends connect(store, LitElement) {
