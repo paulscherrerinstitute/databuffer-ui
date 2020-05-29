@@ -230,11 +230,22 @@ export const dialogShareLinkAbsoluteTimes = createSelector(
 )
 
 export const dialogShareLinkUrl = createSelector(
-	[dialogShareLinkAbsoluteTimes, channels, startTime, endTime],
-	(absTimes, channels, startTime, endTime) => {
+	[
+		dataSeriesConfig,
+		dialogShareLinkAbsoluteTimes,
+		channels,
+		startTime,
+		endTime,
+	],
+	(dataSeriesConfig, absTimes, channels, startTime, endTime) => {
 		const params = channels
 			.slice(0, 16)
 			.map((ch, i) => `c${i + 1}=${encodeURIComponent(channelToId(ch))}`)
+		dataSeriesConfig.slice(0, 16).forEach((cfg, i) => {
+			if (cfg.name === channels[cfg.channelIndex].name) return
+			params.push(`l${i + 1}=${encodeURIComponent(cfg.name)}`)
+		})
+
 		if (absTimes) {
 			params.push(`startTime=${startTime}`)
 			params.push(`endTime=${endTime}`)
