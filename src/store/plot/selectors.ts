@@ -51,9 +51,9 @@ const mapDataPointWithoutBinning = (
 })
 
 const TOOLTIP_FORMAT_WITH_BINNING =
-	'bin size: {point.eventCount}<br/>min: {point.min}<br/><b>mean: {point.mean}</b><br/>max: {point.max}'
+	'<tr><td style="color:{point.color}"><b>{series.name}</b></td><td>{point.eventCount}</td><td>{point.min}</td><td><b>{point.mean}</b></td><td>{point.max}</td></tr>'
 const TOOLTIP_FORMAT_WITHOUT_BINNING =
-	'bin size: {point.eventCount}<br/><b>value: {point.mean}</b>'
+	'<tr><td style="color:{point.color}"><b>{series.name}</b></td><td></td><td></td><td><b>{point.y}</b></td><td></td></tr>'
 
 export const plotTitle = createSelector([getState], state => state.plotTitle)
 export const startTime = createSelector([getState], state => state.startTime)
@@ -138,17 +138,50 @@ export const highchartsYAxes = createSelector([yAxes], yAxes =>
 
 export const highchartsDataSeries = createSelector(
 	[dataSeriesConfig, dataPoints],
-	(dataSeriesConfig, dataPoints) =>
-		dataSeriesConfig.map(cfg => ({
-			name: cfg.name,
-			type: 'line',
-			step: 'left',
-			yAxis: cfg.yAxisIndex,
-			tooltip: dataPoints[cfg.channelIndex].needsBinning
-				? TOOLTIP_FORMAT_WITH_BINNING
-				: TOOLTIP_FORMAT_WITHOUT_BINNING,
-			data: dataPoints[cfg.channelIndex].data,
-		}))
+	(dataSeriesConfig, dataPoints) => {
+		const result = []
+		for (const cfg of dataSeriesConfig) {
+			const series = {
+				name: cfg.name,
+				type: 'line',
+				step: 'left',
+				yAxis: cfg.yAxisIndex,
+				tooltip: {
+					pointFormat: dataPoints[cfg.channelIndex].needsBinning
+						? TOOLTIP_FORMAT_WITH_BINNING
+						: TOOLTIP_FORMAT_WITHOUT_BINNING,
+				},
+				data: dataPoints[cfg.channelIndex].data,
+				color: Highcharts.getOptions().colors[cfg.yAxisIndex],
+				zIndex: 1,
+			}
+			result.push(series)
+			if (dataPoints[cfg.channelIndex].needsBinning) {
+				const series = {
+					name: `${cfg.name} - min/max`,
+					enableMouseTracking: false,
+					type: 'arearange',
+					step: 'left',
+					yAxis: cfg.yAxisIndex,
+					tooltip: { enabled: false },
+					linkedTo: ':previous',
+					data: dataPoints[
+						cfg.channelIndex
+					].data.map((item: HighChartsDataPointWithBinning) => [
+						item.x,
+						item.min,
+						item.max,
+					]),
+					color: Highcharts.getOptions().colors[cfg.yAxisIndex],
+					fillOpacity: 0.3,
+					marker: { enabled: false },
+					zIndex: 0,
+				}
+				result.push(series)
+			}
+		}
+		return result
+	}
 )
 
 export const highchartsTitle = createSelector([plotTitle], plotTitle => ({
@@ -171,6 +204,13 @@ export const highchartsOptions = createSelector(
 		series,
 		title,
 		subtitle,
+		tooltip: {
+			useHTML: true,
+			valueDecimals: 4,
+			headerFormat:
+				'<span style="font-size: 10px">{point.key}</span><table><tr><td>Series</td><td>Bin size</td><td>min</td><td>mean</td><td>max</td></tr>',
+			fiiterFormat: '</table>',
+		},
 	})
 )
 
