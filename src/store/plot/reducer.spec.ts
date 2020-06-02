@@ -73,14 +73,20 @@ describe('plot reducer', () => {
 				dialogShareLinkShowing: false,
 			})
 
+			const expectedDuration = 60_000
 			// give it 5 seconds of jitter, because sometimes the startup time
 			// of the test runner can break this test
-			expect(initialState.startTime).to.be.closeTo(Date.now() - 1000, 5000)
+			expect(initialState.startTime).to.be.closeTo(
+				Date.now() - expectedDuration,
+				5000
+			)
 			expect(initialState.endTime).to.be.closeTo(Date.now(), 5000)
 
 			// so rather, just to be sure, check the relative distance of the
 			// initial start and end times
-			expect(initialState.endTime - initialState.startTime).to.equal(1000)
+			expect(initialState.endTime - initialState.startTime).to.equal(
+				expectedDuration
+			)
 		})
 
 		it('should return initial state at the beginning', () => {

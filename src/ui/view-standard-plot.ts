@@ -190,27 +190,81 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		this.__quickDial.show()
 	}
 
-	private __quickDialClicked(e: Event) {
-		const t = Date.now()
+	private __setTimeRange(startTime: number, endTime: number) {
 		this.dispatchEvent(
 			new CustomEvent<{ endTime: number }>('end-time-change', {
-				detail: { endTime: t },
+				detail: { endTime },
 			})
 		)
 		this.dispatchEvent(
 			new CustomEvent<{ startTime: number }>('start-time-change', {
-				detail: {
-					startTime: t - 1000 * Number.parseInt((e.target as ListItem).value),
-				},
+				detail: { startTime },
 			})
 		)
 	}
 
+	private __quickDialRelative(deltaMs: number) {
+		const endTime = Date.now()
+		const startTime = endTime - deltaMs
+		this.__setTimeRange(startTime, endTime)
+	}
+
+	private __quickDialYesterday() {
+		const d = datefns.subDays(new Date(), 1)
+		d.setHours(0, 0, 0, 0)
+		const startTime = d.getTime()
+		d.setHours(23, 59, 59, 999)
+		const endTime = d.getTime()
+		this.__setTimeRange(startTime, endTime)
+	}
+
 	private __quickDialToday() {
-		this.endTime = Date.now()
 		const d = new Date()
 		d.setHours(0, 0, 0, 0)
-		this.startTime = d.getTime()
+		const startTime = d.getTime()
+		d.setHours(23, 59, 59, 999)
+		const endTime = d.getTime()
+		this.__setTimeRange(startTime, endTime)
+	}
+
+	private __quickDialLastWeek() {
+		const d = datefns.setDay(datefns.subDays(new Date(), 7), 1, {
+			weekStartsOn: 1,
+		})
+		d.setHours(0, 0, 0, 0)
+		const startTime = d.getTime()
+		d.setHours(23, 59, 59, 999)
+		const endTime = datefns.addDays(d, 6).getTime()
+		this.__setTimeRange(startTime, endTime)
+	}
+
+	private __quickDialThisWeek() {
+		const d = datefns.setDay(new Date(), 1, {
+			weekStartsOn: 1,
+		})
+		d.setHours(0, 0, 0, 0)
+		const startTime = d.getTime()
+		d.setHours(23, 59, 59, 999)
+		const endTime = datefns.addDays(d, 6).getTime()
+		this.__setTimeRange(startTime, endTime)
+	}
+
+	private __quickDialLastMonth() {
+		const d = datefns.setDate(datefns.subMonths(new Date(), 1), 1)
+		d.setHours(0, 0, 0, 0)
+		const startTime = d.getTime()
+		d.setHours(23, 59, 59, 999)
+		const endTime = datefns.lastDayOfMonth(d).getTime()
+		this.__setTimeRange(startTime, endTime)
+	}
+
+	private __quickDialThisMonth() {
+		const d = datefns.setDate(new Date(), 1)
+		d.setHours(0, 0, 0, 0)
+		const startTime = d.getTime()
+		d.setHours(23, 59, 59, 999)
+		const endTime = datefns.lastDayOfMonth(d).getTime()
+		this.__setTimeRange(startTime, endTime)
 	}
 
 	private __plot() {
@@ -341,60 +395,56 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		return html`
 			<wl-popover id="quickdial" closeOnClick fixed anchor="#btnQuickDial">
 				<wl-popover-card>
-					<wl-list-item value="1" clickable @click="${this.__quickDialClicked}"
-						>last 1s</wl-list-item
-					>
-					<wl-list-item value="10" clickable @click="${this.__quickDialClicked}"
-						>last 10s</wl-list-item
-					>
-					<wl-list-item value="60" clickable @click="${this.__quickDialClicked}"
+					<wl-list-item
+						clickable
+						@click="${() => this.__quickDialRelative(60_000)}"
 						>last 1m</wl-list-item
 					>
 					<wl-list-item
-						value="600"
 						clickable
-						@click="${this.__quickDialClicked}"
+						@click="${() => this.__quickDialRelative(600_000)}"
 						>last 10m</wl-list-item
 					>
 					<wl-list-item
-						value="3600"
 						clickable
-						@click="${this.__quickDialClicked}"
+						@click="${() => this.__quickDialRelative(3_600_000)}"
 						>last 1h</wl-list-item
 					>
 					<wl-list-item
 						value="43200"
 						clickable
-						@click="${this.__quickDialClicked}"
+						@click="${() => this.__quickDialRelative(43_200_000)}"
 						>last 12h</wl-list-item
 					>
 					<wl-list-item
-						value="86400"
 						clickable
-						@click="${this.__quickDialClicked}"
-						>last 1d</wl-list-item
+						@click="${() => this.__quickDialRelative(86_400_000)}"
+						>last 24h</wl-list-item
 					>
 					<wl-list-item
 						value="604800"
 						clickable
-						@click="${this.__quickDialClicked}"
+						@click="${() => this.__quickDialRelative(604_800_000)}"
 						>last 7d</wl-list-item
 					>
-					<wl-list-item
-						value="2592000"
-						clickable
-						@click="${this.__quickDialClicked}"
-						>last 30d</wl-list-item
-					>
-					<wl-list-item
-						value="31536000"
-						clickable
-						@click="${this.__quickDialClicked}"
-						>last 365d</wl-list-item
-					>
 					<wl-divider></wl-divider>
+					<wl-list-item clickable @click="${this.__quickDialYesterday}"
+						>yesterday</wl-list-item
+					>
 					<wl-list-item clickable @click="${this.__quickDialToday}"
 						>today</wl-list-item
+					>
+					<wl-list-item clickable @click="${this.__quickDialLastWeek}"
+						>last week</wl-list-item
+					>
+					<wl-list-item clickable @click="${this.__quickDialThisWeek}"
+						>this week</wl-list-item
+					>
+					<wl-list-item clickable @click="${this.__quickDialLastMonth}"
+						>last month</wl-list-item
+					>
+					<wl-list-item clickable @click="${this.__quickDialThisMonth}"
+						>this month</wl-list-item
 					>
 				</wl-popover-card>
 			</wl-popover>

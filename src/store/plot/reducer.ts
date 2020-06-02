@@ -26,7 +26,7 @@ export interface PlotState {
 
 export const initialState: PlotState = {
 	plotTitle: '',
-	startTime: Date.now() - 1000,
+	startTime: Date.now() - 60_000,
 	endTime: Date.now(),
 	startPulse: 1,
 	endPulse: 2,
