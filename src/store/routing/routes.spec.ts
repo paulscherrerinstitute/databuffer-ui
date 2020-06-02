@@ -2,7 +2,7 @@ import { describe, it } from 'mocha'
 import { expect } from 'chai'
 import { plotPreselectRoute } from './routes'
 import { put, PutEffect } from 'redux-saga/effects'
-import { PlotActions, Channel } from '../plot'
+import { PlotActions, Channel, PlotActionTypes } from '../plot'
 import { channelToId } from '@psi/databuffer-query-js/channel'
 import { RoutingActions } from './actions'
 import { parseISO } from 'date-fns'
@@ -28,6 +28,7 @@ describe('routing routes sagas', () => {
 			expect(gen.next().value).to.deep.equal(
 				put(PlotActions.setSelectedChannels([]))
 			)
+			// no channels --> no steps for setting data series labels
 
 			// step 2: set end time
 			const step2 = gen.next().value as EndTimeChangeEffect
@@ -222,6 +223,40 @@ describe('routing routes sagas', () => {
 			expect(effect.payload.action.payload.endTime).to.be.closeTo(
 				expectedEndTime,
 				100
+			)
+		})
+
+		it('sets labels if defined', () => {
+			const queryParams = {
+				c1: 'be01/ch01',
+				c2: 'be02/ch02',
+				l2: 'my label',
+				c5: 'be01/ch03',
+				l5: 'another label',
+				c6: 'be99/ch99',
+			}
+			const gen = plotPreselectRoute(null, queryParams)
+			gen.next().value // skip step1
+			expect(gen.next().value).to.deep.equal(
+				put(PlotActions.dataSeriesLabelChange(1, 'my label'))
+			)
+			expect(gen.next().value).to.deep.equal(
+				put(PlotActions.dataSeriesLabelChange(2, 'another label'))
+			)
+		})
+
+		it('ignores labels without matching channel', () => {
+			const queryParams = {
+				c6: 'be99/ch99',
+				l8: 'index number does not match', // <-- should not have an effect
+			}
+			const gen = plotPreselectRoute(null, queryParams)
+			gen.next().value // skip step1
+			// for param `l8` there should not be an effect, as the 8 does not match the 6 (of c6)
+			// so we test, if the next step is anything but setting the data series label
+			const nextStep = gen.next().value as PutEffect
+			expect(nextStep.payload.action.type).to.not.equal(
+				PlotActionTypes.DATA_SERIES_LABEL_CHANGE
 			)
 		})
 	})

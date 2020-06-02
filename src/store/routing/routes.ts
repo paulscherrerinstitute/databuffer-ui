@@ -59,12 +59,22 @@ export function* plotPreselectRoute(params, queries) {
 	}
 
 	const channels: Channel[] = []
+	const dataSeriesLabels: { index: number; label: string }[] = []
 	for (let i = 1; i <= MAX_CHANNELS; i++) {
-		const paramName = `c${i}`
+		let paramName = `c${i}`
 		if (!queries[paramName]) continue
 		channels.push(idToChannel(queries[paramName]))
+		paramName = `l${i}`
+		if (!queries[paramName]) continue
+		dataSeriesLabels.push({
+			index: channels.length - 1,
+			label: queries[paramName],
+		})
 	}
 	yield put(PlotActions.setSelectedChannels(channels))
+	for (const item of dataSeriesLabels) {
+		yield put(PlotActions.dataSeriesLabelChange(item.index, item.label))
+	}
 	yield put(PlotActions.endTimeChange(endTime))
 	yield put(PlotActions.startTimeChange(startTime))
 	yield put(PlotActions.drawPlot())
