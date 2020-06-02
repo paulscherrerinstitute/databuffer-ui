@@ -653,9 +653,13 @@ describe('plot selectors', () => {
 		})
 
 		it('returns correct size array', () => {
+			// there are two channels and hence data series
+			// response[0] is not binned (eventCount = 1), but response[1] is binned
+			// this creates an additional data series **for the plot** to add an
+			// area plot of min/max to the background
 			expect(selectors.highchartsDataSeries(state))
 				.to.be.an('array')
-				.with.length(2)
+				.with.length(3)
 		})
 
 		it('sets data correctly', () => {
@@ -703,15 +707,15 @@ describe('plot selectors', () => {
 		it('sets tooltip', () => {
 			// non-aggregated value point
 			expect(selectors.highchartsDataSeries(state))
-				.to.have.nested.property('[0].tooltip')
-				.include('value: {point.mean}')
+				.to.have.nested.property('[0].tooltip.pointFormat')
+				.include('{point.y}')
 			// aggregated data point
 			expect(selectors.highchartsDataSeries(state))
-				.to.have.nested.property('[1].tooltip')
-				.include('min: {point.min}')
-				.include('mean: {point.mean}')
-				.include('max: {point.max}')
-				.and.not.include('value')
+				.to.have.nested.property('[1].tooltip.pointFormat')
+				.include('{point.min}')
+				.include('{point.mean}')
+				.include('{point.max}')
+				.and.not.include('{point.y}')
 		})
 
 		it('sets type to line', () => {
@@ -836,16 +840,17 @@ describe('plot selectors', () => {
 				...BASE_STATE,
 				plot: { ...BASE_STATE.plot, yAxes: [], dataSeries: [] },
 			}
-			expect(selectors.highchartsOptions(state1)).to.deep.equal({
-				title: {
-					text: '',
-				},
-				subtitle: {
-					text: '',
-				},
-				yAxis: [],
-				series: [],
-			})
+			const options = selectors.highchartsOptions(state1)
+			expect(options).to.have.nested.property('title.text', '')
+			expect(options).to.have.nested.property('subtitle.text', '')
+			expect(options)
+				.to.have.nested.property('yAxis')
+				.to.be.an('array')
+				.of.length(0)
+			expect(options)
+				.to.have.nested.property('series')
+				.to.be.an('array')
+				.of.length(0)
 		})
 
 		it('uses title from other selectors', () => {
