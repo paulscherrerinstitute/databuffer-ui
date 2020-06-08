@@ -153,6 +153,12 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		this.__chart = Highcharts.chart(this.__chartContainer, {
 			chart: {
 				type: 'line',
+				panKey: 'shift',
+				panning: {
+					enabled: true,
+					type: 'xy',
+				},
+				zoomType: 'xy',
 			},
 			series: [],
 			xAxis: {
