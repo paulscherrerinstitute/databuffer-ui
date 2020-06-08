@@ -42,6 +42,10 @@ import { connect } from '@captaincodeman/redux-connect-element'
 const TIMESTAMP_PATTERN = `^\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}\\.\\d{3}$`
 const TIMESTAMP_REGEX = new RegExp(TIMESTAMP_PATTERN)
 
+const IS_MAC = window.navigator.appVersion.toLowerCase().indexOf('mac') >= 0
+const KEY_RELOAD_ZOOM = IS_MAC ? 'Meta' : 'Ctrl'
+let reloadOnZoom = false
+
 // see https://www.highcharts.com/forum/viewtopic.php?t=35113
 highchartsMore(Highcharts)
 
@@ -153,6 +157,16 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		this.__chart = Highcharts.chart(this.__chartContainer, {
 			chart: {
 				type: 'line',
+				events: {
+					selection: (e: Highcharts.ChartSelectionContextObject): boolean => {
+						if (reloadOnZoom) {
+							this.__setTimeRange(e.xAxis[0].min, e.xAxis[0].max)
+							this.__plot()
+							return false
+						}
+						return true
+					},
+				},
 				panKey: 'shift',
 				panning: {
 					enabled: true,
@@ -190,6 +204,18 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		) {
 			this.canPlot = this.__calcCanPlot()
 		}
+	}
+
+	connectedCallback() {
+		window.addEventListener('keydown', this.__keydown)
+		window.addEventListener('keyup', this.__keyup)
+		super.connectedCallback()
+	}
+
+	disconnectedCallback() {
+		window.removeEventListener('keydown', this.__keydown)
+		window.removeEventListener('keyup', this.__keyup)
+		super.disconnectedCallback()
 	}
 
 	private __showQuickDial() {
@@ -315,6 +341,17 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				detail: { endTime: d },
 			})
 		)
+	}
+
+	private __keydown(e: KeyboardEvent) {
+		if (e.repeat) return
+		if (e.key !== KEY_RELOAD_ZOOM) return
+		reloadOnZoom = true
+	}
+
+	private __keyup(e: KeyboardEvent) {
+		if (e.key !== KEY_RELOAD_ZOOM) return
+		reloadOnZoom = false
 	}
 
 	render() {
