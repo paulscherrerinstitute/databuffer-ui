@@ -1,23 +1,22 @@
 # Databuffer UI online manual
 
-This is the online manual for _databuffer UI_ version 4.
+This is the online documentation for _databuffer UI_ version 4.
 
-<div style="padding:1em;border-color:var(--fg);border-width:4px;border-radius:8px;border-style:solid;">
+## How-To guides
 
-<p style="font-size:150%;font-weight:bold;text-align:center;">⚠️ WORK IN PROGRESS ⚠️</p>
+These guides provide step-by-step instructions for **achieving common tasks**. We try to keep them short and to the point, so you can reach your goal without much fuss. That's why in the how-to guides we keep explanations to a minimum. We want you to have a little bit of context and maybe a pointer or two if you _want_ to extend your knowledge, so you don't have to trust us blindly.
 
-Please note, that this manual, just like version 4 of _databuffer UI_ itself, is still a work in progress.
+- [How to share a link to a plot](./howtos/share_link_to_plot.md)
 
-You'll find lots of places where the manual is yet incomplete, or only holds placeholder content.
+## Background information
 
-</div>
+Nobody is an expert on everything. So, in order to keep each part of the documentation focused, details on certain topics are provided here, to **deepen your understanding** of a certain aspect.
 
-For your orientation the manual is broken down into these parts:
+- [Working with URL Query Strings](./background/query_strings.md)
+- [Working with regular expressions](./background/regex.md)
 
-- [Tutorials](./tutorials/index.md) provide step-by-step instructions to **learn your first steps**. We strive for an intuitive and easy to use graphical user interface, and hence sincerely hope nobody _needs_ the tutorials. But maybe you'd _like_ to have the option.
+## Reference material
 
-- [How-To guides](./howtos/index.md) provide step-by-step instructions for **achieving common tasks**. We try to keep them short and to the point, so you can reach your goal without much fuss. That's why in the how-to guides we keep explanations to a minimum. We want you to have a little bit of context and maybe a pointer or two if you _want_ to extend your knowledge, so you don't have to trust us blindly.
+The reference material provides **detailed information** where appropriate. These are not ressources for learning, but for looking up, i.e. you'll find _what_ is there, and _where_ can you find it, but _not_ what you might want to use it for.
 
-- [Topic guides](./topics/index.md) provide background information to **deepen your understanding** of a certain aspect. Here we can discuss certain topics in depth and also have a look at alternatives and such.
-
-- [Reference material](./reference/index.md) provides **detailed information** where appropriate. Here you'll find _what_ is there, and _where_ can you find it, but _not_ what you might want to use it for.
+- [URL parameters for `/preselect`](./reference/url_params_preselect.md)
