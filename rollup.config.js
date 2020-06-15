@@ -15,6 +15,7 @@ const production = !process.env.ROLLUP_WATCH
 const appVersion = production
 	? `v${process.env.APP_VERSION || pkgVersion}`
 	: `v${process.env.APP_VERSION || pkgVersion}-dev`
+const gitRef = production ? appVersion : 'master'
 
 export default {
 	input: 'src/index.ts',
@@ -28,6 +29,7 @@ export default {
 		replace({
 			'process.env.NODE_ENV': JSON.stringify('production'),
 			APP_VERSION_STRING: appVersion,
+			GIT_COMMIT_REF: gitRef,
 		}),
 		resolve({
 			dedupe: ['lit-html', 'lit-html/directives/unsafe-html', 'lit-element'],

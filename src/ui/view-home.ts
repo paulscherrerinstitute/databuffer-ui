@@ -89,9 +89,10 @@ export class HomeElement extends connect(store, LitElement) {
 					</span>
 					<mwc-icon>help</mwc-icon>
 					<span>
-						If you are looking for instructions, have a look at the
-						<a target="_blank" href="./online-manual/index.html"
-							>online manual</a
+						If you are stuck on a problem, maybe have a look at the
+						<a
+							href="https://github.com/paulscherrerinstitute/databuffer-ui/blob/GIT_COMMIT_REF/docs/index.md"
+							>documentation on GitHub</a
 						>.
 					</span>
 					<mwc-icon>feedback</mwc-icon>

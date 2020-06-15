@@ -16,7 +16,6 @@ SCPDEST=""
 FLAG_FORCE=0
 FLAG_SUMMARY=0
 SKIP_CLEAN=0
-SKIP_MANUAL=0
 SKIP_TEST=0
 SKIP_BUILD=0
 SKIP_PACKAGE=0
@@ -101,9 +100,6 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
   --skip-clean )
     SKIP_CLEAN=1
     ;;
-  --skip-manual )
-    SKIP_MANUAL=1
-    ;;
   --skip-package )
     SKIP_PACKAGE=1
     ;;
@@ -152,14 +148,6 @@ if [[ $SKIP_BUILD == 1 ]]; then
   echo "#         Skipping on user request..."
 else
 	npm run build || exit 1
-fi
-echo "#         Done."
-
-echo "## STEP:  BUILDING online manual"
-if [[ $SKIP_MANUAL == 1 ]]; then
-  echo "#         Skipping on user request..."
-else
-	pushd docs >/dev/null && mdbook build && popd >/dev/null || exit 1
 fi
 echo "#         Done."
 
