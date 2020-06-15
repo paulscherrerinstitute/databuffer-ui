@@ -32,6 +32,7 @@ skipped by an option:
   - Clean work area (i.e. clean caches and remove build outputs).
   - Run tests.
   - Run production build (i.e. minified).
+  - Create the online manual.
   - Create a package for deployment.
 
 
@@ -50,6 +51,9 @@ OPTIONS
                   Use this to package an existing development build.
 
   --skip-clean    Skip cleaning of work space.
+                  Use this to package an existing development build.
+
+  --skip-manual   Skip creating the online manual.
                   Use this to package an existing development build.
 
   --skip-package  Skip createing the package.
