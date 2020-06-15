@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.2.0](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.1.0...v4.2.0) (2020-06-15)
+
+### Features
+
+- add configuration for axis min and max ([d294822](https://github.com/paulscherrerinstitute/databuffer-ui/commit/d2948223492b6d9b0aa1b61fa09598ccd742520b))
+- add configuration for axis type ([652e8c5](https://github.com/paulscherrerinstitute/databuffer-ui/commit/652e8c5ecb2dfa952f705bff30769b0f421bf33b))
+- add configuration for plot and axes labels ([7458c4e](https://github.com/paulscherrerinstitute/databuffer-ui/commit/7458c4eab11bbc683cef5aff5978b937c1df5bbe))
+- add fixed time ranges for reporting ([7e4561f](https://github.com/paulscherrerinstitute/databuffer-ui/commit/7e4561f4abdc3a764dc21dee5f71a5824b0069c8)), closes [#52](https://github.com/paulscherrerinstitute/databuffer-ui/issues/52)
+- add tooltips for buttons in toolbar ([7523ea7](https://github.com/paulscherrerinstitute/databuffer-ui/commit/7523ea7e65776e10ba399d72658025c4ff165fbf)), closes [#61](https://github.com/paulscherrerinstitute/databuffer-ui/issues/61)
+- add view for configuring plot settings ([c244433](https://github.com/paulscherrerinstitute/databuffer-ui/commit/c2444332f9ac98df9eaa833c4243ecd9d4e4f453))
+- enable zooming and panning with mouse ([9287d4d](https://github.com/paulscherrerinstitute/databuffer-ui/commit/9287d4df05057aada196866b2aa44a9fc462f8fe))
+- plot band of min/max in background ([5ce78f9](https://github.com/paulscherrerinstitute/databuffer-ui/commit/5ce78f95d31584c3a75b7ac5fb41b15f466162aa)), closes [#20](https://github.com/paulscherrerinstitute/databuffer-ui/issues/20)
+- provide online documentation ([ca80c0b](https://github.com/paulscherrerinstitute/databuffer-ui/commit/ca80c0ba0948818a5f00356c3a585772ad0da7b6)), closes [#27](https://github.com/paulscherrerinstitute/databuffer-ui/issues/27)
+- reconstruct custom labels from link ([063847f](https://github.com/paulscherrerinstitute/databuffer-ui/commit/063847f99d8e0d582c5141e30c8231865131dc54)), closes [#23](https://github.com/paulscherrerinstitute/databuffer-ui/issues/23)
+- zoom and reload ([ad93f3a](https://github.com/paulscherrerinstitute/databuffer-ui/commit/ad93f3ae813617be21d4b664269490cc9111925d)), closes [#14](https://github.com/paulscherrerinstitute/databuffer-ui/issues/14)
+
 ## [4.1.0](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.0.0...v4.1.0) (2020-05-20)
 
 ### Features
