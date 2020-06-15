@@ -1,5 +1,7 @@
 # Databuffer UI online manual
 
+![databuffer UI logo](../assets/app-icon-material.png)
+
 This is the online documentation for _databuffer UI_ version 4.
 
 ## How-To guides
