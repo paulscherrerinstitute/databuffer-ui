@@ -6,8 +6,6 @@ This is the web GUI for the databuffer DAQ system.
 
 As a prerequisite you must install [nodejs]. I use the most current LTS version, which was version 12 at the time of writing. I strongly recommend getting [nodejs] through [nvm], if possible.
 
-Also you need to install [mdBook](https://rust-lang.github.io/mdBook/) for generating the online manual. With [homebrew](https://brew.sh/) this is as easy as `brew install mdbook`.
-
 ### Development workflow
 
 1.  Clone the project
