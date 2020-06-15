@@ -47,7 +47,3 @@ All notable changes to this project will be documented in this file. See [standa
 
 - fix failing tests ([bb5bda7](https://github.com/paulscherrerinstitute/databuffer-ui/commit/bb5bda71730c7e0b5174976633e6ca3598713328))
 - get rid of compiler error ([576702d](https://github.com/paulscherrerinstitute/databuffer-ui/commit/576702db4dec22f66cb63ec20d29e84f54f557e5)), closes [#1](https://github.com/paulscherrerinstitute/databuffer-ui/issues/1)
-
-# Changelog
-
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
