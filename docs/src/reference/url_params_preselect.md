@@ -44,6 +44,16 @@ Examples:
 | 10 minutes past noon on April 28th 2020 CEST | `2020-04-28T12:10:00.000+02:00` |
 | 10 minutes past noon on April 28th 2020 CEST | `1588068600000`                 |
 
+## l1 ... l16
+
+You can specify custom labels for channels `c1` through `c16`. The index number of the label must match the index number of the channel. E.g. `l3` will be the label for channel `c3`.
+
+The default label for any channel is the channel's name.
+
+| Example                       | Parameter value                             |
+| ----------------------------- | ------------------------------------------- |
+| Kühlwassertemperatur Rücklauf | `K%C3%BChlwassertemperatur%20R%C3%BCcklauf` |
+
 ## startTime
 
 Start time of the plot as an absolute timestamp in one of those formats:
