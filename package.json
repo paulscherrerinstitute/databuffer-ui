@@ -70,7 +70,7 @@
 		"@psi/databuffer-query-js": "^0.6.0",
 		"@psi/databuffer-web-components": "^1.0.0",
 		"date-fns": "^2.14.0",
-		"highcharts": "^8.1.0",
+		"highcharts": "^8.1.2",
 		"lit-element": "^2.3.1",
 		"lit-html": "^1.2.1",
 		"mega-material": "^1.0.0-alpha.2",
