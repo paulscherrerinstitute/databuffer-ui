@@ -2,6 +2,10 @@
 
 This is the web GUI for the databuffer DAQ system.
 
+## User manual
+
+The online manual is [located here](./docs/index.md).
+
 ## Developer documentation
 
 As a prerequisite you must install [nodejs]. I use the most current LTS version, which was version 12 at the time of writing. I strongly recommend getting [nodejs] through [nvm], if possible.
