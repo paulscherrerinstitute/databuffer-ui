@@ -9,9 +9,6 @@ PROGRAM=$(basename $0)
 APPNAME=databuffer-ui
 # use tag, if possible, otherwise use shortened SHA
 VERSION=$(git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD)
-PKGNAME="$APPNAME-$VERSION"
-PKGFILE="$PKGNAME.tar.gz"
-SCPDEST=""
 
 FLAG_FORCE=0
 FLAG_SUMMARY=0
@@ -32,7 +29,6 @@ skipped by an option:
   - Clean work area (i.e. clean caches and remove build outputs).
   - Run tests.
   - Run production build (i.e. minified).
-  - Create the online manual.
   - Create a package for deployment.
 
 
@@ -53,12 +49,13 @@ OPTIONS
   --skip-clean    Skip cleaning of work space.
                   Use this to package an existing development build.
 
-  --skip-manual   Skip creating the online manual.
-                  Use this to package an existing development build.
-
   --skip-package  Skip createing the package.
 
   --skip-test     Skip running tests.
+
+	--wip           Create package of WIP. Same as:
+	                --skip-build --skip-clean --skip-test --force
+									--app-version WIP-$(date +%Y%m%d%H%M%S)
 HERE
 }
 
@@ -106,6 +103,13 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
   --skip-test )
     SKIP_TEST=1
     ;;
+	--wip )
+		SKIP_BUILD=1
+		SKIP_CLEAN=1
+		SKIP_TEST=1
+		FLAG_FORCE=1
+		VERSION=WIP-$(date +%Y%m%d%H%M%S)
+		;;
 esac; shift; done
 if [[ "$1" == '--' ]]; then shift; fi
 
@@ -124,6 +128,8 @@ if [[ ! -z $(git status --porcelain) ]]; then
   fi
 fi
 
+PKGNAME="$APPNAME-$VERSION"
+PKGFILE="$PKGNAME.tar.gz"
 
 [[ $FLAG_SUMMARY == 1 ]] && summary
 

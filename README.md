@@ -10,9 +10,10 @@ As a prerequisite you must install [nodejs]. I use the most current LTS version,
 
 1.  Clone the project
 2.  Install the dependencies: `npm install`
-3.  Run these two in parallel:
+3.  Run these in parallel:
     - Run compilation / build in "watch" mode: `npm run build:watch`
     - Run local development server: `npm start`
+    - Run local data api server: `npm run dev-backend:queryrest`
 4.  Run unit tests: `npm test`
 5.  Run test with code coverage reporting: `npm run test:coverage`
 
@@ -25,7 +26,7 @@ As a prerequisite you must install [nodejs]. I use the most current LTS version,
 
 ### Deploying work in progress to beta
 
-- Create a packaged file for uploading to the web server: `./package-app.sh --skip-clean --skip-build`
+- Create a packaged file for uploading to the web server: `./package-app.sh --wip`
 - Copy the file to the web server and unpack it. **The configuration must be provided by the web server.** See notes in `./public/config/databuffer-ui.config.js`.
 
 [nodejs]: https://nodejs.org/en/
