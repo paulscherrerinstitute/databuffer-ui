@@ -53,9 +53,9 @@ OPTIONS
 
   --skip-test     Skip running tests.
 
-	--wip           Create package of WIP. Same as:
-	                --skip-build --skip-clean --skip-test --force
-									--app-version WIP-$(date +%Y%m%d%H%M%S)
+  --wip           Create package of WIP. Same as:
+                  --skip-build --skip-clean --skip-test --force \\
+                  --app-version WIP-$(date +%Y%m%d-%H%M%S)
 HERE
 }
 
@@ -108,7 +108,7 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
 		SKIP_CLEAN=1
 		SKIP_TEST=1
 		FLAG_FORCE=1
-		VERSION=WIP-$(date +%Y%m%d%H%M%S)
+		VERSION=WIP-$(date +%Y%m%d-%H%M%S)
 		;;
 esac; shift; done
 if [[ "$1" == '--' ]]; then shift; fi
