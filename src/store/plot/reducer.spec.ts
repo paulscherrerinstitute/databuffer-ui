@@ -71,6 +71,8 @@ describe('plot reducer', () => {
 				queryRangeShowing: false,
 				dialogShareLinkAbsoluteTimes: true,
 				dialogShareLinkShowing: false,
+				dialogDownloadShowing: false,
+				dialogDownloadAggregation: 'as-is',
 			})
 
 			const expectedDuration = 60_000
@@ -713,6 +715,59 @@ describe('plot reducer', () => {
 			expect(nextState.yAxes[0].type).to.equal('linear')
 			expect(nextState.yAxes[1].type).to.equal('logarithmic')
 			expect(nextState.yAxes[2].type).to.equal('linear')
+		})
+	})
+
+	describe('on action of type SHOW_DOWNLOAD', () => {
+		it('should set dialogDownloadShowing, if it is shown', () => {
+			const previousState = { ...initialState, dialogDownloadShowing: true }
+			const action = PlotActions.showDownload()
+			const nextState = reducer(previousState, action)
+			expect(nextState.dialogDownloadShowing).to.be.true
+		})
+
+		it('should set dialogDownloadShowing, if it is not shown', () => {
+			const previousState = { ...initialState, dialogDownloadShowing: false }
+			const action = PlotActions.showDownload()
+			const nextState = reducer(previousState, action)
+			expect(nextState.dialogDownloadShowing).to.be.true
+		})
+	})
+
+	describe('on action of type HIDE_DOWNLOAD', () => {
+		it('should re-set dialogDownloadShowing, if it is shown', () => {
+			const previousState = { ...initialState, dialogDownloadShowing: true }
+			const action = PlotActions.hideDownload()
+			const nextState = reducer(previousState, action)
+			expect(nextState.dialogDownloadShowing).to.be.false
+		})
+
+		it('should re-set dialogDownloadShowing, if it is not shown', () => {
+			const previousState = { ...initialState, dialogDownloadShowing: false }
+			const action = PlotActions.hideDownload()
+			const nextState = reducer(previousState, action)
+			expect(nextState.dialogDownloadShowing).to.be.false
+		})
+	})
+
+	describe('on action of type SET_DOWNLOAD_AGGREGATION', () => {
+		it('should set dialogDownloadAggregation', () => {
+			const previousState: PlotState = {
+				...initialState,
+				dialogDownloadAggregation: 'PT1M',
+			}
+			const action = PlotActions.setDownloadAggregation('PT1M')
+			const nextState = reducer(previousState, action)
+			expect(nextState.dialogDownloadAggregation).to.equal('PT1M')
+		})
+	})
+
+	describe('on action of type DOWNLOAD_DATA', () => {
+		it('should only trigger the saga, not change the state', () => {
+			const previousState = { ...initialState }
+			const action = PlotActions.downloadData()
+			const nextState = reducer(previousState, action)
+			expect(nextState).to.deep.equal(previousState)
 		})
 	})
 })

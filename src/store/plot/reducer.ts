@@ -1,6 +1,6 @@
 import { PlotActions, PlotActionTypes } from './actions'
 import type { DataResponse } from '../../api/queryrest'
-import { YAxis, DataSeries, Channel } from './models'
+import { YAxis, DataSeries, Channel, DownloadAggregation } from './models'
 
 export interface PlotState {
 	plotTitle: string
@@ -22,6 +22,8 @@ export interface PlotState {
 	queryRangeShowing: boolean
 	dialogShareLinkShowing: boolean
 	dialogShareLinkAbsoluteTimes: boolean
+	dialogDownloadShowing: boolean
+	dialogDownloadAggregation: DownloadAggregation
 }
 
 export const initialState: PlotState = {
@@ -44,6 +46,8 @@ export const initialState: PlotState = {
 	queryRangeShowing: false,
 	dialogShareLinkShowing: false,
 	dialogShareLinkAbsoluteTimes: true,
+	dialogDownloadShowing: false,
+	dialogDownloadAggregation: 'as-is',
 }
 
 const findIndexOfChannel = (state: PlotState, ch: Channel): number =>
@@ -265,6 +269,24 @@ export default (
 						? axis
 						: { ...axis, type: action.payload.type }
 				),
+			}
+
+		case PlotActionTypes.SHOW_DOWNLOAD:
+			return {
+				...state,
+				dialogDownloadShowing: true,
+			}
+
+		case PlotActionTypes.HIDE_DOWNLOAD:
+			return {
+				...state,
+				dialogDownloadShowing: false,
+			}
+
+		case PlotActionTypes.SET_DOWNLOAD_AGGREGATION:
+			return {
+				...state,
+				dialogDownloadAggregation: action.payload.aggregation,
 			}
 
 		default:

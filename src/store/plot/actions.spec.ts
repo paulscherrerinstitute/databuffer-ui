@@ -237,4 +237,39 @@ describe('PlotActions', () => {
 		}
 		expect(action).to.deep.equal(expected)
 	})
+
+	it('should create SHOW_DOWNLOAD', () => {
+		const action = PlotActions.showDownload()
+		const expected = {
+			type: PlotActionTypes.SHOW_DOWNLOAD,
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
+	it('should create HIDE_DOWNLOAD', () => {
+		const action = PlotActions.hideDownload()
+		const expected = {
+			type: PlotActionTypes.HIDE_DOWNLOAD,
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
+	it('should create SET_DOWNLOAD_AGGREGATION', () => {
+		const action = PlotActions.setDownloadAggregation('PT1H')
+		const expected = {
+			type: PlotActionTypes.SET_DOWNLOAD_AGGREGATION,
+			payload: {
+				aggregation: 'PT1H',
+			},
+		}
+		expect(action).to.deep.equal(expected)
+	})
+
+	it('should create DOWNLOAD_DATA', () => {
+		const action = PlotActions.downloadData()
+		const expected = {
+			type: PlotActionTypes.DOWNLOAD_DATA,
+		}
+		expect(action).to.deep.equal(expected)
+	})
 })

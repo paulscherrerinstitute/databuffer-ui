@@ -31,6 +31,7 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 			'plot:info': () => RoutingActions.push('/query-meta'),
 			'plot:settings': () => RoutingActions.push('/plot-settings'),
 			'plot:share': () => PlotActions.showShareLink(),
+			'plot:download': () => PlotActions.showDownload(),
 		}
 	}
 
@@ -50,6 +51,11 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 						icon="date_range"
 						@click=${() =>
 							this.dispatchEvent(new CustomEvent('plot:daterange'))}
+					></mwc-icon-button
+					><mwc-icon-button
+						title="download channel data"
+						icon="cloud_download"
+						@click=${() => this.dispatchEvent(new CustomEvent('plot:download'))}
 					></mwc-icon-button
 					><mwc-icon-button
 						title="share a link to this plot"

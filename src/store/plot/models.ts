@@ -41,3 +41,5 @@ export interface YAxis {
 	/** type of axis */
 	type: YAxisType
 }
+
+export type DownloadAggregation = 'as-is' | 'PT5S' | 'PT1M' | 'PT1H' | 'raw'

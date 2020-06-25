@@ -1,5 +1,5 @@
 import { createAction, ActionsUnion } from '../actions'
-import { Channel, YAxisType } from './models'
+import { Channel, YAxisType, DownloadAggregation } from './models'
 import type { DataResponse } from '../../api/queryrest'
 
 export enum PlotActionTypes {
@@ -30,6 +30,11 @@ export enum PlotActionTypes {
 	SET_AXIS_MIN = 'daq-web-ui-app/PLOT/SET_AXIS_MIN',
 	SET_AXIS_MAX = 'daq-web-ui-app/PLOT/SET_AXIS_MAX',
 	SET_AXIS_TYPE = 'daq-web-ui-app/PLOT/SET_AXIS_TYPE',
+
+	SHOW_DOWNLOAD = 'daq-web-ui-app/PLOT/SHOW_DOWNLOAD',
+	HIDE_DOWNLOAD = 'daq-web-ui-app/PLOT/HIDE_DOWNLOAD',
+	SET_DOWNLOAD_AGGREGATION = 'daq-web-ui-app/PLOT/SET_DOWNLOAD_AGGREGATION',
+	DOWNLOAD_DATA = 'daq-web-ui-app/PLOT/DOWNLOAD_DATA',
 }
 
 export const PlotActions = {
@@ -76,6 +81,12 @@ export const PlotActions = {
 		createAction(PlotActionTypes.SET_AXIS_MAX, { index, max }),
 	setAxisType: (index: number, type: YAxisType) =>
 		createAction(PlotActionTypes.SET_AXIS_TYPE, { index, type }),
+
+	showDownload: () => createAction(PlotActionTypes.SHOW_DOWNLOAD),
+	hideDownload: () => createAction(PlotActionTypes.HIDE_DOWNLOAD),
+	setDownloadAggregation: (aggregation: DownloadAggregation) =>
+		createAction(PlotActionTypes.SET_DOWNLOAD_AGGREGATION, { aggregation }),
+	downloadData: () => createAction(PlotActionTypes.DOWNLOAD_DATA),
 }
 
 export type PlotActions = ActionsUnion<typeof PlotActions>

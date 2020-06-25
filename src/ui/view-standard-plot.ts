@@ -25,6 +25,7 @@ import '@material/mwc-dialog'
 import '@material/mwc-formfield'
 import '@material/mwc-icon-button'
 import '@material/mwc-radio'
+import { Radio } from '@material/mwc-radio'
 import '@material/mwc-textfield'
 import { TextField } from '@material/mwc-textfield'
 import '@material/mwc-snackbar'
@@ -32,7 +33,12 @@ import { Snackbar } from '@material/mwc-snackbar'
 
 import { formatDate } from '../util'
 import { RootState, RoutingActions, store } from '../store'
-import { Channel, PlotActions, PlotSelectors } from '../store/plot/'
+import {
+	Channel,
+	PlotActions,
+	PlotSelectors,
+	DownloadAggregation,
+} from '../store/plot/'
 
 import * as datefns from 'date-fns'
 import type { DataResponse } from '../api/queryrest'
@@ -69,6 +75,11 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@property({ attribute: false }) dialogShareLinkUrl: string
 	@property({ attribute: false })
 	dialogShareLinkChannelsTruncated: boolean = false
+	@property({ attribute: false })
+	dialogDownloadShowing: boolean = false
+	@property({ attribute: false }) dialogDownloadAggregation: string
+
+	private dialogDownloadCurlCommand = ''
 
 	private __calcCanPlot(): boolean {
 		if (this.__txtStartTime === null) return false
@@ -113,6 +124,12 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@query('#linkchannelstruncated')
 	private __snackLinkChannelsTruncated!: Snackbar
 
+	@query('#downloadstarted')
+	private __snackDownloadStarted!: Snackbar
+
+	@query('#curlcopied')
+	private __snackCurlCopied!: Snackbar
+
 	mapState(state: RootState) {
 		return {
 			error: PlotSelectors.error(state),
@@ -135,6 +152,9 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			dialogShareLinkChannelsTruncated: PlotSelectors.dialogShareLinkChannelsTruncated(
 				state
 			),
+			dialogDownloadShowing: PlotSelectors.dialogDownloadShowing(state),
+			dialogDownloadAggregation: PlotSelectors.dialogDownloadAggregation(state),
+			dialogDownloadCurlCommand: PlotSelectors.dialogDownloadCurlCommand(state),
 		}
 	}
 
@@ -150,6 +170,11 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				e.detail.absTimes
 					? PlotActions.shareAbsoluteTimes()
 					: PlotActions.shareRelativeTime(),
+			'dialog-download:closed': () => PlotActions.hideDownload(),
+			'dialog-download:setaggregation': (
+				e: CustomEvent<{ aggregation: DownloadAggregation }>
+			) => PlotActions.setDownloadAggregation(e.detail.aggregation),
+			'dialog-download:download': () => PlotActions.downloadData(),
 		}
 	}
 
@@ -173,6 +198,12 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					type: 'xy',
 				},
 				zoomType: 'xy',
+			},
+			exporting: {
+				csv: {
+					dateFormat: '%Y-%m%d %H:%M:%S.%L',
+				},
+				fallbackToExportServer: false,
 			},
 			series: [],
 			xAxis: {
@@ -357,7 +388,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	render() {
 		return html`
 			${this.__renderQueryRange()} ${this.__renderQuickDial()}
-			${this.__renderShare()}
+			${this.__renderShare()} ${this.__renderDownload()}
 			<wl-progress-spinner ?hidden=${!this.fetching}></wl-progress-spinner>
 			<div class="error" ?hidden=${!this.error}>
 				There was an error:
@@ -390,6 +421,14 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			<mwc-snackbar
 				id="linkchannelstruncated"
 				labelText="Only the first 16 channels are linked. The others are truncated."
+			></mwc-snackbar>
+			<mwc-snackbar
+				id="downloadstarted"
+				labelText="Your download has been started in the background. Please wait."
+			></mwc-snackbar>
+			<mwc-snackbar
+				id="curlcopied"
+				labelText="curl command copied to clipboard"
 			></mwc-snackbar>
 		`
 	}
@@ -555,6 +594,111 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		</mwc-dialog>`
 	}
 
+	private __renderDownload() {
+		return html`<mwc-dialog
+			id="dialog-download"
+			heading="Download data as CSV"
+			?open=${this.dialogDownloadShowing}
+			@closed=${e => {
+				if (e.target !== this.shadowRoot.getElementById('dialog-download'))
+					return
+				if (e.detail.action == 'download') {
+					this.dispatchEvent(new CustomEvent('dialog-download:download'))
+					this.__snackDownloadStarted.show()
+				}
+				this.dispatchEvent(new CustomEvent('dialog-download:closed'))
+			}}
+		>
+			<div>
+				<mwc-formfield label="Download data of plot (as is)">
+					<mwc-radio
+						name="aggregationmode"
+						?checked=${this.dialogDownloadAggregation == 'as-is'}
+						value="as-is"
+						@change=${this._updateAggregation}
+					></mwc-radio>
+				</mwc-formfield>
+				<hr />
+				<mwc-formfield label="Aggregate by 5 seconds">
+					<mwc-radio
+						name="aggregationmode"
+						?checked=${this.dialogDownloadAggregation == 'PT5S'}
+						value="PT5S"
+						@change=${this._updateAggregation}
+					></mwc-radio>
+				</mwc-formfield>
+				<mwc-formfield label="Aggregate by 1 minute">
+					<mwc-radio
+						name="aggregationmode"
+						?checked=${this.dialogDownloadAggregation == 'PT1M'}
+						value="PT1M"
+						@change=${this._updateAggregation}
+					></mwc-radio>
+				</mwc-formfield>
+				<mwc-formfield label="Aggregate by 1 hour">
+					<mwc-radio
+						name="aggregationmode"
+						?checked=${this.dialogDownloadAggregation == 'PT1H'}
+						value="PT1H"
+						@change=${this._updateAggregation}
+					></mwc-radio>
+				</mwc-formfield>
+				<hr />
+				<mwc-formfield label="Get raw data">
+					<mwc-radio
+						name="aggregationmode"
+						?checked=${this.dialogDownloadAggregation == 'raw'}
+						value="raw"
+						@change=${this._updateAggregation}
+					></mwc-radio>
+				</mwc-formfield>
+				<p>
+					<strong>Please note</strong> that you are about to fetch data from the
+					data API <strong>again</strong>. Depending on the channels and
+					aggregation settings this <strong>may take a long time</strong> and
+					result in a <strong>very large file</strong>.
+				</p>
+				<mwc-button
+					icon="content_copy"
+					@click=${async () => {
+						try {
+							await navigator.clipboard.writeText(
+								this.dialogDownloadCurlCommand
+							)
+							this.__snackCurlCopied.show()
+						} catch (e) {
+							console.error(e)
+						}
+					}}
+					>copy curl command to clipboard</mwc-button
+				>
+			</div>
+			<mwc-button
+				raised
+				icon="cloud_download"
+				slot="primaryAction"
+				dialogAction="download"
+				>download</mwc-button
+			>
+			<mwc-button slot="secondaryAction" dialogAction="close">close</mwc-button>
+		</mwc-dialog>`
+	}
+
+	_updateAggregation(e: Event) {
+		const el = e.target as Radio
+		if (!el.checked) return
+		this.dispatchEvent(
+			new CustomEvent<{ aggregation: DownloadAggregation }>(
+				'dialog-download:setaggregation',
+				{
+					detail: {
+						aggregation: el.value as DownloadAggregation,
+					},
+				}
+			)
+		)
+	}
+
 	static get styles() {
 		return [
 			baseStyles,
@@ -623,6 +767,19 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				}
 				#dialog-share > div {
 					flex-direction: column;
+				}
+				#dialog-download div,
+				#dialog-download mwc-radio {
+					display: flex;
+				}
+				#dialog-download mwc-textfield {
+					flex: 1;
+				}
+				#dialog-download > div {
+					flex-direction: column;
+				}
+				#dialog-download [hidden] {
+					display: none;
 				}
 			`,
 		]
