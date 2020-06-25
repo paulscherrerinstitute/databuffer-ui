@@ -637,6 +637,7 @@ describe('plot reducer', () => {
 			expect(nextState.yAxes[2].min).to.equal(1000)
 		})
 	})
+
 	describe('on action of type SET_AXIS_MAX', () => {
 		it('should only change the axis max at the index', () => {
 			const previousState: PlotState = {
@@ -673,6 +674,45 @@ describe('plot reducer', () => {
 			expect(nextState.yAxes[0].max).to.equal(20)
 			expect(nextState.yAxes[1].max).to.equal(4)
 			expect(nextState.yAxes[2].max).to.equal(2000)
+		})
+	})
+
+	describe('on action of type SET_AXIS_TYPE', () => {
+		it('should only change the axis type at the index', () => {
+			const previousState: PlotState = {
+				...initialState,
+				yAxes: [
+					{
+						title: 'a',
+						unit: 'AA',
+						side: 'left',
+						min: 10,
+						max: 20,
+						type: 'linear',
+					},
+					{
+						title: 'b',
+						unit: 'BB',
+						side: 'left',
+						min: 100,
+						max: 200,
+						type: 'linear',
+					},
+					{
+						title: 'c',
+						unit: 'CC',
+						side: 'left',
+						min: 1000,
+						max: 2000,
+						type: 'linear',
+					},
+				],
+			}
+			const action = PlotActions.setAxisType(1, 'logarithmic')
+			const nextState = reducer(previousState, action)
+			expect(nextState.yAxes[0].type).to.equal('linear')
+			expect(nextState.yAxes[1].type).to.equal('logarithmic')
+			expect(nextState.yAxes[2].type).to.equal('linear')
 		})
 	})
 })
