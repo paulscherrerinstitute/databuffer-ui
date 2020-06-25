@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.3.0](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.2.0...v4.3.0) (2020-06-25)
+
+### Features
+
+- copy curl command for download to clipboard ([9a77603](https://github.com/paulscherrerinstitute/databuffer-ui/commit/9a77603a610523a4938fa9b3c5843e81264d0480)), closes [#69](https://github.com/paulscherrerinstitute/databuffer-ui/issues/69)
+- download channel data as CSV from data API ([88b4b4b](https://github.com/paulscherrerinstitute/databuffer-ui/commit/88b4b4bedaae41281a2d2f951e4f375fced90b4e)), closes [#17](https://github.com/paulscherrerinstitute/databuffer-ui/issues/17)
+
 ## [4.2.0](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.1.0...v4.2.0) (2020-06-15)
 
 ### Features
