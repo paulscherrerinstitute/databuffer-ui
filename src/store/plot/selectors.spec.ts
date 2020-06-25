@@ -1100,4 +1100,42 @@ describe('plot selectors', () => {
 			expect(params.get(`l5`)).to.equal('custom-label-2')
 		})
 	})
+
+	it('retrieves dialogDownloadShowing', () => {
+		const state1 = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				dialogDownloadShowing: false,
+			},
+		}
+		const state2 = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				dialogDownloadShowing: true,
+			},
+		}
+		expect(selectors.dialogDownloadShowing(state1)).to.be.false
+		expect(selectors.dialogDownloadShowing(state2)).to.be.true
+	})
+
+	it('retrieves dialogDownloadAggregation', () => {
+		const state1: RootState = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				dialogDownloadAggregation: 'as-is',
+			},
+		}
+		const state2: RootState = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				dialogDownloadAggregation: 'raw',
+			},
+		}
+		expect(selectors.dialogDownloadAggregation(state1)).to.equal('as-is')
+		expect(selectors.dialogDownloadAggregation(state2)).to.equal('raw')
+	})
 })

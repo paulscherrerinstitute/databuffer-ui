@@ -260,3 +260,13 @@ export const dialogShareLinkChannelsTruncated = createSelector(
 	[channels],
 	channels => channels.length > 16
 )
+
+export const dialogDownloadShowing = createSelector(
+	[getState],
+	state => state.dialogDownloadShowing
+)
+
+export const dialogDownloadAggregation = createSelector(
+	[getState],
+	state => state.dialogDownloadAggregation
+)
