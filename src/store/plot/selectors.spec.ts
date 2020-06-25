@@ -977,6 +977,11 @@ describe('plot selectors', () => {
 				...BASE_STATE,
 				plot: {
 					...BASE_STATE.plot,
+					dataSeries: EXAMPLE_CHANNELS.map((ch, idx) => ({
+						name: ch.name,
+						channelIndex: idx,
+						yAxisIndex: idx,
+					})),
 					channels: EXAMPLE_CHANNELS,
 					startTime: 100000,
 					endTime: 300000,
@@ -1074,6 +1079,25 @@ describe('plot selectors', () => {
 			for (let i = 17; i <= 20; i++) {
 				expect(params.has(`c${i}`)).to.be.false
 			}
+		})
+
+		it('does not include l1...l16 if the dataSeries.name == channel.name', () => {
+			const url = selectors.dialogShareLinkUrl(state)
+			const params = new URLSearchParams(url.split('?', 2)[1])
+			for (let i = 1; i <= 16; i++) {
+				expect(params.has(`l${i}`)).to.be.false
+			}
+		})
+
+		it('does include l1...l16 if the dataSeries.name != channel.name', () => {
+			state.plot.dataSeries[2].name = 'custom-label-1'
+			state.plot.dataSeries[4].name = 'custom-label-2'
+			const url = selectors.dialogShareLinkUrl(state)
+			const params = new URLSearchParams(url.split('?', 2)[1])
+			expect(params.has(`l3`)).to.be.true
+			expect(params.get(`l3`)).to.equal('custom-label-1')
+			expect(params.has(`l5`)).to.be.true
+			expect(params.get(`l5`)).to.equal('custom-label-2')
 		})
 	})
 })
