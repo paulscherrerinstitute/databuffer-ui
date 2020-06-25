@@ -1,14 +1,25 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../../ui/global.d.ts" />
+
 import { createSelector } from 'reselect'
 import Highcharts from 'highcharts'
 import { channelToId } from '@psi/databuffer-query-js/channel'
-import type {
+import {
 	DataResponseItem,
 	Event,
 	AggregationResult,
+	AggregationSpecification,
+	AggregationType,
+	AggregationOperation,
+	DataQuery,
+	EventField,
+	DataResponseFormatType,
 } from '@psi/databuffer-query-js/query-data'
 
 import { RootState } from '../reducer'
 import { formatDate } from '../../util'
+
+export const NR_OF_BINS = 512
 
 const getState = (state: RootState) => state.plot
 
@@ -269,4 +280,82 @@ export const dialogDownloadShowing = createSelector(
 export const dialogDownloadAggregation = createSelector(
 	[getState],
 	state => state.dialogDownloadAggregation
+)
+
+export const plotQuery = createSelector(
+	[channels, startTime, endTime],
+	(channels, startTime, endTime) => {
+		const query: DataQuery = {
+			channels,
+			range: {
+				startSeconds: startTime / 1000,
+				endSeconds: endTime / 1000,
+			},
+			eventFields: [
+				EventField.GLOBAL_MILLIS,
+				EventField.PULSE_ID,
+				EventField.VALUE,
+				EventField.EVENT_COUNT,
+			],
+			aggregation: {
+				aggregationType: AggregationType.VALUE,
+				aggregations: [
+					AggregationOperation.MAX,
+					AggregationOperation.MEAN,
+					AggregationOperation.MIN,
+				],
+				nrOfBins: NR_OF_BINS,
+			},
+		}
+		return query
+	}
+)
+
+export const downloadQuery = createSelector(
+	[channels, startTime, endTime, dialogDownloadAggregation],
+	(channels, startTime, endTime, dialogDownloadAggregation) => {
+		const query: DataQuery = {
+			channels,
+			range: {
+				startSeconds: startTime / 1000,
+				endSeconds: endTime / 1000,
+			},
+			eventFields: [
+				EventField.GLOBAL_DATE,
+				EventField.PULSE_ID,
+				EventField.VALUE,
+				EventField.EVENT_COUNT,
+			],
+			response: {
+				format: DataResponseFormatType.CSV,
+			},
+		}
+		const aggregation: AggregationSpecification = {
+			aggregationType: AggregationType.VALUE,
+			aggregations: [
+				AggregationOperation.MAX,
+				AggregationOperation.MEAN,
+				AggregationOperation.MIN,
+			],
+		}
+		if (dialogDownloadAggregation === 'raw') {
+			// do nothing
+		} else if (dialogDownloadAggregation === 'as-is') {
+			query.aggregation = { ...aggregation, nrOfBins: NR_OF_BINS }
+		} else {
+			query.aggregation = {
+				...aggregation,
+				durationPerBin: dialogDownloadAggregation,
+			}
+		}
+		return query
+	}
+)
+
+export const dialogDownloadCurlCommand = createSelector(
+	[downloadQuery],
+	q =>
+		`curl -L -H 'Content-Type: application/json' -X POST -d '${JSON.stringify(
+			q
+		)}' ${window.DatabufferUi.QUERY_API}/query`
 )

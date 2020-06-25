@@ -79,6 +79,8 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	dialogDownloadShowing: boolean = false
 	@property({ attribute: false }) dialogDownloadAggregation: string
 
+	private dialogDownloadCurlCommand = ''
+
 	private __calcCanPlot(): boolean {
 		if (this.__txtStartTime === null) return false
 		if (TIMESTAMP_REGEX.test(this.__txtStartTime.value) === false) return false
@@ -125,6 +127,9 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@query('#downloadstarted')
 	private __snackDownloadStarted!: Snackbar
 
+	@query('#curlcopied')
+	private __snackCurlCopied!: Snackbar
+
 	mapState(state: RootState) {
 		return {
 			error: PlotSelectors.error(state),
@@ -149,6 +154,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			),
 			dialogDownloadShowing: PlotSelectors.dialogDownloadShowing(state),
 			dialogDownloadAggregation: PlotSelectors.dialogDownloadAggregation(state),
+			dialogDownloadCurlCommand: PlotSelectors.dialogDownloadCurlCommand(state),
 		}
 	}
 
@@ -420,6 +426,10 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				id="downloadstarted"
 				labelText="Your download has been started in the background. Please wait."
 			></mwc-snackbar>
+			<mwc-snackbar
+				id="curlcopied"
+				labelText="curl command copied to clipboard"
+			></mwc-snackbar>
 		`
 	}
 
@@ -648,6 +658,20 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					aggregation settings this <strong>may take a long time</strong> and
 					result in a <strong>very large file</strong>.
 				</p>
+				<mwc-button
+					icon="content_copy"
+					@click=${async () => {
+						try {
+							await navigator.clipboard.writeText(
+								this.dialogDownloadCurlCommand
+							)
+							this.__snackCurlCopied.show()
+						} catch (e) {
+							console.error(e)
+						}
+					}}
+					>copy curl command to clipboard</mwc-button
+				>
 			</div>
 			<mwc-button
 				raised

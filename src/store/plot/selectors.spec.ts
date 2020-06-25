@@ -7,9 +7,14 @@ import { RootState } from '../reducer'
 import { initialState } from './reducer'
 import { ChannelSearchState } from '../channelsearch/reducer'
 import { RoutingState } from '../routing/reducer'
-import type {
+import {
 	DataResponse,
 	AggregationResult,
+	DataQuery,
+	EventField,
+	AggregationType,
+	AggregationOperation,
+	DataResponseFormatType,
 } from '@psi/databuffer-query-js/query-data'
 import { YAxis, DataSeries } from './models'
 import { channelToId } from '@psi/databuffer-query-js/channel'
@@ -1137,5 +1142,173 @@ describe('plot selectors', () => {
 		}
 		expect(selectors.dialogDownloadAggregation(state1)).to.equal('as-is')
 		expect(selectors.dialogDownloadAggregation(state2)).to.equal('raw')
+	})
+
+	it('retrieves plotQuery', () => {
+		const state1: RootState = {
+			...BASE_STATE,
+			plot: {
+				...BASE_STATE.plot,
+				channels: [...EXAMPLE_CHANNELS],
+				startTime: 100_000,
+				endTime: 200_000,
+			},
+		}
+		expect(selectors.plotQuery(state1)).to.deep.equal({
+			channels: [...EXAMPLE_CHANNELS],
+			range: {
+				startSeconds: 100,
+				endSeconds: 200,
+			},
+			eventFields: [
+				EventField.GLOBAL_MILLIS,
+				EventField.PULSE_ID,
+				EventField.VALUE,
+				EventField.EVENT_COUNT,
+			],
+			aggregation: {
+				aggregationType: AggregationType.VALUE,
+				aggregations: [
+					AggregationOperation.MAX,
+					AggregationOperation.MEAN,
+					AggregationOperation.MIN,
+				],
+				nrOfBins: selectors.NR_OF_BINS,
+			},
+		} as DataQuery)
+	})
+
+	describe('retrieves downloadQuery', () => {
+		let state: RootState
+
+		beforeEach(() => {
+			state = {
+				...BASE_STATE,
+				plot: {
+					...BASE_STATE.plot,
+					channels: [...EXAMPLE_CHANNELS],
+					startTime: 100_000,
+					endTime: 200_000,
+					dialogDownloadAggregation: 'PT1M',
+				},
+			}
+		})
+
+		it('sets fields correctly', () => {
+			const query = selectors.downloadQuery(state)
+			expect(query).to.deep.equal({
+				channels: [...EXAMPLE_CHANNELS],
+				range: {
+					startSeconds: 100,
+					endSeconds: 200,
+				},
+				eventFields: [
+					EventField.GLOBAL_DATE,
+					EventField.PULSE_ID,
+					EventField.VALUE,
+					EventField.EVENT_COUNT,
+				],
+				aggregation: {
+					aggregationType: AggregationType.VALUE,
+					aggregations: [
+						AggregationOperation.MAX,
+						AggregationOperation.MEAN,
+						AggregationOperation.MIN,
+					],
+					durationPerBin: 'PT1M',
+				},
+				response: {
+					format: DataResponseFormatType.CSV,
+				},
+			} as DataQuery)
+		})
+
+		it('recognizes aggregation "raw"', () => {
+			state.plot.dialogDownloadAggregation = 'raw'
+			const query = selectors.downloadQuery(state)
+			expect(query).not.to.haveOwnProperty('aggregation')
+		})
+
+		it('recognizes aggregation "as-is"', () => {
+			state.plot.dialogDownloadAggregation = 'as-is'
+			const query = selectors.downloadQuery(state)
+			expect(query).to.haveOwnProperty('aggregation')
+			expect(query.aggregation).not.to.haveOwnProperty('durationPerBin')
+			expect(query.aggregation).to.haveOwnProperty('nrOfBins')
+			expect(query.aggregation.nrOfBins).to.equal(selectors.NR_OF_BINS)
+		})
+
+		it('recognizes aggregation "PT5S"', () => {
+			state.plot.dialogDownloadAggregation = 'PT5S'
+			const query = selectors.downloadQuery(state)
+			expect(query).to.haveOwnProperty('aggregation')
+			expect(query.aggregation).not.to.haveOwnProperty('nrOfBins')
+			expect(query.aggregation).to.haveOwnProperty('durationPerBin')
+			expect(query.aggregation.durationPerBin).to.equal('PT5S')
+		})
+
+		it('recognizes aggregation "PT1M"', () => {
+			state.plot.dialogDownloadAggregation = 'PT1M'
+			const query = selectors.downloadQuery(state)
+			expect(query).to.haveOwnProperty('aggregation')
+			expect(query.aggregation).not.to.haveOwnProperty('nrOfBins')
+			expect(query.aggregation).to.haveOwnProperty('durationPerBin')
+			expect(query.aggregation.durationPerBin).to.equal('PT1M')
+		})
+
+		it('recognizes aggregation "PT1H"', () => {
+			state.plot.dialogDownloadAggregation = 'PT1H'
+			const query = selectors.downloadQuery(state)
+			expect(query).to.haveOwnProperty('aggregation')
+			expect(query.aggregation).not.to.haveOwnProperty('nrOfBins')
+			expect(query.aggregation).to.haveOwnProperty('durationPerBin')
+			expect(query.aggregation.durationPerBin).to.equal('PT1H')
+		})
+	})
+
+	describe('retrieves dialogDownloadCurlCommand', () => {
+		let state: RootState
+		let cmd: string
+
+		beforeEach(() => {
+			window.DatabufferUi = {
+				QUERY_API: 'http://localhost:8080/query-api',
+				DISPATCHER_API: 'http://localhost:8080/dispatcher-api',
+			}
+			state = {
+				...BASE_STATE,
+				plot: {
+					...BASE_STATE.plot,
+					channels: [...EXAMPLE_CHANNELS],
+					startTime: 100_000,
+					endTime: 200_000,
+					dialogDownloadAggregation: 'PT1M',
+				},
+			}
+			cmd = selectors.dialogDownloadCurlCommand(state)
+		})
+
+		it('starts with curl', () => {
+			expect(cmd)
+				.to.be.a('string')
+				.that.matches(/^curl /)
+		})
+
+		it('follows redirects', () => {
+			expect(cmd).to.contain('-L')
+		})
+
+		it('uses HTTP method POST', () => {
+			expect(cmd).to.contain('-X POST')
+		})
+
+		it('uses mime type application/json', () => {
+			expect(cmd).to.contain("-H 'Content-Type: application/json'")
+		})
+
+		it('contains downloadQuery as payload', () => {
+			const q = selectors.downloadQuery(state)
+			expect(cmd).to.contain(`-d '${JSON.stringify(q)}'`)
+		})
 	})
 })
