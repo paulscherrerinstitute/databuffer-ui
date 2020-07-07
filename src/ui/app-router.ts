@@ -1,4 +1,3 @@
-import UniversalRouter from 'universal-router'
 import {
 	LitElement,
 	customElement,
@@ -8,6 +7,8 @@ import {
 	PropertyValues,
 } from 'lit-element'
 import { unsafeHTML } from 'lit-html/directives/unsafe-html'
+import createMatcher from '@captaincodeman/router'
+import type { Matcher } from '@captaincodeman/router'
 import { connect } from '@captaincodeman/redux-connect-element'
 import { store, RootState, RoutingSelectors } from '../store'
 import { baseStyles } from './shared-styles'
@@ -25,40 +26,23 @@ export class AppRouterElement extends connect(store, LitElement) {
 
 	constructor() {
 		super()
-		this.router = new UniversalRouter(this.routes)
+		this.router = createMatcher(this.routes)
 	}
 
-	private router: UniversalRouter
+	private router: Matcher
 
-	private routes = [
-		{
-			path: '/',
-			action: () => `<view-home></view-home>`,
-		},
-		{
-			path: '/search',
-			action: () => `<view-channel-search></view-channel-search>`,
-		},
-		{
-			path: '/plot',
-			action: () => `<view-standard-plot></view-standard-plot>`,
-		},
-		{
-			path: '/plot-settings',
-			action: () => `<view-plot-settings></view-plot-settings>`,
-		},
-		{
-			path: '/query-meta',
-			action: () => `<view-query-meta></view-query-meta>`,
-		},
-	]
+	private routes = {
+		'/': `<view-home></view-home>`,
+		'/search': `<view-channel-search></view-channel-search>`,
+		'/plot': `<view-standard-plot></view-standard-plot>`,
+		'/plot-settings': `<view-plot-settings></view-plot-settings>`,
+		'/query-meta': `<view-query-meta></view-query-meta>`,
+	}
 
 	shouldUpdate(changedProperties: PropertyValues) {
 		if (changedProperties.has('pathname')) {
-			this.router
-				.resolve(this.pathname)
-				.then(html => (this.view = html))
-				.catch(error => (this.view = `<view-error>${error}</view-error>`))
+			const v = this.router(this.pathname)
+			this.view = v === null ? `<view-error></view-error>` : v.page
 		}
 		return changedProperties.has('view')
 	}

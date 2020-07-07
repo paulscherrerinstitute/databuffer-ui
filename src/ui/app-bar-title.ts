@@ -1,4 +1,3 @@
-import UniversalRouter from 'universal-router'
 import {
 	LitElement,
 	customElement,
@@ -7,6 +6,8 @@ import {
 	css,
 	PropertyValues,
 } from 'lit-element'
+import createMatcher from '@captaincodeman/router'
+import type { Matcher } from '@captaincodeman/router'
 import { connect } from '@captaincodeman/redux-connect-element'
 import { store, RootState, RoutingSelectors } from '../store'
 import { baseStyles } from './shared-styles'
@@ -24,44 +25,23 @@ export class AppBarTitleElement extends connect(store, LitElement) {
 
 	constructor() {
 		super()
-		this.router = new UniversalRouter(this.routes)
+		this.router = createMatcher(this.routes)
 	}
 
-	private router: UniversalRouter
+	private router: Matcher
 
-	private routes = [
-		{
-			path: '/',
-			action: () => `Databuffer UI`,
-		},
-		{
-			path: '/search',
-			action: () => `Search`,
-		},
-		{
-			path: '/plot',
-			action: () => `Plot`,
-		},
-		{
-			path: '/plot-settings',
-			action: () => `Plot settings`,
-		},
-		{
-			path: '/query-meta',
-			action: () => `About data query`,
-		},
-	]
+	private routes = {
+		'/': `Databuffer UI`,
+		'/search': `Search`,
+		'/plot': `Plot`,
+		'/plot-settings': `Plot settings`,
+		'/query-meta': `About data query`,
+	}
 
 	shouldUpdate(changedProperties: PropertyValues) {
 		if (changedProperties.has('pathname')) {
-			this.router
-				.resolve(this.pathname)
-				.then(title => {
-					this.title = title
-				})
-				.catch(() => {
-					this.title = `Databuffer UI`
-				})
+			const v = this.router(this.pathname)
+			this.title = v === null ? `Databuffer UI` : v.page
 		}
 		return changedProperties.has('title')
 	}

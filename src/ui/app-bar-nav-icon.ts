@@ -1,4 +1,3 @@
-import UniversalRouter from 'universal-router'
 import {
 	LitElement,
 	customElement,
@@ -7,6 +6,8 @@ import {
 	css,
 	PropertyValues,
 } from 'lit-element'
+import createMatcher from '@captaincodeman/router'
+import type { Matcher } from '@captaincodeman/router'
 import { connect } from '@captaincodeman/redux-connect-element'
 import { store, RootState, RoutingSelectors, RoutingActions } from '../store'
 import { baseStyles } from './shared-styles'
@@ -33,44 +34,22 @@ export class AppBarNavIconElement extends connect(store, LitElement) {
 
 	constructor() {
 		super()
-		this.router = new UniversalRouter(this.routes)
+		this.router = createMatcher(this.routes)
 	}
 
-	private router: UniversalRouter
+	private router: Matcher
 
-	private routes = [
-		{
-			path: '/',
-			action: () => ``,
-		},
-		{
-			path: '/search',
-			action: () => `/`,
-		},
-		{
-			path: '/plot',
-			action: () => `/search`,
-		},
-		{
-			path: '/plot-settings',
-			action: () => `/plot`,
-		},
-		{
-			path: '/query-meta',
-			action: () => `/plot`,
-		},
-	]
+	private routes = {
+		'/search': `/`,
+		'/plot': `/search`,
+		'/plot-settings': `/plot`,
+		'/query-meta': `/plot`,
+	}
 
 	shouldUpdate(changedProperties: PropertyValues) {
 		if (changedProperties.has('pathname')) {
-			this.router
-				.resolve(this.pathname)
-				.then(destination => {
-					this.destination = destination
-				})
-				.catch(() => {
-					this.destination = ''
-				})
+			const v = this.router(this.pathname)
+			this.destination = v === null ? '' : v.page
 		}
 		return changedProperties.has('destination')
 	}

@@ -1,4 +1,3 @@
-import UniversalRouter from 'universal-router'
 import {
 	LitElement,
 	customElement,
@@ -6,6 +5,8 @@ import {
 	property,
 	PropertyValues,
 } from 'lit-element'
+import createMatcher from '@captaincodeman/router'
+import type { Matcher } from '@captaincodeman/router'
 import { connect } from '@captaincodeman/redux-connect-element'
 import { store, RootState, RoutingSelectors, RoutingActions } from '../store'
 import { baseStyles } from './shared-styles'
@@ -37,54 +38,43 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 
 	constructor() {
 		super()
-		this.router = new UniversalRouter(this.routes)
+		this.router = createMatcher(this.routes)
 	}
 
-	private router: UniversalRouter
+	private router: Matcher
 
-	private routes = [
-		{
-			path: '/plot',
-			action: () =>
-				html`<mwc-icon-button
-						title="select plot range"
-						icon="date_range"
-						@click=${() =>
-							this.dispatchEvent(new CustomEvent('plot:daterange'))}
-					></mwc-icon-button
-					><mwc-icon-button
-						title="download channel data"
-						icon="cloud_download"
-						@click=${() => this.dispatchEvent(new CustomEvent('plot:download'))}
-					></mwc-icon-button
-					><mwc-icon-button
-						title="share a link to this plot"
-						icon="share"
-						@click=${() => this.dispatchEvent(new CustomEvent('plot:share'))}
-					></mwc-icon-button
-					><mwc-icon-button
-						title="change plot settings"
-						icon="settings"
-						@click=${() => this.dispatchEvent(new CustomEvent('plot:settings'))}
-					></mwc-icon-button
-					><mwc-icon-button
-						title="view query information"
-						icon="info_outline"
-						@click=${() => this.dispatchEvent(new CustomEvent('plot:info'))}
-					></mwc-icon-button>`,
-		},
-	]
+	private routes = {
+		'/plot': html`<mwc-icon-button
+				title="select plot range"
+				icon="date_range"
+				@click=${() => this.dispatchEvent(new CustomEvent('plot:daterange'))}
+			></mwc-icon-button
+			><mwc-icon-button
+				title="download channel data"
+				icon="cloud_download"
+				@click=${() => this.dispatchEvent(new CustomEvent('plot:download'))}
+			></mwc-icon-button
+			><mwc-icon-button
+				title="share a link to this plot"
+				icon="share"
+				@click=${() => this.dispatchEvent(new CustomEvent('plot:share'))}
+			></mwc-icon-button
+			><mwc-icon-button
+				title="change plot settings"
+				icon="settings"
+				@click=${() => this.dispatchEvent(new CustomEvent('plot:settings'))}
+			></mwc-icon-button
+			><mwc-icon-button
+				title="view query information"
+				icon="info_outline"
+				@click=${() => this.dispatchEvent(new CustomEvent('plot:info'))}
+			></mwc-icon-button>`,
+	}
 
 	shouldUpdate(changedProperties: PropertyValues) {
 		if (changedProperties.has('pathname')) {
-			this.router
-				.resolve(this.pathname)
-				.then(templateResult => {
-					this.templateResult = templateResult
-				})
-				.catch(() => {
-					this.templateResult = nothing
-				})
+			const v = this.router(this.pathname)
+			this.templateResult = v === null ? nothing : v.page
 		}
 		return changedProperties.has('templateResult')
 	}
