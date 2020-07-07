@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { AnyAction } from 'redux'
 import { eventChannel, buffers } from 'redux-saga'
-import UniversalRouter from 'universal-router'
+import createMatcher from '@captaincodeman/router'
+import type { Routes } from '@captaincodeman/router'
 import { RoutingActions } from './actions'
 
 import { routes } from './routes'
@@ -9,12 +10,7 @@ import { takeEvery, call, take, put, cancelled } from 'redux-saga/effects'
 
 export default [routeSaga, clickListener]
 
-const ROUTE_SAGAS = [...routes].map(r => ({
-	...r,
-	action: (context, params) => call([r, r.route], params, context.queries),
-}))
-
-const sagaRouter = new UniversalRouter(ROUTE_SAGAS)
+const sagaRouter = createMatcher(routes)
 
 function* routeSaga() {
 	yield takeEvery('ROUTER/LOCATION_CHANGE', navigationSaga)
@@ -27,9 +23,9 @@ function* navigationSaga(action: AnyAction) {
 	if (pathname === pathnamePrev) return
 
 	try {
-		const route = yield sagaRouter.resolve({ pathname, queries })
-		if (route) {
-			yield route
+		const route = sagaRouter(pathname)
+		if (route !== null) {
+			yield call(route.page, route.params, queries)
 		}
 	} catch (err) {
 		// no route, ignore

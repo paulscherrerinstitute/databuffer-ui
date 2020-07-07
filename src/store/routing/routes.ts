@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { put, select } from 'redux-saga/effects'
+import type { Routes } from '@captaincodeman/router'
 
 import { ChannelSearchActions } from '../channelsearch'
 import { PlotActions } from '../plot/actions'
@@ -10,12 +11,12 @@ import { idToChannel } from '@psi/databuffer-query-js/channel'
 import { parseISO } from 'date-fns'
 import { PlotSelectors } from '../plot'
 
-export const routes = [
-	{ path: '/search', route: channelSearchRoute },
-	{ path: '/plot', route: plotRoute },
-	{ path: '/plot/:backend/:name', route: plotSingleChannelRoute },
-	{ path: '/preselect', route: plotPreselectRoute },
-]
+export const routes: Routes = {
+	'/search': channelSearchRoute,
+	'/plot': plotRoute,
+	'/plot/:backend/:name': plotSingleChannelRoute,
+	'/preselect': plotPreselectRoute,
+}
 
 function* channelSearchRoute(params, queries) {
 	const { q } = queries
