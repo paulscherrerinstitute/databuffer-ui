@@ -199,12 +199,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				},
 				zoomType: 'xy',
 			},
-			exporting: {
-				csv: {
-					dateFormat: '%Y-%m%d %H:%M:%S.%L',
-				},
-				fallbackToExportServer: false,
-			},
 			series: [],
 			xAxis: {
 				type: 'datetime',
