@@ -59,6 +59,7 @@
 	},
 	"dependencies": {
 		"@captaincodeman/redux-connect-element": "^2.0.0",
+		"@captaincodeman/router": "^1.0.1",
 		"@material/mwc-button": "^0.15.0",
 		"@material/mwc-dialog": "^0.15.0",
 		"@material/mwc-formfield": "^0.15.0",
