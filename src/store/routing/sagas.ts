@@ -2,7 +2,6 @@
 import { AnyAction } from 'redux'
 import { eventChannel, buffers } from 'redux-saga'
 import createMatcher from '@captaincodeman/router'
-import type { Routes } from '@captaincodeman/router'
 import { RoutingActions } from './actions'
 
 import { routes } from './routes'
@@ -23,7 +22,7 @@ function* navigationSaga(action: AnyAction) {
 	if (pathname === pathnamePrev) return
 
 	try {
-		const route = sagaRouter(pathname)
+		const route = yield Promise.resolve(sagaRouter(pathname))
 		if (route !== null) {
 			yield call(route.page, route.params, queries)
 		}
