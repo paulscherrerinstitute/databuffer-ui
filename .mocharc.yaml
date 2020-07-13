@@ -4,5 +4,6 @@ extension:
 require:
   - esm
   - jsdom-global/register
+  - ./public/config/databuffer-ui.config.js
   - ts-node/register
 spec: src/**/*.spec.ts

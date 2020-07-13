@@ -1,4 +1,7 @@
 {
+	"ts-node": {
+		"files": true
+	},
 	"compilerOptions": {
 		"sourceMap": true,
 		"module": "esnext",
@@ -10,5 +13,6 @@
 		"experimentalDecorators": true,
 		"allowSyntheticDefaultImports": true,
 		"lib": ["esnext", "dom"]
-	}
+	},
+	"files": ["./src/index.ts", "./src/ui/global.d.ts"]
 }

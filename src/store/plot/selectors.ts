@@ -1,6 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../../ui/global.d.ts" />
-
 import { createSelector } from 'reselect'
 import Highcharts from 'highcharts'
 import { channelToId } from '@psi/databuffer-query-js/channel'
