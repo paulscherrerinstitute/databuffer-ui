@@ -1,0 +1,25 @@
+#!/bin/bash
+
+. $(dirname $0)/.colors.sh
+. $(dirname $0)/.dockerconfig.sh
+
+
+echo -e "${COLOR_CYAN}### Building docker image ${DOCKERIMAGE}${COLOR_OFF}"
+cd $(dirname $0)/..
+docker build -t $DOCKERFULL .
+if [[ $? -ne 0 ]]
+then
+    echo -e "Aborting due to ${COLOR_RED}error${COLOR_OFF}."
+    exit 1
+fi
+
+
+echo -e "${COLOR_CYAN}### Publishing docker image to registry ${DOCKERREGISTRY}${COLOR_OFF}"
+docker push $DOCKERFULL
+if [[ $? -ne 0 ]]
+then
+    echo -e "Aborting due to ${COLOR_RED}error${COLOR_OFF}."
+    exit 1
+fi
+
+echo -e "${COLOR_CYAN}### Done :^)${COLOR_OFF}"
