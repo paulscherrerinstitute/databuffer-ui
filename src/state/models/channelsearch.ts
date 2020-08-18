@@ -2,11 +2,11 @@ import {
 	ChannelConfig,
 	ChannelConfigsQuery,
 } from '@psi/databuffer-query-js/query-channel-configs'
-import { createModel } from '@captaincodeman/rdx'
-import { Store, State } from '../store'
-import { queryRestApi } from '../../api/queryrest'
+import { createModel, RoutingState } from '@captaincodeman/rdx'
 import { channelToId } from '@psi/databuffer-query-js/channel'
 import { createSelector } from 'reselect'
+import { Store, State } from '../store'
+import { queryRestApi } from '../../api/queryrest'
 import { compareNameThenBackend, getShapeName } from '../../store/channelsearch'
 
 type IdToChannelMap = { [id: string]: ChannelConfig }
@@ -71,6 +71,17 @@ export const channelsearch = createModel({
 					dispatch.channelsearch.searchSuccess(entities)
 				} catch (err) {
 					dispatch.channelsearch.searchFailure(err)
+				}
+			},
+
+			async 'routing/change'(payload: RoutingState) {
+				switch (payload.page) {
+					case 'channel-search':
+						if (payload.queries && payload.queries.q) {
+							dispatch.channelsearch.patternChange(payload.queries.q as string)
+							dispatch.channelsearch.runSearch()
+						}
+						break
 				}
 			},
 		}

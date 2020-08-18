@@ -1,4 +1,4 @@
-import { createModel } from '@captaincodeman/rdx'
+import { createModel, RoutingState } from '@captaincodeman/rdx'
 import Highcharts from 'highcharts'
 import { createSelector } from 'reselect'
 import {
@@ -12,8 +12,8 @@ import {
 	DataResponseFormatType,
 	AggregationSpecification,
 } from '@psi/databuffer-query-js/query-data'
-import { channelToId } from '@psi/databuffer-query-js/channel'
-import { DataResponse } from '../../api/queryrest'
+import { channelToId, idToChannel } from '@psi/databuffer-query-js/channel'
+import { DataResponse, queryRestApi } from '../../api/queryrest'
 import {
 	YAxis,
 	DataSeries,
@@ -23,6 +23,7 @@ import {
 } from '../../store/plot/models'
 import { Store, State } from '../store'
 import { formatDate } from '../../util'
+import { parseISO } from 'date-fns'
 
 export interface PlotState {
 	plotTitle: string
@@ -289,7 +290,94 @@ export const plot = createModel({
 	effects: (store: Store) => {
 		const dispatch = store.dispatch()
 		return {
-			//
+			async drawPlot() {
+				const query = plotSelectors.plotQuery(store.getState())
+				dispatch.plot.hideQueryRange()
+				dispatch.plot.drawPlotRequest(Date.now())
+				try {
+					const response = await queryRestApi.queryData(query)
+					dispatch.plot.drawPlotSuccess({ timestamp: Date.now(), response })
+				} catch (error) {
+					dispatch.plot.drawPlotFailure({ timestamp: Date.now(), error })
+				}
+			},
+
+			async 'routing/change'(payload: RoutingState) {
+				switch (payload.page) {
+					case 'plot':
+						// automatically display the query range pop up,
+						// but only if we haven't already drawn a plot
+						if (!plotSelectors.shouldDisplayChart(store.getState())) {
+							dispatch.plot.showQueryRange()
+						}
+						break
+
+					case 'plot-single-channel':
+						{
+							const channel: Channel = {
+								backend: payload.params.backend,
+								name: payload.params.name,
+							}
+							dispatch.plot.setSelectedChannels([channel])
+							// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+							// @ts-ignore
+							dispatch.routing.replace('/plot')
+						}
+						break
+
+					case 'preselect':
+						{
+							const MAX_CHANNELS = 16
+							const strToDate = (s: string): number =>
+								/^\d+$/.test(s) ? Number.parseInt(s, 10) : parseISO(s).getTime()
+
+							let duration = 12 * 60 * 60 * 1000 // 12 hours
+							let endTime = Date.now()
+							let startTime = endTime - duration
+							if ('duration' in payload.queries) {
+								duration = Number.parseInt(
+									payload.queries.duration as string,
+									10
+								)
+								startTime = endTime - duration
+							}
+							if ('endTime' in payload.queries) {
+								endTime = strToDate(payload.queries.endTime as string)
+							}
+							if ('startTime' in payload.queries) {
+								startTime = strToDate(payload.queries.startTime as string)
+							}
+
+							const channels: Channel[] = []
+							const dataSeriesLabels: { index: number; label: string }[] = []
+							for (let i = 1; i <= MAX_CHANNELS; i++) {
+								let paramName = `c${i}`
+								if (!payload.queries[paramName]) continue
+								channels.push(idToChannel(payload.queries[paramName] as string))
+								paramName = `l${i}`
+								if (!payload.queries[paramName]) continue
+								dataSeriesLabels.push({
+									index: channels.length - 1,
+									label: payload.queries[paramName] as string,
+								})
+							}
+							dispatch.plot.setSelectedChannels(channels)
+							for (const item of dataSeriesLabels) {
+								dispatch.plot.changeDataSeriesLabel(item)
+							}
+							dispatch.plot.changeEndTime(endTime)
+							dispatch.plot.changeStartTime(startTime)
+							dispatch.plot.drawPlot()
+							// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+							// @ts-ignore
+							dispatch.routing.replace('/plot')
+						}
+						break
+
+					default:
+						break
+				}
+			},
 		}
 	},
 })

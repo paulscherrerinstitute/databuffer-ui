@@ -6,7 +6,7 @@ import sinon from 'sinon'
 import { channelsearch, channelsearchSelectors } from './channelsearch'
 import { IdToChannelMap, ShapeName } from '../../store/channelsearch'
 import { Store, store, Dispatch, State } from '../store'
-import { EffectFns } from '@captaincodeman/rdx'
+import { EffectFns, RoutingState } from '@captaincodeman/rdx'
 
 describe('channelsearch model', () => {
 	describe('initial state', () => {
@@ -196,6 +196,35 @@ describe('channelsearch model', () => {
 				await effects.runSearch()
 				expect(fake.callCount).to.equal(1)
 				console.log(fake.args)
+			})
+		})
+
+		describe('routing/change', () => {
+			describe('route channel-search', () => {
+				it('sets the search pattern', async () => {
+					const fake = sinon.fake()
+					testDispatch.channelsearch.patternChange = fake
+					const payload: RoutingState = {
+						page: 'channel-search',
+						params: {},
+						queries: { q: 'foo' },
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(1)
+					expect(fake.args[0][0]).to.equal('foo')
+				})
+
+				it('triggers the search', async () => {
+					const fake = sinon.fake()
+					testDispatch.channelsearch.runSearch = fake
+					const payload: RoutingState = {
+						page: 'channel-search',
+						params: {},
+						queries: { q: 'foo' },
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(1)
+				})
 			})
 		})
 	})

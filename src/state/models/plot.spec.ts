@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import { plot, PlotState, plotSelectors, NR_OF_BINS } from './plot'
 import { QueryMode, YAxis, DataSeries } from '../../store/plot/models'
 import { Channel, channelToId } from '@psi/databuffer-query-js/channel'
-import { store, State } from '../store'
+import { store, State, Store, Dispatch } from '../store'
 import { DataResponse } from '../../api/queryrest'
 import {
 	AggregationResult,
@@ -15,6 +15,10 @@ import {
 	DataResponseFormatType,
 } from '@psi/databuffer-query-js/query-data'
 import { formatDate } from '../../util'
+import sinon from 'sinon'
+import { EffectFns, RoutingState } from '@captaincodeman/rdx'
+import { createTestEnv, RdxTestEnv } from '../rdx-test-util'
+import { parseISO } from 'date-fns'
 
 const EXAMPLE_CHANNELS = [
 	{ name: 'channel2', backend: 'backend2' },
@@ -224,13 +228,388 @@ describe('plot model', () => {
 	})
 
 	describe('effects', () => {
-		//
+		let rdxTest: RdxTestEnv<State, Dispatch>
+		let effects: EffectFns
+
+		beforeEach(() => {
+			rdxTest = createTestEnv(store)
+			effects = rdxTest.modelEffects(plot)
+		})
+
+		afterEach(() => {
+			sinon.restore()
+			rdxTest.cleanup()
+		})
+
+		describe('drawPlot', () => {
+			it('triggers drawPlotRequest', async () => {
+				const fake = sinon.fake()
+				rdxTest.dispatch.plot.drawPlotRequest = fake
+				effects.drawPlot()
+				expect(fake.callCount).to.equal(1)
+			})
+		})
+
+		describe('routing/change', () => {
+			describe('route plot-single-channel', () => {
+				beforeEach(() => {
+					// replace the routing, as it will otherwise cause trouble, as
+					// there is no real browser...
+					// --
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					rdxTest.dispatch.routing.replace = sinon.fake()
+				})
+
+				it('sets the selected channels', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.setSelectedChannels = fake
+					const payload: RoutingState = {
+						page: 'plot-single-channel',
+						params: { backend: 'be1', name: 'ch1' },
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(1)
+					expect(fake.args[0][0]).to.deep.equal([
+						{ backend: 'be1', name: 'ch1' },
+					])
+				})
+
+				it('changes route to /plot', async () => {
+					const fake = sinon.fake()
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					rdxTest.dispatch.routing.replace = fake
+					const payload: RoutingState = {
+						page: 'plot-single-channel',
+						params: { backend: 'be1', name: 'ch1' },
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(1)
+					expect(fake.args[0][0]).to.equal('/plot')
+				})
+			})
+
+			describe('route preselect', () => {
+				beforeEach(() => {
+					// replace the routing, as it will otherwise cause trouble, as
+					// there is no real browser...
+					// --
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					rdxTest.dispatch.routing.replace = sinon.fake()
+				})
+
+				it('uses the right defaults', async () => {
+					const fakeSetSelectedChannels = (rdxTest.dispatch.plot.setSelectedChannels = sinon.fake())
+					const fakeChangeEndTime = (rdxTest.dispatch.plot.changeEndTime = sinon.fake())
+					const fakeChangeStartTime = (rdxTest.dispatch.plot.changeStartTime = sinon.fake())
+					const expectedChannels = []
+					const expectedEndTime = Date.now()
+					const expectedStartTime = expectedEndTime - 12 * 60 * 60 * 1000 // default = 12 hours
+					const payload: RoutingState = {
+						page: 'preselect',
+						params: {},
+						queries: {},
+					}
+					await effects['routing/change'](payload)
+
+					expect(fakeSetSelectedChannels.callCount).to.equal(1)
+					expect(fakeSetSelectedChannels.args[0][0]).to.deep.equal(
+						expectedChannels
+					)
+
+					expect(fakeChangeEndTime.callCount).to.equal(1)
+					expect(fakeChangeEndTime.args[0][0]).to.be.closeTo(
+						expectedEndTime,
+						100
+					)
+
+					expect(fakeChangeStartTime.callCount).to.equal(1)
+					expect(fakeChangeStartTime.args[0][0]).to.be.closeTo(
+						expectedStartTime,
+						100
+					)
+				})
+
+				it('dispatches drawPlot', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.drawPlot = fake
+					const payload: RoutingState = {
+						page: 'preselect',
+						params: {},
+						queries: {},
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(1)
+				})
+
+				it('changes route to /plot', async () => {
+					const fake = sinon.fake()
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					rdxTest.dispatch.routing.replace = fake
+					const payload: RoutingState = {
+						page: 'preselect',
+						params: {},
+						queries: {},
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(1)
+					expect(fake.args[0][0]).to.equal('/plot')
+				})
+
+				it('takes channels from parameters c1...c16', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.setSelectedChannels = fake
+					const expectedChannels: Channel[] = [
+						{ backend: 'be16', name: 'ch01' },
+						{ backend: 'be15', name: 'ch02' },
+						{ backend: 'be14', name: 'ch03' },
+						{ backend: 'be13', name: 'ch04' },
+						{ backend: 'be12', name: 'ch05' },
+						{ backend: 'be11', name: 'ch06' },
+						{ backend: 'be10', name: 'ch07' },
+						{ backend: 'be09', name: 'ch08' },
+						{ backend: 'be08', name: 'ch09' },
+						{ backend: 'be07', name: 'ch10' },
+						{ backend: 'be06', name: 'ch11' },
+						{ backend: 'be05', name: 'ch12' },
+						{ backend: 'be04', name: 'ch13' },
+						{ backend: 'be03', name: 'ch14' },
+						{ backend: 'be02', name: 'ch15' },
+						{ backend: 'be01', name: 'ch16' },
+					]
+					const payload: RoutingState = {
+						page: 'preselect',
+						params: {},
+						queries: {},
+					}
+					for (let i = 0; i < expectedChannels.length; i++) {
+						payload.queries[`c${i + 1}`] = channelToId(expectedChannels[i])
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(1)
+					expect(fake.args[0][0]).to.deep.equal(expectedChannels)
+				})
+
+				it('allows gaps in parameters c1...c16', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.setSelectedChannels = fake
+					const expectedChannels: Channel[] = [
+						{ backend: 'be01', name: 'ch01' },
+						{ backend: 'be02', name: 'ch02' },
+						{ backend: 'be03', name: 'ch03' },
+					]
+					const payload: RoutingState = {
+						page: 'preselect',
+						params: {},
+						queries: {
+							c4: 'be01/ch01',
+							c9: 'be02/ch02',
+							c13: 'be03/ch03',
+						},
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(1)
+					expect(fake.args[0][0]).to.deep.equal(expectedChannels)
+				})
+
+				it('ignores parameters c0, and c17+', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.setSelectedChannels = fake
+					const expectedChannels: Channel[] = [
+						{ backend: 'be01', name: 'ch01' },
+						{ backend: 'be02', name: 'ch02' },
+					]
+					const payload: RoutingState = {
+						page: 'preselect',
+						params: {},
+						queries: {
+							c0: 'be00/ch00', // should be ignored
+							c1: 'be01/ch01', // should be included
+							c16: 'be02/ch02', // should be included
+							c17: 'be03/ch03', // should be ignored
+							c18: 'be04/ch04', // should be ignored
+							c19: 'be05/ch05', // should be ignored
+						},
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(1)
+					expect(fake.args[0][0]).to.deep.equal(expectedChannels)
+				})
+
+				it('reads parameter endTime as ISO string', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.changeEndTime = fake
+					const payload: RoutingState = {
+						page: 'preselect',
+						params: {},
+						queries: {
+							endTime: '2020-05-04T12:07:45.234+02:00',
+						},
+					}
+					await effects['routing/change'](payload)
+					const expectedEndTime = parseISO(
+						payload.queries.endTime as string
+					).getTime()
+					expect(fake.callCount).to.equal(1)
+					expect(fake.args[0][0]).to.equal(expectedEndTime)
+				})
+
+				it('reads parameter startTime as ISO string', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.changeStartTime = fake
+					const payload: RoutingState = {
+						page: 'preselect',
+						params: {},
+						queries: {
+							startTime: '2020-05-04T11:07:45.123+02:00',
+						},
+					}
+					await effects['routing/change'](payload)
+					const expectedStartTime = parseISO(
+						payload.queries.startTime as string
+					).getTime()
+					expect(fake.callCount).to.equal(1)
+					expect(fake.args[0][0]).to.equal(expectedStartTime)
+				})
+
+				it('reads parameter endTime as milliseconds', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.changeEndTime = fake
+					const expectedEndTime = 200000
+					const payload: RoutingState = {
+						page: 'preselect',
+						params: {},
+						queries: {
+							endTime: expectedEndTime.toString(),
+						},
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(1)
+					expect(fake.args[0][0]).to.equal(expectedEndTime)
+				})
+
+				it('reads parameter startTime as milliseconds', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.changeStartTime = fake
+					const expectedStartTime = 100000
+					const payload: RoutingState = {
+						page: 'preselect',
+						params: {},
+						queries: {
+							startTime: expectedStartTime.toString(),
+						},
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(1)
+					expect(fake.args[0][0]).to.equal(expectedStartTime)
+				})
+
+				it('sets start and end time from parameter duration', async () => {
+					const duration = 60000 // 1 minute
+					const expectedEndTime = Date.now()
+					const expectedStartTime = expectedEndTime - duration
+					const fakeEndTime = sinon.fake()
+					rdxTest.dispatch.plot.changeEndTime = fakeEndTime
+					const fakeStartTime = sinon.fake()
+					rdxTest.dispatch.plot.changeStartTime = fakeStartTime
+					const payload: RoutingState = {
+						page: 'preselect',
+						params: {},
+						queries: {
+							duration: duration.toString(),
+						},
+					}
+					await effects['routing/change'](payload)
+					expect(fakeEndTime.callCount).to.equal(1)
+					expect(fakeEndTime.args[0][0]).to.be.closeTo(expectedEndTime, 100)
+					expect(fakeStartTime.callCount).to.equal(1)
+					expect(fakeStartTime.args[0][0]).to.be.closeTo(expectedStartTime, 100)
+				})
+
+				it('endTime has precedence over duration', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.changeEndTime = fake
+					const expectedEndTime = 200000
+					const payload: RoutingState = {
+						page: 'preselect',
+						params: {},
+						queries: {
+							duration: '60000',
+							endTime: expectedEndTime.toString(),
+						},
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(1)
+					expect(fake.args[0][0]).to.equal(expectedEndTime)
+				})
+
+				it('startTime has precedence over duration', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.changeStartTime = fake
+					const expectedStartTime = 100000
+					const payload: RoutingState = {
+						page: 'preselect',
+						params: {},
+						queries: {
+							duration: '60000',
+							startTime: expectedStartTime.toString(),
+						},
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(1)
+					expect(fake.args[0][0]).to.equal(expectedStartTime)
+				})
+
+				it('sets labels if defined', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.changeDataSeriesLabel = fake
+					const payload: RoutingState = {
+						page: 'preselect',
+						params: {},
+						queries: {
+							c1: 'be01/ch01',
+							c2: 'be02/ch02',
+							l2: 'my label',
+							c5: 'be01/ch03',
+							l5: 'another label',
+							c6: 'be99/ch99',
+						},
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(2)
+					expect(fake.args[0][0]).to.deep.equal({ index: 1, label: 'my label' })
+					expect(fake.args[1][0]).to.deep.equal({
+						index: 2,
+						label: 'another label',
+					})
+				})
+
+				it('ignores labels without matching channel', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.changeDataSeriesLabel = fake
+					const payload: RoutingState = {
+						page: 'preselect',
+						params: {},
+						queries: {
+							c6: 'be99/ch99',
+							l8: 'index number does not match', // <-- should not have an effect
+						},
+					}
+					await effects['routing/change'](payload)
+					// for param `l8` there should not be an effect, as the 8 does not match the 6 (of c6)
+					expect(fake.callCount).to.equal(0)
+				})
+			})
+		})
 	})
 
 	describe('selectors', () => {
 		let state: State
 		beforeEach(() => {
-			state = { ...store.state }
+			state = store.state
 		})
 
 		it('retrieves plotTitle', () => {
