@@ -53,7 +53,7 @@ export const channelsearch = createModel({
 		searchFailure: (state, error) => ({ ...state, fetching: false, error }),
 	},
 
-	effects: (store: Store) => {
+	effects(store: Store) {
 		const dispatch = store.dispatch() // save for later
 		return {
 			async runSearch() {

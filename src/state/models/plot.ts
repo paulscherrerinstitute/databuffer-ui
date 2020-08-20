@@ -287,7 +287,7 @@ export const plot = createModel({
 		}),
 	},
 
-	effects: (store: Store) => {
+	effects(store: Store) {
 		const dispatch = store.dispatch()
 		return {
 			async drawPlot() {
