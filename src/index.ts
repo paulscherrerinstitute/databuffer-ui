@@ -1,2 +1,2 @@
-import './store'
+import './state/store'
 import './ui'

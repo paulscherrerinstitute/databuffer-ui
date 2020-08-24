@@ -6,6 +6,7 @@ import sinon from 'sinon'
 import { channelsearch, channelsearchSelectors } from './channelsearch'
 import { IdToChannelMap, ShapeName } from '../../store/channelsearch'
 import { Store, store, Dispatch, State } from '../store'
+import { createTestEnv, RdxTestEnv } from '../rdx-test-util'
 import { EffectFns, RoutingState } from '@captaincodeman/rdx'
 
 describe('channelsearch model', () => {
@@ -156,46 +157,71 @@ describe('channelsearch model', () => {
 	})
 
 	describe('effects', () => {
+		let rdxTest: RdxTestEnv<State, Dispatch>
 		let effects: EffectFns
-		let testStore: Store
-		let testState: State
-		let testDispatch: Dispatch
 
 		beforeEach(() => {
-			testDispatch = store.dispatch
-			testState = store.state
-			testStore = {
-				dispatch: () => testDispatch,
-				getState: () => testState,
-			}
-			effects = channelsearch.effects(testStore)
+			rdxTest = createTestEnv(store)
+			// need to fake dispatching actions for routing, because jsdom
+			// messes things up and tests will fail
+			// ---
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			rdxTest.dispatch.routing.replace = sinon.fake()
+			// @ts-ignore: routing plugin is not added to dispatch somehow.
+			rdxTest.dispatch.routing.push = sinon.fake()
+			effects = rdxTest.modelEffects(channelsearch)
 		})
 
 		afterEach(() => {
 			sinon.restore()
+			rdxTest.cleanup()
 		})
 
 		describe('runSearch', () => {
 			it('dispatches searchRequest', async () => {
 				const fake = sinon.fake()
-				testDispatch.channelsearch.searchRequest = fake
+				rdxTest.dispatch.channelsearch.searchRequest = fake
 				await effects.runSearch()
 				expect(fake.callCount).to.equal(1)
 			})
 
 			xit('dispatches searchSuccess on successful search', async () => {
 				const fake = sinon.fake()
-				testDispatch.channelsearch.searchSuccess = fake
+				rdxTest.dispatch.channelsearch.searchSuccess = fake
 				await effects.runSearch()
 				expect(fake.callCount).to.equal(1)
 			})
 
 			xit('dispatches searchFailure on error', async () => {
 				const fake = sinon.fake()
-				testDispatch.channelsearch.searchFailure = fake
+				rdxTest.dispatch.channelsearch.searchFailure = fake
 				await effects.runSearch()
 				expect(fake.callCount).to.equal(1)
 				console.log(fake.args)
+			})
+
+			it('does not change view to channel-search if that is the current view', async () => {
+				const fake = sinon.fake()
+				rdxTest.dispatch.routing.push = fake
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				rdxTest.state.routing.page = 'channel-search'
+				await effects.runSearch()
+				expect(fake.callCount).to.equal(0)
+			})
+
+			it('changes view to channel-search if that is not the current view', async () => {
+				const fake = sinon.fake()
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				rdxTest.dispatch.routing.push = fake
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				rdxTest.state.routing.page = 'some-other-view'
+				await effects.runSearch()
+				expect(fake.callCount).to.equal(1)
+				expect(fake.args[0][0]).to.equal('/search')
 			})
 		})
 
@@ -203,7 +229,7 @@ describe('channelsearch model', () => {
 			describe('route channel-search', () => {
 				it('sets the search pattern', async () => {
 					const fake = sinon.fake()
-					testDispatch.channelsearch.patternChange = fake
+					rdxTest.dispatch.channelsearch.patternChange = fake
 					const payload: RoutingState = {
 						page: 'channel-search',
 						params: {},
@@ -216,7 +242,7 @@ describe('channelsearch model', () => {
 
 				it('triggers the search', async () => {
 					const fake = sinon.fake()
-					testDispatch.channelsearch.runSearch = fake
+					rdxTest.dispatch.channelsearch.runSearch = fake
 					const payload: RoutingState = {
 						page: 'channel-search',
 						params: {},

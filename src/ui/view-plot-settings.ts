@@ -1,17 +1,11 @@
 import { LitElement, customElement, html, property, css } from 'lit-element'
 
-import { RootState, store } from '../store'
-import {
-	Channel,
-	PlotSelectors,
-	PlotActions,
-	DataSeries,
-	YAxis,
-	YAxisType,
-} from '../store/plot'
+import { State, store } from '../state/store'
+import { Channel, DataSeries, YAxis, YAxisType } from '../store/plot'
+import { plotSelectors } from '../state/models/plot'
 
 import { baseStyles } from './shared-styles'
-import { connect } from '@captaincodeman/redux-connect-element'
+import { connect } from '@captaincodeman/rdx'
 import '@material/mwc-list/mwc-list-item'
 import '@material/mwc-select'
 import '@material/mwc-textfield'
@@ -23,29 +17,43 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 	@property({ attribute: false }) plotTitle: string
 	@property({ attribute: false }) yAxes: YAxis[] = []
 
-	mapState(state: RootState) {
+	mapState(state: State) {
 		return {
-			channels: PlotSelectors.channels(state),
-			dataSeriesConfig: PlotSelectors.dataSeriesConfig(state),
-			plotTitle: PlotSelectors.plotTitle(state),
-			yAxes: PlotSelectors.yAxes(state),
+			channels: plotSelectors.channels(state),
+			dataSeriesConfig: plotSelectors.dataSeriesConfig(state),
+			plotTitle: plotSelectors.plotTitle(state),
+			yAxes: plotSelectors.yAxes(state),
 		}
 	}
 
 	mapEvents() {
 		return {
 			'title-change': (e: CustomEvent<{ title: string }>) =>
-				PlotActions.plotTitleChange(e.detail.title),
+				store.dispatch.plot.changePlotTitle(e.detail.title),
 			'series-label': (e: CustomEvent<{ index: number; label: string }>) =>
-				PlotActions.dataSeriesLabelChange(e.detail.index, e.detail.label),
+				store.dispatch.plot.changeDataSeriesLabel({
+					index: e.detail.index,
+					label: e.detail.label,
+				}),
 			'axis:scale:min': (
 				e: CustomEvent<{ index: number; min: number | null }>
-			) => PlotActions.setAxisMin(e.detail.index, e.detail.min),
+			) =>
+				store.dispatch.plot.setAxisMin({
+					index: e.detail.index,
+					min: e.detail.min,
+				}),
 			'axis:scale:max': (
 				e: CustomEvent<{ index: number; max: number | null }>
-			) => PlotActions.setAxisMax(e.detail.index, e.detail.max),
+			) =>
+				store.dispatch.plot.setAxisMax({
+					index: e.detail.index,
+					max: e.detail.max,
+				}),
 			'axis:type': (e: CustomEvent<{ index: number; type: YAxisType }>) =>
-				PlotActions.setAxisType(e.detail.index, e.detail.type),
+				store.dispatch.plot.setAxisType({
+					index: e.detail.index,
+					type: e.detail.type,
+				}),
 		}
 	}
 

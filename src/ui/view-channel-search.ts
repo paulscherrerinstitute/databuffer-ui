@@ -17,18 +17,15 @@ import type { Snackbar } from '@material/mwc-snackbar'
 import '@material/mwc-textfield'
 import type { TextField } from '@material/mwc-textfield'
 
-import {
-	ChannelSearchSelectors,
-	ChannelSearchActions,
-} from '../store/channelsearch'
-import { RootState, RoutingActions, store } from '../store'
+import { State, store } from '../state/store'
 import type { ChannelWithTags } from '../store/channelsearch'
+import { channelsearchSelectors } from '../state/models/channelsearch'
 import { TemplateResult } from 'lit-html'
 
 import './channel-search-result-list'
 import './channel-search-selected-list'
 import { baseStyles } from './shared-styles'
-import { connect } from '@captaincodeman/redux-connect-element'
+import { connect } from '@captaincodeman/rdx'
 
 const MAX_NUM_RESULTS = 100
 
@@ -45,21 +42,21 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 	@query('#notify-cutoff')
 	private __notifyCutoff!: Snackbar
 
-	mapState(state: RootState) {
+	mapState(state: State) {
 		return {
-			pattern: ChannelSearchSelectors.pattern(state),
-			searchResults: ChannelSearchSelectors.resultsWithTags(state),
-			fetching: ChannelSearchSelectors.fetching(state),
-			error: ChannelSearchSelectors.error(state),
+			pattern: channelsearchSelectors.pattern(state),
+			searchResults: channelsearchSelectors.resultsWithTags(state),
+			fetching: channelsearchSelectors.fetching(state),
+			error: channelsearchSelectors.error(state),
 		}
 	}
 
 	mapEvents() {
 		return {
 			'pattern-change': (e: CustomEvent) =>
-				ChannelSearchActions.patternChange(e.detail.pattern),
-			'search-click': () => ChannelSearchActions.searchChannel(),
-			'nav-back': () => RoutingActions.push('/'),
+				store.dispatch.channelsearch.patternChange(e.detail.pattern),
+			'search-click': () => store.dispatch.channelsearch.runSearch(),
+			'nav-back': () => store.dispatch.routing.push('/'),
 		}
 	}
 

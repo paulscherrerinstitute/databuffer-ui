@@ -7,42 +7,36 @@ import {
 	PropertyValues,
 } from 'lit-element'
 import { unsafeHTML } from 'lit-html/directives/unsafe-html'
-import createMatcher from '@captaincodeman/router'
-import type { Matcher } from '@captaincodeman/router'
-import { connect } from '@captaincodeman/redux-connect-element'
-import { store, RootState, RoutingSelectors } from '../store'
+import { connect } from '@captaincodeman/rdx'
+import { store, State } from '../state/store'
 import { baseStyles } from './shared-styles'
 
 @customElement('app-router')
 export class AppRouterElement extends connect(store, LitElement) {
-	@property({ type: String }) pathname: string
+	@property({ type: String }) page: string
 	@property({ type: String }) view: string
 
-	mapState(state: RootState) {
+	mapState(state: State) {
 		return {
-			pathname: RoutingSelectors.pathname(state),
+			page: state.routing.page,
 		}
 	}
 
 	constructor() {
 		super()
-		this.router = createMatcher(this.routes)
 	}
 
-	private router: Matcher
-
-	private routes = {
-		'/': `<view-home></view-home>`,
-		'/search': `<view-channel-search></view-channel-search>`,
-		'/plot': `<view-standard-plot></view-standard-plot>`,
-		'/plot-settings': `<view-plot-settings></view-plot-settings>`,
-		'/query-meta': `<view-query-meta></view-query-meta>`,
+	private viewByPage = {
+		home: `<view-home></view-home>`,
+		'channel-search': `<view-channel-search></view-channel-search>`,
+		plot: `<view-standard-plot></view-standard-plot>`,
+		'plot-settings': `<view-plot-settings></view-plot-settings>`,
+		'query-meta': `<view-query-meta></view-query-meta>`,
 	}
 
 	shouldUpdate(changedProperties: PropertyValues) {
-		if (changedProperties.has('pathname')) {
-			const v = this.router(this.pathname)
-			this.view = v === null ? `<view-error></view-error>` : v.page
+		if (changedProperties.has('page')) {
+			this.view = this.viewByPage[this.page] ?? `<view-error></view-error>`
 		}
 		return changedProperties.has('view')
 	}

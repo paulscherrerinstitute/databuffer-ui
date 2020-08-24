@@ -4,11 +4,12 @@ import {
 	ModelStore,
 	StoreState,
 	StoreDispatch,
+	devtools,
 } from '@captaincodeman/rdx'
 
 import { config } from './config'
 
-export const store = createStore(config)
+export const store = devtools(createStore(config))
 export const dispatch = store.dispatch
 
 // This would technically be possible, but the type hints vscode will provide

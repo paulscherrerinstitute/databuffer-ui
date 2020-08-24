@@ -32,18 +32,14 @@ import '@material/mwc-snackbar'
 import { Snackbar } from '@material/mwc-snackbar'
 
 import { formatDate } from '../util'
-import { RootState, RoutingActions, store } from '../store'
-import {
-	Channel,
-	PlotActions,
-	PlotSelectors,
-	DownloadAggregation,
-} from '../store/plot/'
+import { State, store } from '../state/store'
+import { plotSelectors } from '../state/models/plot'
+import { Channel, DownloadAggregation } from '../store/plot/'
 
 import * as datefns from 'date-fns'
 import type { DataResponse } from '../api/queryrest'
 import { baseStyles } from './shared-styles'
-import { connect } from '@captaincodeman/redux-connect-element'
+import { connect } from '@captaincodeman/rdx'
 
 const TIMESTAMP_PATTERN = `^\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}\\.\\d{3}$`
 const TIMESTAMP_REGEX = new RegExp(TIMESTAMP_PATTERN)
@@ -130,51 +126,51 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@query('#curlcopied')
 	private __snackCurlCopied!: Snackbar
 
-	mapState(state: RootState) {
+	mapState(state: State) {
 		return {
-			error: PlotSelectors.error(state),
-			channels: PlotSelectors.channels(state),
-			startTime: PlotSelectors.startTime(state),
-			endTime: PlotSelectors.endTime(state),
-			fetching: PlotSelectors.fetching(state),
-			response: PlotSelectors.response(state),
-			highchartsOptions: PlotSelectors.highchartsOptions(state),
-			requestDuration: PlotSelectors.requestDuration(state),
-			requestFinishedAt: PlotSelectors.requestFinishedAt(state),
-			shouldDisplayChart: PlotSelectors.shouldDisplayChart(state),
-			channelsWithoutData: PlotSelectors.channelsWithoutData(state),
-			queryRangeShowing: PlotSelectors.queryRangeShowing(state),
-			dialogShareLinkShowing: PlotSelectors.dialogShareLinkShowing(state),
-			dialogShareLinkAbsoluteTimes: PlotSelectors.dialogShareLinkAbsoluteTimes(
+			error: plotSelectors.error(state),
+			channels: plotSelectors.channels(state),
+			startTime: plotSelectors.startTime(state),
+			endTime: plotSelectors.endTime(state),
+			fetching: plotSelectors.fetching(state),
+			response: plotSelectors.response(state),
+			highchartsOptions: plotSelectors.highchartsOptions(state),
+			requestDuration: plotSelectors.requestDuration(state),
+			requestFinishedAt: plotSelectors.requestFinishedAt(state),
+			shouldDisplayChart: plotSelectors.shouldDisplayChart(state),
+			channelsWithoutData: plotSelectors.channelsWithoutData(state),
+			queryRangeShowing: plotSelectors.queryRangeShowing(state),
+			dialogShareLinkShowing: plotSelectors.dialogShareLinkShowing(state),
+			dialogShareLinkAbsoluteTimes: plotSelectors.dialogShareLinkAbsoluteTimes(
 				state
 			),
-			dialogShareLinkUrl: PlotSelectors.dialogShareLinkUrl(state),
-			dialogShareLinkChannelsTruncated: PlotSelectors.dialogShareLinkChannelsTruncated(
+			dialogShareLinkUrl: plotSelectors.dialogShareLinkUrl(state),
+			dialogShareLinkChannelsTruncated: plotSelectors.dialogShareLinkChannelsTruncated(
 				state
 			),
-			dialogDownloadShowing: PlotSelectors.dialogDownloadShowing(state),
-			dialogDownloadAggregation: PlotSelectors.dialogDownloadAggregation(state),
-			dialogDownloadCurlCommand: PlotSelectors.dialogDownloadCurlCommand(state),
+			dialogDownloadShowing: plotSelectors.dialogDownloadShowing(state),
+			dialogDownloadAggregation: plotSelectors.dialogDownloadAggregation(state),
+			dialogDownloadCurlCommand: plotSelectors.dialogDownloadCurlCommand(state),
 		}
 	}
 
 	mapEvents() {
 		return {
-			'draw-plot': () => PlotActions.drawPlot(),
+			'draw-plot': () => store.dispatch.plot.drawPlot(),
 			'start-time-change': (e: CustomEvent<{ startTime: number }>) =>
-				PlotActions.startTimeChange(e.detail.startTime),
+				store.dispatch.plot.changeStartTime(e.detail.startTime),
 			'end-time-change': (e: CustomEvent<{ endTime: number }>) =>
-				PlotActions.endTimeChange(e.detail.endTime),
-			'dialog-share:closed': () => PlotActions.hideShareLink(),
+				store.dispatch.plot.changeEndTime(e.detail.endTime),
+			'dialog-share:closed': () => store.dispatch.plot.hideShareLink(),
 			'dialog-share:absolute-times': e =>
 				e.detail.absTimes
-					? PlotActions.shareAbsoluteTimes()
-					: PlotActions.shareRelativeTime(),
-			'dialog-download:closed': () => PlotActions.hideDownload(),
+					? store.dispatch.plot.shareAbsoluteTimes()
+					: store.dispatch.plot.shareRelativeTimes(),
+			'dialog-download:closed': () => store.dispatch.plot.hideDownload(),
 			'dialog-download:setaggregation': (
 				e: CustomEvent<{ aggregation: DownloadAggregation }>
-			) => PlotActions.setDownloadAggregation(e.detail.aggregation),
-			'dialog-download:download': () => PlotActions.downloadData(),
+			) => store.dispatch.plot.setDownloadAggregation(e.detail.aggregation),
+			'dialog-download:download': () => store.dispatch.plot.downloadData(),
 		}
 	}
 

@@ -6,8 +6,8 @@ import {
 	property,
 	query,
 } from 'lit-element'
-import { connect } from '@captaincodeman/redux-connect-element'
-import { store, RootState } from '../store'
+import { connect } from '@captaincodeman/rdx'
+import { store, State } from '../state/store'
 import pluralize from 'pluralize'
 
 import './channel-search-result-item'
@@ -19,8 +19,9 @@ import type {
 	DaqPillListElement,
 	DaqPillListSelectedEvent,
 } from '@psi/databuffer-web-components/daq-pill-list'
-import { ChannelSearchSelectors, ChannelWithTags } from '../store/channelsearch'
-import { PlotSelectors, PlotActions } from '../store/plot'
+import { ChannelWithTags } from '../store/channelsearch'
+import { channelsearchSelectors } from '../state/models/channelsearch'
+import { plotSelectors } from '../state/models/plot'
 import { nothing } from 'lit-html'
 
 type Channel = {
@@ -42,22 +43,22 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 	@query('#filterlist')
 	private _filterList: DaqPillListElement
 
-	public mapState(state: RootState) {
+	public mapState(state: State) {
 		return {
-			pattern: ChannelSearchSelectors.pattern(state),
-			searchResults: ChannelSearchSelectors.resultsWithTags(state),
-			error: ChannelSearchSelectors.error(state),
-			availableFilters: ChannelSearchSelectors.availableTags(state),
-			selectedChannels: PlotSelectors.channels(state),
+			pattern: channelsearchSelectors.pattern(state),
+			searchResults: channelsearchSelectors.resultsWithTags(state),
+			error: channelsearchSelectors.error(state),
+			availableFilters: channelsearchSelectors.availableTags(state),
+			selectedChannels: plotSelectors.channels(state),
 		}
 	}
 
 	public mapEvents() {
 		return {
 			'channel-remove': (e: CustomEvent) =>
-				PlotActions.unselectChannel(e.detail.index),
+				store.dispatch.plot.unselectChannel(e.detail.index),
 			'channel-select': (e: CustomEvent) =>
-				PlotActions.selectChannel(e.detail.channel),
+				store.dispatch.plot.selectChannel(e.detail.channel),
 		}
 	}
 

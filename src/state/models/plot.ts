@@ -24,6 +24,7 @@ import {
 import { Store, State } from '../store'
 import { formatDate } from '../../util'
 import { parseISO } from 'date-fns'
+import FileSaver from 'file-saver'
 
 export interface PlotState {
 	plotTitle: string
@@ -302,6 +303,18 @@ export const plot = createModel({
 				}
 			},
 
+			async downloadData() {
+				const aggregationSelection = plotSelectors.dialogDownloadAggregation(
+					store.getState()
+				)
+				const query = plotSelectors.plotQuery(store.getState())
+				const response = await queryRestApi.queryDataRaw(query)
+				const blob = await response.blob()
+				const ts = formatDate(Date.now())
+				const fname = `export_${ts}_${aggregationSelection}.csv`
+				FileSaver.saveAs(blob, fname)
+			},
+
 			async 'routing/change'(payload: RoutingState) {
 				switch (payload.page) {
 					case 'plot':
@@ -334,17 +347,17 @@ export const plot = createModel({
 							let duration = 12 * 60 * 60 * 1000 // 12 hours
 							let endTime = Date.now()
 							let startTime = endTime - duration
-							if ('duration' in payload.queries) {
+							if (payload.queries && payload.queries.duration) {
 								duration = Number.parseInt(
 									payload.queries.duration as string,
 									10
 								)
 								startTime = endTime - duration
 							}
-							if ('endTime' in payload.queries) {
+							if (payload.queries && payload.queries.endTime) {
 								endTime = strToDate(payload.queries.endTime as string)
 							}
-							if ('startTime' in payload.queries) {
+							if (payload.queries && payload.queries.startTime) {
 								startTime = strToDate(payload.queries.startTime as string)
 							}
 

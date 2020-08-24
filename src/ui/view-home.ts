@@ -6,17 +6,14 @@ import {
 	css,
 	query,
 } from 'lit-element'
-import { connect } from '@captaincodeman/redux-connect-element'
+import { connect } from '@captaincodeman/rdx'
 import '@material/mwc-button'
 import '@material/mwc-textfield'
 import { TextField } from '@material/mwc-textfield'
 
-import { store, RootState } from '../store'
+import { store, State } from '../state/store'
 
-import {
-	ChannelSearchSelectors,
-	ChannelSearchActions,
-} from '../store/channelsearch'
+import { channelsearchSelectors } from '../state/models/channelsearch'
 
 @customElement('view-home')
 export class HomeElement extends connect(store, LitElement) {
@@ -26,17 +23,17 @@ export class HomeElement extends connect(store, LitElement) {
 	@query('#query')
 	private __query!: TextField
 
-	mapState(state: RootState) {
+	mapState(state: State) {
 		return {
-			pattern: ChannelSearchSelectors.pattern(state),
+			pattern: channelsearchSelectors.pattern(state),
 		}
 	}
 
 	mapEvents() {
 		return {
-			'search-click': () => ChannelSearchActions.searchChannel(),
+			'search-click': () => store.dispatch.channelsearch.runSearch(),
 			'pattern-change': (e: CustomEvent<{ pattern: string }>) =>
-				ChannelSearchActions.patternChange(e.detail.pattern),
+				store.dispatch.channelsearch.patternChange(e.detail.pattern),
 		}
 	}
 

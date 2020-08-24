@@ -1,5 +1,5 @@
 import createMatcher from '@captaincodeman/router'
-import { routingPlugin } from '@captaincodeman/rdx'
+import { routingPlugin, withQuerystring } from '@captaincodeman/rdx'
 import * as models from './models'
 
 const routes = {
@@ -13,6 +13,6 @@ const routes = {
 	'/*': 'not-found',
 }
 const matcher = createMatcher(routes)
-const routing = routingPlugin(matcher)
+const routing = routingPlugin(matcher, { transform: withQuerystring })
 
 export const config = { models, plugins: { routing } }

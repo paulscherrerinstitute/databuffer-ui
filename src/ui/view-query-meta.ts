@@ -1,12 +1,13 @@
 import { LitElement, customElement, html, property, css } from 'lit-element'
 
 import { formatDate } from '../util'
-import { RootState, store } from '../store'
-import { Channel, PlotSelectors } from '../store/plot/'
+import { State, store } from '../state/store'
+import { Channel } from '../store/plot/'
+import { plotSelectors } from '../state/models/plot'
 
 import type { DataResponse } from '../api/queryrest'
 import { baseStyles } from './shared-styles'
-import { connect } from '@captaincodeman/redux-connect-element'
+import { connect } from '@captaincodeman/rdx'
 
 @customElement('view-query-meta')
 export class QueryMetaElement extends connect(store, LitElement) {
@@ -18,15 +19,15 @@ export class QueryMetaElement extends connect(store, LitElement) {
 	@property({ attribute: false }) requestFinishedAt: number
 	@property({ attribute: false }) response: DataResponse
 
-	mapState(state: RootState) {
+	mapState(state: State) {
 		return {
-			channels: PlotSelectors.channels(state),
-			channelsWithoutData: PlotSelectors.channelsWithoutData(state),
-			error: PlotSelectors.error(state),
-			fetching: PlotSelectors.fetching(state),
-			requestDuration: PlotSelectors.requestDuration(state),
-			requestFinishedAt: PlotSelectors.requestFinishedAt(state),
-			response: PlotSelectors.response(state),
+			channels: plotSelectors.channels(state),
+			channelsWithoutData: plotSelectors.channelsWithoutData(state),
+			error: plotSelectors.error(state),
+			fetching: plotSelectors.fetching(state),
+			requestDuration: plotSelectors.requestDuration(state),
+			requestFinishedAt: plotSelectors.requestFinishedAt(state),
+			response: plotSelectors.response(state),
 		}
 	}
 

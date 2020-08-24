@@ -65,6 +65,13 @@ export const channelsearch = createModel({
 					// backends,
 				}
 				dispatch.channelsearch.searchRequest()
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
+				if (store.getState().routing.page !== 'channel-search') {
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					dispatch.routing.push('/search')
+				}
 				try {
 					// eslint-disable-next-line @typescript-eslint/no-use-before-define
 					const entities = await _searchChannel(query)
