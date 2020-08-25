@@ -66,24 +66,32 @@ export const channelsearch = createModel({
 	} as ChannelSearchState,
 
 	reducers: {
-		patternChange: (state, newPattern: string) => ({
-			...state,
-			pattern: newPattern,
-		}),
-		searchRequest: state => ({
-			...state,
-			entities: {},
-			ids: [],
-			fetching: true,
-			error: null,
-		}),
-		searchSuccess: (state, entities: IdToChannelMap) => ({
-			...state,
-			entities,
-			ids: Object.keys(entities).sort(),
-			fetching: false,
-		}),
-		searchFailure: (state, error) => ({ ...state, fetching: false, error }),
+		patternChange(state, newPattern: string) {
+			return {
+				...state,
+				pattern: newPattern,
+			}
+		},
+		searchRequest(state) {
+			return {
+				...state,
+				entities: {},
+				ids: [],
+				fetching: true,
+				error: null,
+			}
+		},
+		searchSuccess(state, entities: IdToChannelMap) {
+			return {
+				...state,
+				entities,
+				ids: Object.keys(entities).sort(),
+				fetching: false,
+			}
+		},
+		searchFailure(state, error) {
+			return { ...state, fetching: false, error }
+		},
 	},
 
 	effects(store: Store) {

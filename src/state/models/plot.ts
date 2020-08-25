@@ -122,8 +122,8 @@ export const plot = createModel({
 		dialogDownloadAggregation: 'as-is',
 	} as PlotState,
 	reducers: {
-		selectChannel: (state, channel: Channel) =>
-			isChannelSelected(state, channel)
+		selectChannel(state, channel: Channel) {
+			return isChannelSelected(state, channel)
 				? state
 				: {
 						...state,
@@ -147,185 +147,227 @@ export const plot = createModel({
 								name: channel.name,
 							},
 						],
-				  },
+				  }
+		},
 
-		unselectChannel: (state, index: number) => ({
-			...state,
-			channels: [
-				...state.channels.slice(0, index),
-				...state.channels.slice(index + 1),
-			],
-			yAxes: state.yAxes
-				.filter((x, idx) => idx !== index)
-				.map((x, idx) => ({
-					...x,
+		unselectChannel(state, index: number) {
+			return {
+				...state,
+				channels: [
+					...state.channels.slice(0, index),
+					...state.channels.slice(index + 1),
+				],
+				yAxes: state.yAxes
+					.filter((x, idx) => idx !== index)
+					.map((x, idx) => ({
+						...x,
+						side: idx % 2 === 0 ? 'left' : 'right',
+					})),
+				dataSeries: state.dataSeries
+					.filter((x, idx) => idx !== index)
+					.map((
+						x // shift the indices for all items after the unselected item
+					) =>
+						x.channelIndex < index
+							? x
+							: {
+									...x,
+									channelIndex: x.channelIndex - 1,
+									yAxisIndex: x.yAxisIndex - 1,
+							  }
+					),
+			}
+		},
+
+		setSelectedChannels(state, channels: Channel[]) {
+			return {
+				...state,
+				channels: channels,
+				yAxes: channels.map((ch, idx) => ({
+					title: ch.name,
 					side: idx % 2 === 0 ? 'left' : 'right',
+					unit: '',
+					min: null,
+					max: null,
+					type: 'linear',
 				})),
-			dataSeries: state.dataSeries
-				.filter((x, idx) => idx !== index)
-				.map((
-					x // shift the indices for all items after the unselected item
-				) =>
-					x.channelIndex < index
-						? x
-						: {
-								...x,
-								channelIndex: x.channelIndex - 1,
-								yAxisIndex: x.yAxisIndex - 1,
-						  }
+				dataSeries: channels.map((ch, idx) => ({
+					name: ch.name,
+					channelIndex: idx,
+					yAxisIndex: idx,
+				})),
+			}
+		},
+
+		changePlotTitle(state, plotTitle: string) {
+			return {
+				...state,
+				plotTitle,
+			}
+		},
+
+		changeDataSeriesLabel(state, payload: { index: number; label: string }) {
+			return {
+				...state,
+				dataSeries: state.dataSeries.map((series, idx) =>
+					idx !== payload.index ? series : { ...series, name: payload.label }
 				),
-		}),
+				yAxes: state.yAxes.map((axis, idx) =>
+					idx !== payload.index ? axis : { ...axis, title: payload.label }
+				),
+			}
+		},
 
-		setSelectedChannels: (state, channels: Channel[]) => ({
-			...state,
-			channels: channels,
-			yAxes: channels.map((ch, idx) => ({
-				title: ch.name,
-				side: idx % 2 === 0 ? 'left' : 'right',
-				unit: '',
-				min: null,
-				max: null,
-				type: 'linear',
-			})),
-			dataSeries: channels.map((ch, idx) => ({
-				name: ch.name,
-				channelIndex: idx,
-				yAxisIndex: idx,
-			})),
-		}),
+		changeStartTime(state, startTime: number) {
+			return {
+				...state,
+				startTime,
+			}
+		},
 
-		changePlotTitle: (state, plotTitle: string) => ({
-			...state,
-			plotTitle,
-		}),
+		changeEndTime(state, endTime: number) {
+			return {
+				...state,
+				endTime,
+			}
+		},
 
-		changeDataSeriesLabel: (
-			state,
-			payload: { index: number; label: string }
-		) => ({
-			...state,
-			dataSeries: state.dataSeries.map((series, idx) =>
-				idx !== payload.index ? series : { ...series, name: payload.label }
-			),
-			yAxes: state.yAxes.map((axis, idx) =>
-				idx !== payload.index ? axis : { ...axis, title: payload.label }
-			),
-		}),
+		drawPlotRequest(state, sentAt: number) {
+			return {
+				...state,
+				fetching: true,
+				error: null,
+				request: {
+					sentAt,
+					finishedAt: undefined,
+				},
+				response: [],
+			}
+		},
 
-		changeStartTime: (state, startTime: number) => ({
-			...state,
-			startTime,
-		}),
-
-		changeEndTime: (state, endTime: number) => ({
-			...state,
-			endTime,
-		}),
-
-		drawPlotRequest: (state, sentAt: number) => ({
-			...state,
-			fetching: true,
-			error: null,
-			request: {
-				sentAt,
-				finishedAt: undefined,
-			},
-			response: [],
-		}),
-
-		drawPlotSuccess: (
+		drawPlotSuccess(
 			state,
 			payload: { timestamp: number; response: DataResponse }
-		) => ({
-			...state,
-			fetching: false,
-			request: {
-				...state.request,
-				finishedAt: payload.timestamp,
-			},
-			response: payload.response,
-		}),
+		) {
+			return {
+				...state,
+				fetching: false,
+				request: {
+					...state.request,
+					finishedAt: payload.timestamp,
+				},
+				response: payload.response,
+			}
+		},
 
-		drawPlotFailure: (state, payload: { timestamp: number; error: Error }) => ({
-			...state,
-			fetching: false,
-			request: {
-				...state.request,
-				finishedAt: payload.timestamp,
-			},
-			error: payload.error,
-		}),
+		drawPlotFailure(state, payload: { timestamp: number; error: Error }) {
+			return {
+				...state,
+				fetching: false,
+				request: {
+					...state.request,
+					finishedAt: payload.timestamp,
+				},
+				error: payload.error,
+			}
+		},
 
-		toggleQueryRange: state => ({
-			...state,
-			queryRangeShowing: !state.queryRangeShowing,
-		}),
+		toggleQueryRange(state) {
+			return {
+				...state,
+				queryRangeShowing: !state.queryRangeShowing,
+			}
+		},
 
-		hideQueryRange: state => ({
-			...state,
-			queryRangeShowing: false,
-		}),
+		hideQueryRange(state) {
+			return {
+				...state,
+				queryRangeShowing: false,
+			}
+		},
 
-		showQueryRange: state => ({
-			...state,
-			queryRangeShowing: true,
-		}),
+		showQueryRange(state) {
+			return {
+				...state,
+				queryRangeShowing: true,
+			}
+		},
 
-		showShareLink: state => ({
-			...state,
-			dialogShareLinkShowing: true,
-		}),
+		showShareLink(state) {
+			return {
+				...state,
+				dialogShareLinkShowing: true,
+			}
+		},
 
-		hideShareLink: state => ({
-			...state,
-			dialogShareLinkShowing: false,
-		}),
+		hideShareLink(state) {
+			return {
+				...state,
+				dialogShareLinkShowing: false,
+			}
+		},
 
-		shareAbsoluteTimes: state => ({
-			...state,
-			dialogShareLinkAbsoluteTimes: true,
-		}),
+		shareAbsoluteTimes(state) {
+			return {
+				...state,
+				dialogShareLinkAbsoluteTimes: true,
+			}
+		},
 
-		shareRelativeTimes: state => ({
-			...state,
-			dialogShareLinkAbsoluteTimes: false,
-		}),
+		shareRelativeTimes(state) {
+			return {
+				...state,
+				dialogShareLinkAbsoluteTimes: false,
+			}
+		},
 
-		setAxisMin: (state, payload: { index: number; min: number }) => ({
-			...state,
-			yAxes: state.yAxes.map((axis, index) =>
-				index !== payload.index ? axis : { ...axis, min: payload.min }
-			),
-		}),
+		setAxisMin(state, payload: { index: number; min: number }) {
+			return {
+				...state,
+				yAxes: state.yAxes.map((axis, index) =>
+					index !== payload.index ? axis : { ...axis, min: payload.min }
+				),
+			}
+		},
 
-		setAxisMax: (state, payload: { index: number; max: number }) => ({
-			...state,
-			yAxes: state.yAxes.map((axis, index) =>
-				index !== payload.index ? axis : { ...axis, max: payload.max }
-			),
-		}),
+		setAxisMax(state, payload: { index: number; max: number }) {
+			return {
+				...state,
+				yAxes: state.yAxes.map((axis, index) =>
+					index !== payload.index ? axis : { ...axis, max: payload.max }
+				),
+			}
+		},
 
-		setAxisType: (state, payload: { index: number; type: YAxisType }) => ({
-			...state,
-			yAxes: state.yAxes.map((axis, index) =>
-				index !== payload.index ? axis : { ...axis, type: payload.type }
-			),
-		}),
+		setAxisType(state, payload: { index: number; type: YAxisType }) {
+			return {
+				...state,
+				yAxes: state.yAxes.map((axis, index) =>
+					index !== payload.index ? axis : { ...axis, type: payload.type }
+				),
+			}
+		},
 
-		showDownload: state => ({
-			...state,
-			dialogDownloadShowing: true,
-		}),
+		showDownload(state) {
+			return {
+				...state,
+				dialogDownloadShowing: true,
+			}
+		},
 
-		hideDownload: state => ({
-			...state,
-			dialogDownloadShowing: false,
-		}),
+		hideDownload(state) {
+			return {
+				...state,
+				dialogDownloadShowing: false,
+			}
+		},
 
-		setDownloadAggregation: (state, aggregation: DownloadAggregation) => ({
-			...state,
-			dialogDownloadAggregation: aggregation,
-		}),
+		setDownloadAggregation(state, aggregation: DownloadAggregation) {
+			return {
+				...state,
+				dialogDownloadAggregation: aggregation,
+			}
+		},
 	},
 
 	effects(store: Store) {
