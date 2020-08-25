@@ -3,8 +3,12 @@ import { describe, it, xit } from 'mocha'
 import { expect } from 'chai'
 import sinon from 'sinon'
 
-import { channelsearch, channelsearchSelectors } from './channelsearch'
-import { IdToChannelMap, ShapeName } from '../../store/channelsearch'
+import {
+	channelsearch,
+	channelsearchSelectors,
+	ShapeName,
+	IdToChannelMap,
+} from './channelsearch'
 import { Store, store, Dispatch, State } from '../store'
 import { createTestEnv, RdxTestEnv } from '../rdx-test-util'
 import { EffectFns, RoutingState } from '@captaincodeman/rdx'
@@ -168,6 +172,7 @@ describe('channelsearch model', () => {
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
 			rdxTest.dispatch.routing.replace = sinon.fake()
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore: routing plugin is not added to dispatch somehow.
 			rdxTest.dispatch.routing.push = sinon.fake()
 			effects = rdxTest.modelEffects(channelsearch)

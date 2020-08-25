@@ -1,8 +1,15 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 
-import { plot, PlotState, plotSelectors, NR_OF_BINS } from './plot'
-import { QueryMode, YAxis, DataSeries } from '../../store/plot/models'
+import {
+	plot,
+	PlotState,
+	plotSelectors,
+	NR_OF_BINS,
+	YAxis,
+	DataSeries,
+	QueryMode,
+} from './plot'
 import { Channel, channelToId } from '@psi/databuffer-query-js/channel'
 import { store, State, Store, Dispatch } from '../store'
 import { DataResponse } from '../../api/queryrest'
