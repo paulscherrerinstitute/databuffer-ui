@@ -9,6 +9,7 @@ import {
 import { connect } from '@captaincodeman/rdx'
 import { store, State } from '../state/store'
 import { baseStyles } from './shared-styles'
+import { ROUTE } from '../state/routing'
 
 @customElement('app-bar-title')
 export class AppBarTitleElement extends connect(store, LitElement) {
@@ -26,11 +27,11 @@ export class AppBarTitleElement extends connect(store, LitElement) {
 	}
 
 	private titleByPage = {
-		home: `Databuffer UI`,
-		'channel-search': `Search`,
-		plot: `Plot`,
-		'plot-settings': `Plot settings`,
-		'query-meta': `About data query`,
+		[ROUTE.HOME]: `Databuffer UI`,
+		[ROUTE.CHANNEL_SEARCH]: `Search`,
+		[ROUTE.PLOT_SETTINGS]: `Plot`,
+		[ROUTE.PLOT_SETTINGS]: `Plot settings`,
+		[ROUTE.QUERY_META]: `About data query`,
 	}
 
 	shouldUpdate(changedProperties: PropertyValues) {

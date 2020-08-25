@@ -7,6 +7,7 @@ import { channelToId } from '@psi/databuffer-query-js/channel'
 import { createSelector } from 'reselect'
 import { Store, State } from '../store'
 import { queryRestApi } from '../../api/queryrest'
+import { ROUTE } from '../routing'
 
 export type { ChannelConfig }
 
@@ -99,7 +100,7 @@ export const channelsearch = createModel({
 				dispatch.channelsearch.searchRequest()
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
-				if (store.getState().routing.page !== 'channel-search') {
+				if (store.getState().routing.page !== ROUTE.CHANNEL_SEARCH) {
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 					// @ts-ignore
 					dispatch.routing.push('/search')
@@ -115,7 +116,7 @@ export const channelsearch = createModel({
 
 			async 'routing/change'(payload: RoutingState) {
 				switch (payload.page) {
-					case 'channel-search':
+					case ROUTE.CHANNEL_SEARCH:
 						if (payload.queries && payload.queries.q) {
 							dispatch.channelsearch.patternChange(payload.queries.q as string)
 							dispatch.channelsearch.runSearch()

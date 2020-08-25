@@ -18,6 +18,7 @@ import { Store, State } from '../store'
 import { formatDate } from '../../util'
 import { parseISO } from 'date-fns'
 import FileSaver from 'file-saver'
+import { ROUTE } from '../routing'
 
 export interface Channel {
 	backend: string
@@ -356,7 +357,7 @@ export const plot = createModel({
 
 			async 'routing/change'(payload: RoutingState) {
 				switch (payload.page) {
-					case 'plot':
+					case ROUTE.PLOT:
 						// automatically display the query range pop up,
 						// but only if we haven't already drawn a plot
 						if (!plotSelectors.shouldDisplayChart(store.getState())) {
@@ -364,7 +365,7 @@ export const plot = createModel({
 						}
 						break
 
-					case 'plot-single-channel':
+					case ROUTE.PLOT_SINGLE_CHANEL:
 						{
 							const channel: Channel = {
 								backend: payload.params.backend,
@@ -377,7 +378,7 @@ export const plot = createModel({
 						}
 						break
 
-					case 'preselect':
+					case ROUTE.PRESELECT:
 						{
 							const MAX_CHANNELS = 16
 							const strToDate = (s: string): number =>

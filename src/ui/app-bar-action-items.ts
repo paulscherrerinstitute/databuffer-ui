@@ -11,6 +11,7 @@ import { baseStyles } from './shared-styles'
 import { nothing, TemplateResult } from 'lit-html'
 
 import '@material/mwc-icon-button'
+import { ROUTE } from '../state/routing'
 
 @customElement('app-bar-action-items')
 export class AppBarActionItemsElement extends connect(store, LitElement) {
@@ -38,7 +39,7 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 	}
 
 	private actionItemsByPage = {
-		plot: html`<mwc-icon-button
+		[ROUTE.PLOT]: html`<mwc-icon-button
 				title="select plot range"
 				icon="date_range"
 				@click=${() => this.dispatchEvent(new CustomEvent('plot:daterange'))}

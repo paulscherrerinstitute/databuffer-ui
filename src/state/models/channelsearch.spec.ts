@@ -12,6 +12,7 @@ import {
 import { Store, store, Dispatch, State } from '../store'
 import { createTestEnv, RdxTestEnv } from '../rdx-test-util'
 import { EffectFns, RoutingState } from '@captaincodeman/rdx'
+import { ROUTE } from '../routing'
 
 describe('channelsearch model', () => {
 	describe('initial state', () => {
@@ -211,7 +212,7 @@ describe('channelsearch model', () => {
 				rdxTest.dispatch.routing.push = fake
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
-				rdxTest.state.routing.page = 'channel-search'
+				rdxTest.state.routing.page = ROUTE.CHANNEL_SEARCH
 				await effects.runSearch()
 				expect(fake.callCount).to.equal(0)
 			})
@@ -236,7 +237,7 @@ describe('channelsearch model', () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.channelsearch.patternChange = fake
 					const payload: RoutingState = {
-						page: 'channel-search',
+						page: ROUTE.CHANNEL_SEARCH,
 						params: {},
 						queries: { q: 'foo' },
 					}
@@ -249,7 +250,7 @@ describe('channelsearch model', () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.channelsearch.runSearch = fake
 					const payload: RoutingState = {
-						page: 'channel-search',
+						page: ROUTE.CHANNEL_SEARCH,
 						params: {},
 						queries: { q: 'foo' },
 					}

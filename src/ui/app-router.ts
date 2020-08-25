@@ -10,6 +10,7 @@ import { unsafeHTML } from 'lit-html/directives/unsafe-html'
 import { connect } from '@captaincodeman/rdx'
 import { store, State } from '../state/store'
 import { baseStyles } from './shared-styles'
+import { ROUTE } from '../state/routing'
 
 @customElement('app-router')
 export class AppRouterElement extends connect(store, LitElement) {
@@ -27,11 +28,11 @@ export class AppRouterElement extends connect(store, LitElement) {
 	}
 
 	private viewByPage = {
-		home: `<view-home></view-home>`,
-		'channel-search': `<view-channel-search></view-channel-search>`,
-		plot: `<view-standard-plot></view-standard-plot>`,
-		'plot-settings': `<view-plot-settings></view-plot-settings>`,
-		'query-meta': `<view-query-meta></view-query-meta>`,
+		[ROUTE.HOME]: `<view-home></view-home>`,
+		[ROUTE.CHANNEL_SEARCH]: `<view-channel-search></view-channel-search>`,
+		[ROUTE.PLOT]: `<view-standard-plot></view-standard-plot>`,
+		[ROUTE.PLOT_SETTINGS]: `<view-plot-settings></view-plot-settings>`,
+		[ROUTE.QUERY_META]: `<view-query-meta></view-query-meta>`,
 	}
 
 	shouldUpdate(changedProperties: PropertyValues) {

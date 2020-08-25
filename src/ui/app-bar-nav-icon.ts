@@ -12,6 +12,7 @@ import { baseStyles } from './shared-styles'
 import { nothing } from 'lit-html'
 
 import '@material/mwc-icon-button'
+import { ROUTE } from '../state/routing'
 
 @customElement('app-bar-nav-icon')
 export class AppBarNavIconElement extends connect(store, LitElement) {
@@ -35,10 +36,10 @@ export class AppBarNavIconElement extends connect(store, LitElement) {
 	}
 
 	private destinationByPage = {
-		search: `/`,
-		plot: `/search`,
-		'plot-settings': `/plot`,
-		'query-meta': `/plot`,
+		[ROUTE.CHANNEL_SEARCH]: `/`,
+		[ROUTE.PLOT]: `/search`,
+		[ROUTE.PLOT_SETTINGS]: `/plot`,
+		[ROUTE.QUERY_META]: `/plot`,
 	}
 
 	shouldUpdate(changedProperties: PropertyValues) {

@@ -26,6 +26,7 @@ import sinon from 'sinon'
 import { EffectFns, RoutingState } from '@captaincodeman/rdx'
 import { createTestEnv, RdxTestEnv } from '../rdx-test-util'
 import { parseISO } from 'date-fns'
+import { ROUTE } from '../routing'
 
 const EXAMPLE_CHANNELS = [
 	{ name: 'channel2', backend: 'backend2' },
@@ -272,7 +273,7 @@ describe('plot model', () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.setSelectedChannels = fake
 					const payload: RoutingState = {
-						page: 'plot-single-channel',
+						page: ROUTE.PLOT_SINGLE_CHANEL,
 						params: { backend: 'be1', name: 'ch1' },
 					}
 					await effects['routing/change'](payload)
@@ -288,7 +289,7 @@ describe('plot model', () => {
 					// @ts-ignore
 					rdxTest.dispatch.routing.replace = fake
 					const payload: RoutingState = {
-						page: 'plot-single-channel',
+						page: ROUTE.PLOT_SINGLE_CHANEL,
 						params: { backend: 'be1', name: 'ch1' },
 					}
 					await effects['routing/change'](payload)
@@ -315,7 +316,7 @@ describe('plot model', () => {
 					const expectedEndTime = Date.now()
 					const expectedStartTime = expectedEndTime - 12 * 60 * 60 * 1000 // default = 12 hours
 					const payload: RoutingState = {
-						page: 'preselect',
+						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {},
 					}
@@ -343,7 +344,7 @@ describe('plot model', () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.drawPlot = fake
 					const payload: RoutingState = {
-						page: 'preselect',
+						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {},
 					}
@@ -357,7 +358,7 @@ describe('plot model', () => {
 					// @ts-ignore
 					rdxTest.dispatch.routing.replace = fake
 					const payload: RoutingState = {
-						page: 'preselect',
+						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {},
 					}
@@ -388,7 +389,7 @@ describe('plot model', () => {
 						{ backend: 'be01', name: 'ch16' },
 					]
 					const payload: RoutingState = {
-						page: 'preselect',
+						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {},
 					}
@@ -409,7 +410,7 @@ describe('plot model', () => {
 						{ backend: 'be03', name: 'ch03' },
 					]
 					const payload: RoutingState = {
-						page: 'preselect',
+						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
 							c4: 'be01/ch01',
@@ -430,7 +431,7 @@ describe('plot model', () => {
 						{ backend: 'be02', name: 'ch02' },
 					]
 					const payload: RoutingState = {
-						page: 'preselect',
+						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
 							c0: 'be00/ch00', // should be ignored
@@ -450,7 +451,7 @@ describe('plot model', () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changeEndTime = fake
 					const payload: RoutingState = {
-						page: 'preselect',
+						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
 							endTime: '2020-05-04T12:07:45.234+02:00',
@@ -468,7 +469,7 @@ describe('plot model', () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changeStartTime = fake
 					const payload: RoutingState = {
-						page: 'preselect',
+						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
 							startTime: '2020-05-04T11:07:45.123+02:00',
@@ -487,7 +488,7 @@ describe('plot model', () => {
 					rdxTest.dispatch.plot.changeEndTime = fake
 					const expectedEndTime = 200000
 					const payload: RoutingState = {
-						page: 'preselect',
+						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
 							endTime: expectedEndTime.toString(),
@@ -503,7 +504,7 @@ describe('plot model', () => {
 					rdxTest.dispatch.plot.changeStartTime = fake
 					const expectedStartTime = 100000
 					const payload: RoutingState = {
-						page: 'preselect',
+						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
 							startTime: expectedStartTime.toString(),
@@ -523,7 +524,7 @@ describe('plot model', () => {
 					const fakeStartTime = sinon.fake()
 					rdxTest.dispatch.plot.changeStartTime = fakeStartTime
 					const payload: RoutingState = {
-						page: 'preselect',
+						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
 							duration: duration.toString(),
@@ -541,7 +542,7 @@ describe('plot model', () => {
 					rdxTest.dispatch.plot.changeEndTime = fake
 					const expectedEndTime = 200000
 					const payload: RoutingState = {
-						page: 'preselect',
+						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
 							duration: '60000',
@@ -558,7 +559,7 @@ describe('plot model', () => {
 					rdxTest.dispatch.plot.changeStartTime = fake
 					const expectedStartTime = 100000
 					const payload: RoutingState = {
-						page: 'preselect',
+						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
 							duration: '60000',
@@ -574,7 +575,7 @@ describe('plot model', () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changeDataSeriesLabel = fake
 					const payload: RoutingState = {
-						page: 'preselect',
+						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
 							c1: 'be01/ch01',
@@ -598,7 +599,7 @@ describe('plot model', () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changeDataSeriesLabel = fake
 					const payload: RoutingState = {
-						page: 'preselect',
+						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
 							c6: 'be99/ch99',
