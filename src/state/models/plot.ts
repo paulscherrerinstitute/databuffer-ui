@@ -390,6 +390,10 @@ export const plot = createModel({
 					store.getState()
 				)
 				const query = plotSelectors.plotQuery(store.getState())
+				query.response = {
+					...query.response,
+					format: DataResponseFormatType.CSV,
+				}
 				const response = await queryRestApi.queryDataRaw(query)
 				const blob = await response.blob()
 				const ts = formatDate(Date.now())
