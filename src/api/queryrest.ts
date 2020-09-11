@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../ui/global.d.ts" />
+
 import { QueryRest } from '@psi/databuffer-query-js'
 import type {
 	DataResponse,

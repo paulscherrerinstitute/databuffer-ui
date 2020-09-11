@@ -8,16 +8,16 @@ import {
 } from 'lit-element'
 import { unsafeHTML } from 'lit-html/directives/unsafe-html'
 import { connect } from '@captaincodeman/rdx'
-import { store, State } from '../state/store'
+import { store, AppState } from '../state/store'
 import { baseStyles } from './shared-styles'
 import { ROUTE } from '../state/routing'
 
 @customElement('app-router')
 export class AppRouterElement extends connect(store, LitElement) {
-	@property({ type: String }) page: string
-	@property({ type: String }) view: string
+	@property({ type: String }) page: string = ''
+	@property({ type: String }) view: string = ''
 
-	mapState(state: State) {
+	mapState(state: AppState) {
 		return {
 			page: state.routing.page,
 		}
@@ -27,7 +27,7 @@ export class AppRouterElement extends connect(store, LitElement) {
 		super()
 	}
 
-	private viewByPage = {
+	private viewByPage: { [key: string]: string } = {
 		[ROUTE.HOME]: `<view-home></view-home>`,
 		[ROUTE.CHANNEL_SEARCH]: `<view-channel-search></view-channel-search>`,
 		[ROUTE.PLOT]: `<view-standard-plot></view-standard-plot>`,

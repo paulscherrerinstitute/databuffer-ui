@@ -3,11 +3,10 @@ import {
 	customElement,
 	html,
 	property,
-	css,
 	PropertyValues,
 } from 'lit-element'
 import { connect } from '@captaincodeman/rdx'
-import { store, State } from '../state/store'
+import { store, AppState } from '../state/store'
 import { baseStyles } from './shared-styles'
 import { nothing } from 'lit-html'
 
@@ -16,10 +15,10 @@ import { ROUTE } from '../state/routing'
 
 @customElement('app-bar-nav-icon')
 export class AppBarNavIconElement extends connect(store, LitElement) {
-	@property({ attribute: false }) page: string
+	@property({ attribute: false }) page: string = ''
 	@property({ attribute: false }) destination: string = ''
 
-	mapState(state: State) {
+	mapState(state: AppState) {
 		return {
 			page: state.routing.page,
 		}
@@ -35,7 +34,7 @@ export class AppBarNavIconElement extends connect(store, LitElement) {
 		super()
 	}
 
-	private destinationByPage = {
+	private destinationByPage: { [key: string]: string } = {
 		[ROUTE.CHANNEL_SEARCH]: `/`,
 		[ROUTE.PLOT]: `/search`,
 		[ROUTE.PLOT_SETTINGS]: `/plot`,

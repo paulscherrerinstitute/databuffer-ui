@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 
@@ -10,8 +11,8 @@ import {
 	DataSeries,
 	QueryMode,
 } from './plot'
-import { Channel, channelToId } from '@psi/databuffer-query-js/channel'
-import { store, State, Store, Dispatch } from '../store'
+import { Channel, channelToId } from '../../shared/channel'
+import { store, AppState, AppDispatch } from '../store'
 import { DataResponse } from '../../api/queryrest'
 import {
 	AggregationResult,
@@ -111,7 +112,7 @@ describe('plot model', () => {
 		})
 
 		it('error', () => {
-			expect(plot.state.error).to.be.null
+			expect(plot.state.error).to.be.undefined
 		})
 
 		it('request', () => {
@@ -236,7 +237,7 @@ describe('plot model', () => {
 	})
 
 	describe('effects', () => {
-		let rdxTest: RdxTestEnv<State, Dispatch>
+		let rdxTest: RdxTestEnv<AppState, AppDispatch>
 		let effects: EffectFns
 
 		beforeEach(() => {
@@ -312,7 +313,7 @@ describe('plot model', () => {
 					const fakeSetSelectedChannels = (rdxTest.dispatch.plot.setSelectedChannels = sinon.fake())
 					const fakeChangeEndTime = (rdxTest.dispatch.plot.changeEndTime = sinon.fake())
 					const fakeChangeStartTime = (rdxTest.dispatch.plot.changeStartTime = sinon.fake())
-					const expectedChannels = []
+					const expectedChannels: Channel[] = []
 					const expectedEndTime = Date.now()
 					const expectedStartTime = expectedEndTime - 12 * 60 * 60 * 1000 // default = 12 hours
 					const payload: RoutingState = {
@@ -394,7 +395,7 @@ describe('plot model', () => {
 						queries: {},
 					}
 					for (let i = 0; i < expectedChannels.length; i++) {
-						payload.queries[`c${i + 1}`] = channelToId(expectedChannels[i])
+						payload.queries![`c${i + 1}`] = channelToId(expectedChannels[i])
 					}
 					await effects['routing/change'](payload)
 					expect(fake.callCount).to.equal(1)
@@ -459,7 +460,7 @@ describe('plot model', () => {
 					}
 					await effects['routing/change'](payload)
 					const expectedEndTime = parseISO(
-						payload.queries.endTime as string
+						payload.queries!.endTime as string
 					).getTime()
 					expect(fake.callCount).to.equal(1)
 					expect(fake.args[0][0]).to.equal(expectedEndTime)
@@ -477,7 +478,7 @@ describe('plot model', () => {
 					}
 					await effects['routing/change'](payload)
 					const expectedStartTime = parseISO(
-						payload.queries.startTime as string
+						payload.queries!.startTime as string
 					).getTime()
 					expect(fake.callCount).to.equal(1)
 					expect(fake.args[0][0]).to.equal(expectedStartTime)
@@ -615,7 +616,7 @@ describe('plot model', () => {
 	})
 
 	describe('selectors', () => {
-		let state: State
+		let state: AppState
 		beforeEach(() => {
 			state = store.state
 		})
@@ -741,7 +742,7 @@ describe('plot model', () => {
 		it('retrieves error', () => {
 			const state1 = {
 				...state,
-				plot: { ...state.plot, error: null },
+				plot: { ...state.plot, error: undefined },
 			}
 			const state2 = {
 				...state,
@@ -750,9 +751,9 @@ describe('plot model', () => {
 					error: new Error('example error'),
 				},
 			}
-			expect(plotSelectors.error(state1)).to.be.null
+			expect(plotSelectors.error(state1)).to.be.undefined
 			expect(plotSelectors.error(state2)).to.be.instanceOf(Error)
-			expect(plotSelectors.error(state2).message).to.equal('example error')
+			expect(plotSelectors.error(state2)!.message).to.equal('example error')
 		})
 
 		it('retrieves fetching', () => {
@@ -1057,7 +1058,7 @@ describe('plot model', () => {
 		})
 
 		describe('retrieves highchartsYAxes', () => {
-			let state: State
+			let state: AppState
 
 			beforeEach(() => {
 				state = {
@@ -1182,7 +1183,7 @@ describe('plot model', () => {
 		})
 
 		describe('it retrieves highchartsDataSeries', () => {
-			let state: State
+			let state: AppState
 
 			beforeEach(() => {
 				state = {
@@ -1313,7 +1314,7 @@ describe('plot model', () => {
 		})
 
 		describe('it retrieves highchartsSubTitle', () => {
-			let state: State
+			let state: AppState
 
 			beforeEach(() => {
 				state = {
@@ -1334,7 +1335,7 @@ describe('plot model', () => {
 				const expected = {
 					text:
 						'Data retrieved ' +
-						formatDate(plotSelectors.requestFinishedAt(state)),
+						formatDate(plotSelectors.requestFinishedAt(state)!),
 				}
 				expect(plotSelectors.highchartsSubTitle(state)).to.deep.equal(expected)
 			})
@@ -1348,7 +1349,7 @@ describe('plot model', () => {
 		})
 
 		describe('it retrieves highchartsOptions', () => {
-			let state: State
+			let state: AppState
 			beforeEach(() => {
 				state = {
 					...store.state,
@@ -1496,7 +1497,7 @@ describe('plot model', () => {
 		})
 
 		it('retrieves dialogShareLinkChannelsTruncated', () => {
-			let state1 = {
+			let state1: AppState = {
 				...state,
 				plot: {
 					...state.plot,
@@ -1534,7 +1535,7 @@ describe('plot model', () => {
 		})
 
 		describe('it retrieves dialogShareLinkUrl', () => {
-			let state: State
+			let state: AppState
 			beforeEach(() => {
 				state = {
 					...store.state,
@@ -1684,14 +1685,14 @@ describe('plot model', () => {
 		})
 
 		it('retrieves dialogDownloadAggregation', () => {
-			const state1: State = {
+			const state1: AppState = {
 				...state,
 				plot: {
 					...state.plot,
 					dialogDownloadAggregation: 'as-is',
 				},
 			}
-			const state2: State = {
+			const state2: AppState = {
 				...state,
 				plot: {
 					...state.plot,
@@ -1703,7 +1704,7 @@ describe('plot model', () => {
 		})
 
 		it('retrieves plotQuery', () => {
-			const state1: State = {
+			const state1: AppState = {
 				...state,
 				plot: {
 					...state.plot,
@@ -1737,7 +1738,7 @@ describe('plot model', () => {
 		})
 
 		describe('retrieves downloadQuery', () => {
-			let state: State
+			let state: AppState
 
 			beforeEach(() => {
 				state = {
@@ -1793,7 +1794,7 @@ describe('plot model', () => {
 				expect(query).to.haveOwnProperty('aggregation')
 				expect(query.aggregation).not.to.haveOwnProperty('durationPerBin')
 				expect(query.aggregation).to.haveOwnProperty('nrOfBins')
-				expect(query.aggregation.nrOfBins).to.equal(NR_OF_BINS)
+				expect(query.aggregation!.nrOfBins).to.equal(NR_OF_BINS)
 			})
 
 			it('recognizes aggregation "PT5S"', () => {
@@ -1802,7 +1803,7 @@ describe('plot model', () => {
 				expect(query).to.haveOwnProperty('aggregation')
 				expect(query.aggregation).not.to.haveOwnProperty('nrOfBins')
 				expect(query.aggregation).to.haveOwnProperty('durationPerBin')
-				expect(query.aggregation.durationPerBin).to.equal('PT5S')
+				expect(query.aggregation!.durationPerBin).to.equal('PT5S')
 			})
 
 			it('recognizes aggregation "PT1M"', () => {
@@ -1811,7 +1812,7 @@ describe('plot model', () => {
 				expect(query).to.haveOwnProperty('aggregation')
 				expect(query.aggregation).not.to.haveOwnProperty('nrOfBins')
 				expect(query.aggregation).to.haveOwnProperty('durationPerBin')
-				expect(query.aggregation.durationPerBin).to.equal('PT1M')
+				expect(query.aggregation!.durationPerBin).to.equal('PT1M')
 			})
 
 			it('recognizes aggregation "PT1H"', () => {
@@ -1820,12 +1821,12 @@ describe('plot model', () => {
 				expect(query).to.haveOwnProperty('aggregation')
 				expect(query.aggregation).not.to.haveOwnProperty('nrOfBins')
 				expect(query.aggregation).to.haveOwnProperty('durationPerBin')
-				expect(query.aggregation.durationPerBin).to.equal('PT1H')
+				expect(query.aggregation!.durationPerBin).to.equal('PT1H')
 			})
 		})
 
 		describe('retrieves dialogDownloadCurlCommand', () => {
-			let state: State
+			let state: AppState
 			let cmd: string
 
 			beforeEach(() => {

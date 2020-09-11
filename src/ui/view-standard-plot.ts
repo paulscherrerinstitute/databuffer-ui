@@ -5,8 +5,8 @@ import {
 	property,
 	css,
 	query,
-	CSSResult,
 	TemplateResult,
+	PropertyValues,
 } from 'lit-element'
 
 import Highcharts from 'highcharts'
@@ -15,7 +15,6 @@ import 'weightless/card'
 import 'weightless/divider'
 import 'weightless/expansion'
 import 'weightless/list-item'
-import { ListItem } from 'weightless/list-item'
 import 'weightless/popover'
 import { Popover } from 'weightless/popover'
 import 'weightless/popover-card'
@@ -32,9 +31,12 @@ import '@material/mwc-snackbar'
 import { Snackbar } from '@material/mwc-snackbar'
 
 import { formatDate } from '../util'
-import { State, store } from '../state/store'
-import { plotSelectors } from '../state/models/plot'
-import { Channel, DownloadAggregation } from '../store/plot/'
+import { AppState, store } from '../state/store'
+import {
+	Channel,
+	DownloadAggregation,
+	plotSelectors,
+} from '../state/models/plot'
 
 import * as datefns from 'date-fns'
 import type { DataResponse } from '../api/queryrest'
@@ -53,27 +55,27 @@ highchartsMore(Highcharts)
 
 @customElement('view-standard-plot')
 export class StandardPlotElement extends connect(store, LitElement) {
-	@property({ type: Array }) response: DataResponse
-	@property({ type: Number }) startTime: number
-	@property({ type: Number }) endTime: number
-	@property({ type: Array }) channels: Channel[]
-	@property({ type: Object }) error: Error
-	@property({ type: Boolean }) fetching: boolean
-	@property({ type: Number }) requestDuration: number
-	@property({ type: Number }) requestFinishedAt: number
-	@property({ type: Boolean }) shouldDisplayChart: boolean
-	@property({ type: Array }) channelsWithoutData: Channel[]
+	@property({ attribute: false }) response: DataResponse = []
+	@property({ attribute: false }) startTime: number = 1
+	@property({ attribute: false }) endTime: number = 2
+	@property({ attribute: false }) channels: Channel[] = []
+	@property({ attribute: false }) error?: Error
+	@property({ attribute: false }) fetching: boolean = false
+	@property({ attribute: false }) requestDuration!: number
+	@property({ attribute: false }) requestFinishedAt!: number
+	@property({ type: Boolean }) shouldDisplayChart!: boolean
+	@property({ type: Array }) channelsWithoutData: Channel[] = []
 	@property({ type: Boolean }) canPlot: boolean = false
-	@property({ attribute: false }) highchartsOptions: Highcharts.Options
+	@property({ attribute: false }) highchartsOptions!: Highcharts.Options
 	@property({ attribute: false }) queryRangeShowing: boolean = false
 	@property({ attribute: false }) dialogShareLinkShowing: boolean = false
 	@property({ attribute: false }) dialogShareLinkAbsoluteTimes: boolean = false
-	@property({ attribute: false }) dialogShareLinkUrl: string
+	@property({ attribute: false }) dialogShareLinkUrl!: string
 	@property({ attribute: false })
 	dialogShareLinkChannelsTruncated: boolean = false
 	@property({ attribute: false })
 	dialogDownloadShowing: boolean = false
-	@property({ attribute: false }) dialogDownloadAggregation: string
+	@property({ attribute: false }) dialogDownloadAggregation!: string
 
 	private dialogDownloadCurlCommand = ''
 
@@ -85,7 +87,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		return true
 	}
 
-	private __chart: Highcharts.Chart
+	private __chart!: Highcharts.Chart
 
 	@query('#queryrange')
 	private __queryRange!: Popover
@@ -126,7 +128,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@query('#curlcopied')
 	private __snackCurlCopied!: Snackbar
 
-	mapState(state: State) {
+	mapState(state: AppState) {
 		return {
 			error: plotSelectors.error(state),
 			channels: plotSelectors.channels(state),
@@ -151,26 +153,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			dialogDownloadShowing: plotSelectors.dialogDownloadShowing(state),
 			dialogDownloadAggregation: plotSelectors.dialogDownloadAggregation(state),
 			dialogDownloadCurlCommand: plotSelectors.dialogDownloadCurlCommand(state),
-		}
-	}
-
-	mapEvents() {
-		return {
-			'draw-plot': () => store.dispatch.plot.drawPlot(),
-			'start-time-change': (e: CustomEvent<{ startTime: number }>) =>
-				store.dispatch.plot.changeStartTime(e.detail.startTime),
-			'end-time-change': (e: CustomEvent<{ endTime: number }>) =>
-				store.dispatch.plot.changeEndTime(e.detail.endTime),
-			'dialog-share:closed': () => store.dispatch.plot.hideShareLink(),
-			'dialog-share:absolute-times': e =>
-				e.detail.absTimes
-					? store.dispatch.plot.shareAbsoluteTimes()
-					: store.dispatch.plot.shareRelativeTimes(),
-			'dialog-download:closed': () => store.dispatch.plot.hideDownload(),
-			'dialog-download:setaggregation': (
-				e: CustomEvent<{ aggregation: DownloadAggregation }>
-			) => store.dispatch.plot.setDownloadAggregation(e.detail.aggregation),
-			'dialog-download:download': () => store.dispatch.plot.downloadData(),
 		}
 	}
 
@@ -208,7 +190,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		this.canPlot = this.__calcCanPlot()
 	}
 
-	updated(changedProperties) {
+	updated(changedProperties: PropertyValues): void {
 		if (changedProperties.has('highchartsOptions')) {
 			this.__chart.update(this.highchartsOptions, true, true)
 		}
@@ -244,16 +226,8 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	}
 
 	private __setTimeRange(startTime: number, endTime: number) {
-		this.dispatchEvent(
-			new CustomEvent<{ endTime: number }>('end-time-change', {
-				detail: { endTime },
-			})
-		)
-		this.dispatchEvent(
-			new CustomEvent<{ startTime: number }>('start-time-change', {
-				detail: { startTime },
-			})
-		)
+		store.dispatch.plot.changeEndTime(endTime)
+		store.dispatch.plot.changeStartTime(startTime)
 	}
 
 	private __quickDialRelative(deltaMs: number) {
@@ -321,15 +295,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	}
 
 	private __plot() {
-		const e = new CustomEvent('draw-plot', {
-			composed: true,
-			bubbles: true,
-			detail: {
-				startTime: this.startTime,
-				endTime: this.endTime,
-			},
-		})
-		this.dispatchEvent(e)
+		store.dispatch.plot.drawPlot()
 	}
 
 	private __onStartTimeChanged(e: Event) {
@@ -341,11 +307,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			this.canPlot = false
 			return
 		}
-		this.dispatchEvent(
-			new CustomEvent<{ startTime: number }>('start-time-change', {
-				detail: { startTime: d },
-			})
-		)
+		store.dispatch.plot.changeStartTime(d)
 	}
 
 	private __onEndTimeChanged(e: Event) {
@@ -357,11 +319,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			this.canPlot = false
 			return
 		}
-		this.dispatchEvent(
-			new CustomEvent<{ endTime: number }>('end-time-change', {
-				detail: { endTime: d },
-			})
-		)
+		store.dispatch.plot.changeEndTime(d)
 	}
 
 	private __keydown(e: KeyboardEvent) {
@@ -528,8 +486,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			id="dialog-share"
 			heading="Share link to plot"
 			?open=${this.dialogShareLinkShowing}
-			@closed=${() =>
-				this.dispatchEvent(new CustomEvent('dialog-share:closed'))}
+			@closed=${() => store.dispatch.plot.hideShareLink()}
 			@opened=${() => {
 				if (this.dialogShareLinkChannelsTruncated)
 					this.__snackLinkChannelsTruncated.show()
@@ -540,24 +497,27 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					<mwc-radio
 						name="a"
 						?checked=${this.dialogShareLinkAbsoluteTimes}
-						@change=${e =>
-							this.dispatchEvent(
-								new CustomEvent('dialog-share:absolute-times', {
-									detail: { absTimes: e.target.checked },
-								})
-							)}
+						@change=${(e: Event) => {
+							if ((e.target as Radio).checked) {
+								store.dispatch.plot.shareAbsoluteTimes()
+							} else {
+								store.dispatch.plot.shareRelativeTimes()
+							}
+						}}
 					></mwc-radio>
 				</mwc-formfield>
 				<mwc-formfield label="Use relative time span (e.g. last 1h)">
 					<mwc-radio
 						name="a"
 						?checked=${!this.dialogShareLinkAbsoluteTimes}
-						@change=${e =>
-							this.dispatchEvent(
-								new CustomEvent('dialog-share:absolute-times', {
-									detail: { absTimes: !e.target.checked },
-								})
-							)}
+						@change=${(e: Event) => {
+							const el = e.target as Radio
+							if (el.checked) {
+								store.dispatch.plot.shareRelativeTimes()
+							} else {
+								store.dispatch.plot.shareAbsoluteTimes()
+							}
+						}}
 					></mwc-radio>
 				</mwc-formfield>
 				<div>
@@ -589,14 +549,14 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			id="dialog-download"
 			heading="Download data as CSV"
 			?open=${this.dialogDownloadShowing}
-			@closed=${e => {
-				if (e.target !== this.shadowRoot.getElementById('dialog-download'))
+			@closed=${(e: CustomEvent<{ action: string }>) => {
+				if (e.target !== this.shadowRoot?.getElementById('dialog-download'))
 					return
 				if (e.detail.action == 'download') {
-					this.dispatchEvent(new CustomEvent('dialog-download:download'))
+					store.dispatch.plot.downloadData()
 					this.__snackDownloadStarted.show()
 				}
-				this.dispatchEvent(new CustomEvent('dialog-download:closed'))
+				store.dispatch.plot.hideDownload()
 			}}
 		>
 			<div>
@@ -677,16 +637,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	_updateAggregation(e: Event) {
 		const el = e.target as Radio
 		if (!el.checked) return
-		this.dispatchEvent(
-			new CustomEvent<{ aggregation: DownloadAggregation }>(
-				'dialog-download:setaggregation',
-				{
-					detail: {
-						aggregation: el.value as DownloadAggregation,
-					},
-				}
-			)
-		)
+		store.dispatch.plot.setDownloadAggregation(el.value as DownloadAggregation)
 	}
 
 	static get styles() {

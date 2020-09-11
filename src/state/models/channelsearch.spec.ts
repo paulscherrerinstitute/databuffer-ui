@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable mocha/no-skipped-tests */
 import { describe, it, xit } from 'mocha'
 import { expect } from 'chai'
@@ -9,7 +10,7 @@ import {
 	ShapeName,
 	IdToChannelMap,
 } from './channelsearch'
-import { Store, store, Dispatch, State } from '../store'
+import { store, AppDispatch, AppState } from '../store'
 import { createTestEnv, RdxTestEnv } from '../rdx-test-util'
 import { EffectFns, RoutingState } from '@captaincodeman/rdx'
 import { ROUTE } from '../routing'
@@ -35,8 +36,8 @@ describe('channelsearch model', () => {
 		it('fetching === false', () => {
 			expect(channelsearch.state.fetching).to.be.false
 		})
-		it('error  === null', () => {
-			expect(channelsearch.state.error).to.be.null
+		it('error  === undefined', () => {
+			expect(channelsearch.state.error).to.be.undefined
 		})
 	})
 
@@ -70,11 +71,11 @@ describe('channelsearch model', () => {
 				)
 				expect(newState.ids).to.be.an('array').of.length(0)
 			})
-			it('sets error = null', () => {
+			it('sets error = undefined', () => {
 				const newState = channelsearch.reducers.searchRequest(
 					channelsearch.state
 				)
-				expect(newState.error).to.be.null
+				expect(newState.error).to.be.undefined
 			})
 		})
 
@@ -162,7 +163,7 @@ describe('channelsearch model', () => {
 	})
 
 	describe('effects', () => {
-		let rdxTest: RdxTestEnv<State, Dispatch>
+		let rdxTest: RdxTestEnv<AppState, AppDispatch>
 		let effects: EffectFns
 
 		beforeEach(() => {
@@ -262,7 +263,7 @@ describe('channelsearch model', () => {
 	})
 
 	describe('selectors', () => {
-		let state: State
+		let state: AppState
 		beforeEach(() => {
 			state = { ...store.state }
 		})
@@ -270,9 +271,9 @@ describe('channelsearch model', () => {
 		it('retrieves error', () => {
 			const state1 = {
 				...state,
-				channelsearch: { ...state.channelsearch, error: null },
+				channelsearch: { ...state.channelsearch, error: undefined },
 			}
-			expect(channelsearchSelectors.error(state1)).to.be.null
+			expect(channelsearchSelectors.error(state1)).to.be.undefined
 			const state2 = {
 				...state,
 				channelsearch: {
@@ -280,10 +281,9 @@ describe('channelsearch model', () => {
 					error: new Error('example error'),
 				},
 			}
-			expect(channelsearchSelectors.error(state2)).to.be.instanceOf(Error)
-			expect(channelsearchSelectors.error(state2).message).to.equal(
-				'example error'
-			)
+			const err = channelsearchSelectors.error(state2)!
+			expect(err).to.be.instanceOf(Error)
+			expect(err.message).to.equal('example error')
 		})
 
 		it('retrieves fetching', () => {

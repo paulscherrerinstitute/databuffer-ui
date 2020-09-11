@@ -5,9 +5,10 @@ import {
 	html,
 	property,
 	query,
+	PropertyValues,
 } from 'lit-element'
 import { connect } from '@captaincodeman/rdx'
-import { store, State } from '../state/store'
+import { store, AppState } from '../state/store'
 import pluralize from 'pluralize'
 
 import './channel-search-result-item'
@@ -19,8 +20,10 @@ import type {
 	DaqPillListElement,
 	DaqPillListSelectedEvent,
 } from '@psi/databuffer-web-components/daq-pill-list'
-import { ChannelWithTags } from '../store/channelsearch'
-import { channelsearchSelectors } from '../state/models/channelsearch'
+import {
+	ChannelWithTags,
+	channelsearchSelectors,
+} from '../state/models/channelsearch'
 import { plotSelectors } from '../state/models/plot'
 import { nothing } from 'lit-html'
 
@@ -29,36 +32,35 @@ type Channel = {
 	name: string
 }
 
+function _onChannelRemove(e: CustomEvent<{ index: number }>) {
+	store.dispatch.plot.unselectChannel(e.detail.index)
+}
+
+function _onChannelSelect(e: CustomEvent<{ channel: Channel }>) {
+	store.dispatch.plot.selectChannel(e.detail.channel)
+}
+
 @customElement('channel-search-result-list')
 export class ChannelSearchResultListElement extends connect(store, LitElement) {
-	@property({ attribute: false }) pattern: string
+	@property({ attribute: false }) pattern: string = ''
 	@property({ attribute: false }) searchResults: ChannelWithTags[] = []
 	@property({ attribute: false }) resultsForDisplay: ChannelWithTags[] = []
-	@property({ attribute: false }) error: Error
+	@property({ attribute: false }) error: Error | null = null
 	@property({ attribute: false }) availableFilters: string[] = []
 	@property({ attribute: false }) activeFilters: string[] = []
 	@property({ attribute: false }) selectedChannels: Channel[] = []
 	@property({ attribute: false }) maxResults: number = 0
 
 	@query('#filterlist')
-	private _filterList: DaqPillListElement
+	private _filterList!: DaqPillListElement
 
-	public mapState(state: State) {
+	public mapState(state: AppState) {
 		return {
 			pattern: channelsearchSelectors.pattern(state),
 			searchResults: channelsearchSelectors.resultsWithTags(state),
 			error: channelsearchSelectors.error(state),
 			availableFilters: channelsearchSelectors.availableTags(state),
 			selectedChannels: plotSelectors.channels(state),
-		}
-	}
-
-	public mapEvents() {
-		return {
-			'channel-remove': (e: CustomEvent) =>
-				store.dispatch.plot.unselectChannel(e.detail.index),
-			'channel-select': (e: CustomEvent) =>
-				store.dispatch.plot.selectChannel(e.detail.channel),
 		}
 	}
 
@@ -71,7 +73,7 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 		).slice(0, this.maxResults)
 	}
 
-	updated(changedProperties): void {
+	updated(changedProperties: PropertyValues): void {
 		// re-calculate resultsForDisplay when either the search results or the filters have changed
 		if (
 			changedProperties.has('activeFilters') ||
@@ -131,6 +133,8 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 					.selectedIndex=${selectedIndex}
 					.activeFilters=${this.activeFilters}
 					@daq-pill-selected=${this._onItemFilterChanged}
+					@channel-remove=${_onChannelRemove}
+					@channel-select=${_onChannelSelect}
 				></channel-search-result-item>`
 			})}
 		</div>`

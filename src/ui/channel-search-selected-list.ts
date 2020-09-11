@@ -8,7 +8,7 @@ import 'weightless/list-item'
 
 import './channel-search-selected-item'
 
-import { store, State } from '../state/store'
+import { store, AppState } from '../state/store'
 import { plotSelectors } from '../state/models/plot'
 
 type Channel = {
@@ -23,7 +23,7 @@ export class ChannelSearchSelectedListElement extends connect(
 ) {
 	@property({ attribute: false }) selectedChannels: Channel[] = []
 
-	public mapState(state: State) {
+	public mapState(state: AppState) {
 		return {
 			selectedChannels: plotSelectors.channels(state),
 		}
@@ -33,8 +33,6 @@ export class ChannelSearchSelectedListElement extends connect(
 		return {
 			'clear-selection': () => store.dispatch.plot.setSelectedChannels([]),
 			'channel-plot': () => store.dispatch.routing.push(`/plot`),
-			'channel-remove': (e: CustomEvent<{ index: number }>) =>
-				store.dispatch.plot.unselectChannel(e.detail.index),
 		}
 	}
 
@@ -65,11 +63,7 @@ export class ChannelSearchSelectedListElement extends connect(
 							.backend=${ch.backend}
 							.name=${ch.name}
 							@channel-search-selected-item:remove=${() =>
-								this.dispatchEvent(
-									new CustomEvent('channel-remove', {
-										detail: { index: idx },
-									})
-								)}
+								store.dispatch.plot.unselectChannel(idx)}
 						></channel-search-selected-item>`
 				)}
 			</div>

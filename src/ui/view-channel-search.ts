@@ -6,6 +6,7 @@ import {
 	css,
 	query,
 	CSSResultArray,
+	PropertyValues,
 } from 'lit-element'
 
 import 'weightless/expansion'
@@ -17,8 +18,8 @@ import type { Snackbar } from '@material/mwc-snackbar'
 import '@material/mwc-textfield'
 import type { TextField } from '@material/mwc-textfield'
 
-import { State, store } from '../state/store'
-import type { ChannelWithTags } from '../store/channelsearch'
+import { AppState, store } from '../state/store'
+import type { ChannelWithTags } from '../state/models/channelsearch'
 import { channelsearchSelectors } from '../state/models/channelsearch'
 import { TemplateResult } from 'lit-html'
 
@@ -31,10 +32,10 @@ const MAX_NUM_RESULTS = 100
 
 @customElement('view-channel-search')
 export class ChannelSearchElement extends connect(store, LitElement) {
-	@property({ attribute: false }) pattern: string
-	@property({ attribute: false }) searchResults: ChannelWithTags[]
-	@property({ attribute: false }) fetching: boolean
-	@property({ attribute: false }) error: Error
+	@property({ attribute: false }) pattern: string = ''
+	@property({ attribute: false }) searchResults: ChannelWithTags[] = []
+	@property({ attribute: false }) fetching: boolean = false
+	@property({ attribute: false }) error: Error | null = null
 
 	@query('#query')
 	private __query!: TextField
@@ -42,7 +43,7 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 	@query('#notify-cutoff')
 	private __notifyCutoff!: Snackbar
 
-	mapState(state: State) {
+	mapState(state: AppState) {
 		return {
 			pattern: channelsearchSelectors.pattern(state),
 			searchResults: channelsearchSelectors.resultsWithTags(state),
@@ -53,9 +54,7 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 
 	mapEvents() {
 		return {
-			'pattern-change': (e: CustomEvent) =>
-				store.dispatch.channelsearch.patternChange(e.detail.pattern),
-			'search-click': () => store.dispatch.channelsearch.runSearch(),
+			// TODO: Check, if this actually ever fires...
 			'nav-back': () => store.dispatch.routing.push('/'),
 		}
 	}
@@ -66,7 +65,7 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 		})
 	}
 
-	updated(changedProperties): void {
+	updated(changedProperties: PropertyValues): void {
 		// show notification if cut-off is done
 		if (
 			changedProperties.has('searchResults') &&
@@ -77,10 +76,8 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 	}
 
 	private __search(): void {
-		const q = this.__query.value
-		if (!q) return
-		const e = new CustomEvent('search-click')
-		this.dispatchEvent(e)
+		if (!this.pattern) return
+		store.dispatch.channelsearch.runSearch()
 	}
 
 	render(): TemplateResult {
@@ -95,19 +92,13 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 						if (e.key === 'Enter') this.__search()
 					}}
 					@change=${() =>
-						this.dispatchEvent(
-							new CustomEvent('pattern-change', {
-								detail: { pattern: this.__query.value },
-							})
-						)}
+						store.dispatch.channelsearch.patternChange(this.__query.value)}
 				></mwc-textfield
 				><mwc-button icon="search" raised @click=${this.__search}
 					>Search</mwc-button
 				>
 			</div>
-			<div id="results">
-				${this.__resultsTemplate()}
-			</div>
+			<div id="results">${this.__resultsTemplate()}</div>
 			<channel-search-selected-list></channel-search-selected-list>
 			<mwc-snackbar
 				id="notify-cutoff"

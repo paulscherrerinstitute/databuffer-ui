@@ -1,22 +1,20 @@
 import {
 	LitElement,
 	customElement,
-	html,
 	property,
-	css,
 	PropertyValues,
 } from 'lit-element'
 import { connect } from '@captaincodeman/rdx'
-import { store, State } from '../state/store'
+import { store, AppState } from '../state/store'
 import { baseStyles } from './shared-styles'
 import { ROUTE } from '../state/routing'
 
 @customElement('app-bar-title')
 export class AppBarTitleElement extends connect(store, LitElement) {
-	@property({ attribute: false }) page: string
-	@property({ attribute: false }) title: string
+	@property({ attribute: false }) page: string = ''
+	@property({ attribute: false }) title: string = ''
 
-	mapState(state: State) {
+	mapState(state: AppState) {
 		return {
 			page: state.routing.page,
 		}
@@ -26,7 +24,7 @@ export class AppBarTitleElement extends connect(store, LitElement) {
 		super()
 	}
 
-	private titleByPage = {
+	private titleByPage: { [key: string]: string } = {
 		[ROUTE.HOME]: `Databuffer UI`,
 		[ROUTE.CHANNEL_SEARCH]: `Search`,
 		[ROUTE.PLOT_SETTINGS]: `Plot`,

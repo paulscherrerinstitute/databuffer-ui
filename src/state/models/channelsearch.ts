@@ -5,9 +5,10 @@ import {
 import { createModel, RoutingState } from '@captaincodeman/rdx'
 import { channelToId } from '@psi/databuffer-query-js/channel'
 import { createSelector } from 'reselect'
-import { Store, State } from '../store'
+import { EffectsStore, AppState } from '../store'
 import { queryRestApi } from '../../api/queryrest'
 import { ROUTE } from '../routing'
+import { compareNameThenBackend } from '../../shared/channel'
 
 export type { ChannelConfig }
 
@@ -31,17 +32,6 @@ export const getShapeName = (c: ChannelConfig): ShapeName => {
 	return ShapeName.WAVEFORM
 }
 
-export const compareNameThenBackend = (
-	a: ChannelConfig,
-	b: ChannelConfig
-): number => {
-	if (a.name < b.name) return -1
-	if (a.name > b.name) return 1
-	if (a.backend < b.backend) return -1
-	if (a.backend > b.backend) return 1
-	return 0
-}
-
 export type IdToChannelMap = { [id: string]: ChannelConfig }
 
 export interface ChannelSearchState {
@@ -51,7 +41,7 @@ export interface ChannelSearchState {
 	entities: IdToChannelMap
 	ids: string[]
 	fetching: boolean
-	error: Error
+	error?: Error
 }
 
 export const channelsearch = createModel({
@@ -62,7 +52,7 @@ export const channelsearch = createModel({
 		entities: {},
 		ids: [],
 		fetching: false,
-		error: null,
+		error: undefined,
 	} as ChannelSearchState,
 
 	reducers: {
@@ -78,7 +68,7 @@ export const channelsearch = createModel({
 				entities: {},
 				ids: [],
 				fetching: true,
-				error: null,
+				error: undefined,
 			}
 		},
 		searchSuccess(state, entities: IdToChannelMap) {
@@ -94,7 +84,7 @@ export const channelsearch = createModel({
 		},
 	},
 
-	effects(store: Store) {
+	effects(store: EffectsStore) {
 		const dispatch = store.getDispatch() // save for later
 		return {
 			async runSearch() {
@@ -154,7 +144,7 @@ export async function _searchChannel(
 	return result
 }
 
-const getState = (state: State) => state.channelsearch
+const getState = (state: AppState) => state.channelsearch
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace channelsearchSelectors {
@@ -183,15 +173,7 @@ export namespace channelsearchSelectors {
 	export const availableTags = createSelector(
 		[resultsWithTags],
 		resultsWithTags =>
-			resultsWithTags
-				.reduce(
-					(aggr, current) => [
-						...aggr,
-						...current.tags.filter(t => !aggr.includes(t)),
-					],
-					[]
-				)
-				.sort()
+			Array.from(new Set(resultsWithTags.flatMap(x => x.tags))).sort()
 	)
 
 	export const fetching = createSelector([getState], state => state.fetching)

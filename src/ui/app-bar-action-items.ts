@@ -6,7 +6,7 @@ import {
 	PropertyValues,
 } from 'lit-element'
 import { connect } from '@captaincodeman/rdx'
-import { store, State } from '../state/store'
+import { store, AppState } from '../state/store'
 import { baseStyles } from './shared-styles'
 import { nothing, TemplateResult } from 'lit-html'
 
@@ -15,10 +15,12 @@ import { ROUTE } from '../state/routing'
 
 @customElement('app-bar-action-items')
 export class AppBarActionItemsElement extends connect(store, LitElement) {
-	@property({ attribute: false }) page: string
-	@property({ attribute: false }) templateResult: TemplateResult | {} = nothing
+	@property({ attribute: false }) page: string = ''
+	@property({ attribute: false }) templateResult:
+		| TemplateResult
+		| typeof nothing = nothing
 
-	mapState(state: State) {
+	mapState(state: AppState) {
 		return {
 			page: state.routing.page,
 		}
@@ -26,11 +28,21 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 
 	mapEvents() {
 		return {
-			'plot:daterange': () => store.dispatch.plot.toggleQueryRange(),
-			'plot:info': () => store.dispatch.routing.push('/query-meta'),
-			'plot:settings': () => store.dispatch.routing.push('/plot-settings'),
-			'plot:share': () => store.dispatch.plot.showShareLink(),
-			'plot:download': () => store.dispatch.plot.showDownload(),
+			'plot:daterange'() {
+				store.dispatch.plot.toggleQueryRange()
+			},
+			'plot:info'() {
+				store.dispatch.routing.push('/query-meta')
+			},
+			'plot:settings'() {
+				store.dispatch.routing.push('/plot-settings')
+			},
+			'plot:share'() {
+				store.dispatch.plot.showShareLink()
+			},
+			'plot:download'() {
+				store.dispatch.plot.showDownload()
+			},
 		}
 	}
 
@@ -38,7 +50,7 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 		super()
 	}
 
-	private actionItemsByPage = {
+	private actionItemsByPage: { [key: string]: TemplateResult } = {
 		[ROUTE.PLOT]: html`<mwc-icon-button
 				title="select plot range"
 				icon="date_range"

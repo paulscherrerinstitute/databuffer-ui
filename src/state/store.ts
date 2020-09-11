@@ -21,6 +21,6 @@ export const dispatch = store.dispatch
 // export type State = StoreState<typeof config>
 // export type Dispatch = StoreDispatch<typeof config>
 // export type Store = ModelStore<Dispatch, State>
-export interface State extends StoreState<typeof config> {}
-export interface Dispatch extends StoreDispatch<typeof config> {}
-export interface Store extends ModelStore<Dispatch, State> {}
+export interface AppState extends StoreState<typeof config> {}
+export interface AppDispatch extends StoreDispatch<typeof config> {}
+export interface EffectsStore extends ModelStore<AppDispatch, AppState> {}

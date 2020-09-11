@@ -11,7 +11,7 @@ import '@material/mwc-button'
 import '@material/mwc-textfield'
 import { TextField } from '@material/mwc-textfield'
 
-import { store, State } from '../state/store'
+import { store, AppState } from '../state/store'
 
 import { channelsearchSelectors } from '../state/models/channelsearch'
 
@@ -23,17 +23,9 @@ export class HomeElement extends connect(store, LitElement) {
 	@query('#query')
 	private __query!: TextField
 
-	mapState(state: State) {
+	mapState(state: AppState) {
 		return {
 			pattern: channelsearchSelectors.pattern(state),
-		}
-	}
-
-	mapEvents() {
-		return {
-			'search-click': () => store.dispatch.channelsearch.runSearch(),
-			'pattern-change': (e: CustomEvent<{ pattern: string }>) =>
-				store.dispatch.channelsearch.patternChange(e.detail.pattern),
 		}
 	}
 
@@ -57,11 +49,7 @@ export class HomeElement extends connect(store, LitElement) {
 						label="Search for EPICS channels"
 						helper="Search supports regular expressions"
 						@change=${() =>
-							this.dispatchEvent(
-								new CustomEvent('pattern-change', {
-									detail: { pattern: this.__query.value },
-								})
-							)}
+							store.dispatch.channelsearch.patternChange(this.__query.value)}
 						@keyup=${(e: KeyboardEvent): void => {
 							if (e.key === 'Enter') this.__search()
 						}}
@@ -111,8 +99,7 @@ export class HomeElement extends connect(store, LitElement) {
 
 	private __search(): void {
 		if (!this.__query.value) return
-		const e = new CustomEvent('search-click')
-		this.dispatchEvent(e)
+		store.dispatch.channelsearch.runSearch()
 	}
 
 	static get styles() {

@@ -14,7 +14,7 @@ import {
 } from '@psi/databuffer-query-js/query-data'
 import { channelToId, idToChannel } from '@psi/databuffer-query-js/channel'
 import { DataResponse, queryRestApi } from '../../api/queryrest'
-import { Store, State } from '../store'
+import { EffectsStore, AppState } from '../store'
 import { formatDate } from '../../util'
 import { parseISO } from 'date-fns'
 import FileSaver from 'file-saver'
@@ -73,12 +73,12 @@ export interface PlotState {
 	startPulse: number
 	endPulse: number
 	queryMode: 'time' | 'pulse'
-	channels: { backend: string; name: string }[]
+	channels: Channel[]
 	fetching: boolean
-	error: Error
+	error?: Error
 	request: {
-		sentAt: number
-		finishedAt: number
+		sentAt?: number
+		finishedAt?: number
 	}
 	response: DataResponse
 	yAxes: YAxis[]
@@ -107,7 +107,7 @@ export const plot = createModel({
 		queryMode: 'time',
 		channels: [],
 		fetching: false,
-		error: null,
+		error: undefined,
 		request: {
 			sentAt: undefined,
 			finishedAt: undefined,
@@ -236,7 +236,7 @@ export const plot = createModel({
 			return {
 				...state,
 				fetching: true,
-				error: null,
+				error: undefined,
 				request: {
 					sentAt,
 					finishedAt: undefined,
@@ -321,7 +321,7 @@ export const plot = createModel({
 			}
 		},
 
-		setAxisMin(state, payload: { index: number; min: number }) {
+		setAxisMin(state, payload: { index: number; min: number | null }) {
 			return {
 				...state,
 				yAxes: state.yAxes.map((axis, index) =>
@@ -330,7 +330,7 @@ export const plot = createModel({
 			}
 		},
 
-		setAxisMax(state, payload: { index: number; max: number }) {
+		setAxisMax(state, payload: { index: number; max: number | null }) {
 			return {
 				...state,
 				yAxes: state.yAxes.map((axis, index) =>
@@ -370,7 +370,7 @@ export const plot = createModel({
 		},
 	},
 
-	effects(store: Store) {
+	effects(store: EffectsStore) {
 		const dispatch = store.getDispatch()
 		return {
 			async drawPlot() {
@@ -447,7 +447,7 @@ export const plot = createModel({
 							const dataSeriesLabels: { index: number; label: string }[] = []
 							for (let i = 1; i <= MAX_CHANNELS; i++) {
 								let paramName = `c${i}`
-								if (!payload.queries[paramName]) continue
+								if (!payload.queries || !payload.queries[paramName]) continue
 								channels.push(idToChannel(payload.queries[paramName] as string))
 								paramName = `l${i}`
 								if (!payload.queries[paramName]) continue
@@ -478,28 +478,34 @@ export const plot = createModel({
 })
 
 //#region selectors
-const getState = (state: State) => state.plot
+const getState = (state: AppState) => state.plot
 
 export const NR_OF_BINS = 512
 
 interface HighChartsDataPointWithBinning {
-	x: number
-	y: number
-	eventCount: number
-	min: number
-	mean: number
-	max: number
+	x?: number
+	y?: number
+	eventCount?: number
+	min?: number
+	mean?: number
+	max?: number
 }
 
 interface HighChartsDataPointWithoutBinning {
-	x: number
-	y: number
-	eventCount: number
+	x?: number
+	y?: number
+	eventCount?: number
+}
+
+function getColor(idx: number): string {
+	const colors = Highcharts.getOptions().colors
+	if (colors) return colors[idx]
+	return '#000000'
 }
 
 const needsBinning = (item: DataResponseItem): boolean => {
 	if (item.data.length === 0) return false
-	return item.data.some(x => x.eventCount > 1)
+	return item.data.some(x => x.eventCount && x.eventCount > 1)
 }
 
 const mapDataPointWithBinning = (
@@ -595,11 +601,11 @@ export namespace plotSelectors {
 		yAxes.map((yaxis, idx) => ({
 			labels: {
 				format: `{value}${yaxis.unit ? ' ' + yaxis.unit : ''}`,
-				style: { color: Highcharts.getOptions().colors[idx] },
+				style: { color: getColor(idx) },
 			},
 			title: {
 				text: yaxis.title,
-				style: { color: Highcharts.getOptions().colors[idx] },
+				style: { color: getColor(idx) },
 			},
 			opposite: yaxis.side !== 'left',
 			min: yaxis.min,
@@ -624,7 +630,7 @@ export namespace plotSelectors {
 							: TOOLTIP_FORMAT_WITHOUT_BINNING,
 					},
 					data: dataPoints[cfg.channelIndex].data,
-					color: Highcharts.getOptions().colors[cfg.yAxisIndex],
+					color: getColor(cfg.yAxisIndex),
 					zIndex: 1,
 				}
 				result.push(series)
@@ -644,7 +650,7 @@ export namespace plotSelectors {
 							item.min,
 							item.max,
 						]),
-						color: Highcharts.getOptions().colors[cfg.yAxisIndex],
+						color: getColor(cfg.yAxisIndex),
 						fillOpacity: 0.3,
 						marker: { enabled: false },
 						zIndex: 0,

@@ -1,9 +1,8 @@
 import { LitElement, customElement, html, property, css } from 'lit-element'
 
 import { formatDate } from '../util'
-import { State, store } from '../state/store'
-import { Channel } from '../store/plot/'
-import { plotSelectors } from '../state/models/plot'
+import { AppState, store } from '../state/store'
+import { Channel, plotSelectors } from '../state/models/plot'
 
 import type { DataResponse } from '../api/queryrest'
 import { baseStyles } from './shared-styles'
@@ -11,15 +10,15 @@ import { connect } from '@captaincodeman/rdx'
 
 @customElement('view-query-meta')
 export class QueryMetaElement extends connect(store, LitElement) {
-	@property({ attribute: false }) channels: Channel[]
-	@property({ attribute: false }) channelsWithoutData: Channel[]
-	@property({ attribute: false }) error: Error
-	@property({ attribute: false }) fetching: boolean
-	@property({ attribute: false }) requestDuration: number
-	@property({ attribute: false }) requestFinishedAt: number
-	@property({ attribute: false }) response: DataResponse
+	@property({ attribute: false }) channels: Channel[] = []
+	@property({ attribute: false }) channelsWithoutData: Channel[] = []
+	@property({ attribute: false }) error?: Error
+	@property({ attribute: false }) fetching: boolean = false
+	@property({ attribute: false }) requestDuration!: number
+	@property({ attribute: false }) requestFinishedAt!: number
+	@property({ attribute: false }) response!: DataResponse
 
-	mapState(state: State) {
+	mapState(state: AppState) {
 		return {
 			channels: plotSelectors.channels(state),
 			channelsWithoutData: plotSelectors.channelsWithoutData(state),

@@ -26,11 +26,13 @@ export const deepCopyState = <T>(obj: T): T => {
 		return (obj.map(x => deepCopyState(x)) as unknown) as T
 	}
 	if (typeof obj === 'object') {
-		const result = ({} as unknown) as T
+		// need to do a few casts to do this type trickery for TS
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const result = { ...obj } as { [key: string]: any }
 		for (const k of Object.keys(obj)) {
-			result[k] = deepCopyState(obj[k])
+			result[k] = deepCopyState(result[k])
 		}
-		return result
+		return result as T
 	}
 	throw new Error(
 		'deepCopyState did not branch into a return statement! typeof obj: ' +
@@ -63,7 +65,7 @@ export const createTestEnv = <S, D>(store: {
 	const state = deepCopyState(originalState)
 	store.state = state
 	const modelStore = {
-		dispatch: () => dispatch,
+		getDispatch: () => dispatch,
 		getState: () => state,
 	}
 	const cleanup = () => {
@@ -73,7 +75,11 @@ export const createTestEnv = <S, D>(store: {
 		state,
 		dispatch,
 		modelStore,
-		modelEffects: (model: Model): EffectFns => model.effects(modelStore),
+		modelEffects(model: Model): EffectFns {
+			if (model.effects === undefined)
+				throw new Error('Model does not provide effects')
+			return model.effects(modelStore)
+		},
 		cleanup,
 	}
 }
