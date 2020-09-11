@@ -5,8 +5,8 @@ import '@psi/databuffer-web-components/daq-pill'
 
 @customElement('channel-search-selected-item')
 export class ChannelSearchSelectedItemElement extends LitElement {
-	@property({ attribute: false }) backend: string
-	@property({ attribute: false }) name: string
+	@property({ attribute: false }) backend: string = ''
+	@property({ attribute: false }) name: string = ''
 
 	public render() {
 		return html`<wl-list-item class="hide-buttons-until-hover">

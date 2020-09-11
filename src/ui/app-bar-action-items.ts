@@ -5,46 +5,53 @@ import {
 	property,
 	PropertyValues,
 } from 'lit-element'
-import createMatcher from '@captaincodeman/router'
-import type { Matcher } from '@captaincodeman/router'
-import { connect } from '@captaincodeman/redux-connect-element'
-import { store, RootState, RoutingSelectors, RoutingActions } from '../store'
+import { connect } from '@captaincodeman/rdx'
+import { store, AppState } from '../state/store'
 import { baseStyles } from './shared-styles'
 import { nothing, TemplateResult } from 'lit-html'
 
 import '@material/mwc-icon-button'
-import { PlotActions } from '../store/plot'
+import { ROUTE } from '../state/routing'
 
 @customElement('app-bar-action-items')
 export class AppBarActionItemsElement extends connect(store, LitElement) {
-	@property({ attribute: false }) pathname: string
-	@property({ attribute: false }) templateResult: TemplateResult | {} = nothing
+	@property({ attribute: false }) page: string = ''
+	@property({ attribute: false }) templateResult:
+		| TemplateResult
+		| typeof nothing = nothing
 
-	mapState(state: RootState) {
+	mapState(state: AppState) {
 		return {
-			pathname: RoutingSelectors.pathname(state),
+			page: state.routing.page,
 		}
 	}
 
 	mapEvents() {
 		return {
-			'plot:daterange': () => PlotActions.toggleQueryRange(),
-			'plot:info': () => RoutingActions.push('/query-meta'),
-			'plot:settings': () => RoutingActions.push('/plot-settings'),
-			'plot:share': () => PlotActions.showShareLink(),
-			'plot:download': () => PlotActions.showDownload(),
+			'plot:daterange'() {
+				store.dispatch.plot.toggleQueryRange()
+			},
+			'plot:info'() {
+				store.dispatch.routing.push('/query-meta')
+			},
+			'plot:settings'() {
+				store.dispatch.routing.push('/plot-settings')
+			},
+			'plot:share'() {
+				store.dispatch.plot.showShareLink()
+			},
+			'plot:download'() {
+				store.dispatch.plot.showDownload()
+			},
 		}
 	}
 
 	constructor() {
 		super()
-		this.router = createMatcher(this.routes)
 	}
 
-	private router: Matcher
-
-	private routes = {
-		'/plot': html`<mwc-icon-button
+	private actionItemsByPage: { [key: string]: TemplateResult } = {
+		[ROUTE.PLOT]: html`<mwc-icon-button
 				title="select plot range"
 				icon="date_range"
 				@click=${() => this.dispatchEvent(new CustomEvent('plot:daterange'))}
@@ -72,9 +79,8 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 	}
 
 	shouldUpdate(changedProperties: PropertyValues) {
-		if (changedProperties.has('pathname')) {
-			const v = this.router(this.pathname)
-			this.templateResult = v === null ? nothing : v.page
+		if (changedProperties.has('page')) {
+			this.templateResult = this.actionItemsByPage[this.page] ?? nothing
 		}
 		return changedProperties.has('templateResult')
 	}

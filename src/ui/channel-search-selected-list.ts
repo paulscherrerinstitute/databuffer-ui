@@ -1,5 +1,5 @@
 import { LitElement, css, customElement, html, property } from 'lit-element'
-import { connect } from '@captaincodeman/redux-connect-element'
+import { connect } from '@captaincodeman/rdx'
 import pluralize from 'pluralize'
 
 import '@material/mwc-button'
@@ -8,8 +8,8 @@ import 'weightless/list-item'
 
 import './channel-search-selected-item'
 
-import { store, RootState, RoutingActions } from '../store'
-import { PlotSelectors, PlotActions } from '../store/plot'
+import { store, AppState } from '../state/store'
+import { plotSelectors } from '../state/models/plot'
 
 type Channel = {
 	backend: string
@@ -23,18 +23,16 @@ export class ChannelSearchSelectedListElement extends connect(
 ) {
 	@property({ attribute: false }) selectedChannels: Channel[] = []
 
-	public mapState(state: RootState) {
+	public mapState(state: AppState) {
 		return {
-			selectedChannels: PlotSelectors.channels(state),
+			selectedChannels: plotSelectors.channels(state),
 		}
 	}
 
 	public mapEvents() {
 		return {
-			'clear-selection': () => PlotActions.setSelectedChannels([]),
-			'channel-plot': () => RoutingActions.push(`/plot`),
-			'channel-remove': (e: CustomEvent<{ index: number }>) =>
-				PlotActions.unselectChannel(e.detail.index),
+			'clear-selection': () => store.dispatch.plot.setSelectedChannels([]),
+			'channel-plot': () => store.dispatch.routing.push(`/plot`),
 		}
 	}
 
@@ -65,11 +63,7 @@ export class ChannelSearchSelectedListElement extends connect(
 							.backend=${ch.backend}
 							.name=${ch.name}
 							@channel-search-selected-item:remove=${() =>
-								this.dispatchEvent(
-									new CustomEvent('channel-remove', {
-										detail: { index: idx },
-									})
-								)}
+								store.dispatch.plot.unselectChannel(idx)}
 						></channel-search-selected-item>`
 				)}
 			</div>

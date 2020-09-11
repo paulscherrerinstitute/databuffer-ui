@@ -3,53 +3,47 @@ import {
 	customElement,
 	html,
 	property,
-	css,
 	PropertyValues,
 } from 'lit-element'
-import createMatcher from '@captaincodeman/router'
-import type { Matcher } from '@captaincodeman/router'
-import { connect } from '@captaincodeman/redux-connect-element'
-import { store, RootState, RoutingSelectors, RoutingActions } from '../store'
+import { connect } from '@captaincodeman/rdx'
+import { store, AppState } from '../state/store'
 import { baseStyles } from './shared-styles'
 import { nothing } from 'lit-html'
 
 import '@material/mwc-icon-button'
+import { ROUTE } from '../state/routing'
 
 @customElement('app-bar-nav-icon')
 export class AppBarNavIconElement extends connect(store, LitElement) {
-	@property({ attribute: false }) pathname: string
+	@property({ attribute: false }) page: string = ''
 	@property({ attribute: false }) destination: string = ''
 
-	mapState(state: RootState) {
+	mapState(state: AppState) {
 		return {
-			pathname: RoutingSelectors.pathname(state),
+			page: state.routing.page,
 		}
 	}
 
 	mapEvents() {
 		return {
-			click: () => RoutingActions.push(this.destination),
+			click: () => store.dispatch.routing.push(this.destination),
 		}
 	}
 
 	constructor() {
 		super()
-		this.router = createMatcher(this.routes)
 	}
 
-	private router: Matcher
-
-	private routes = {
-		'/search': `/`,
-		'/plot': `/search`,
-		'/plot-settings': `/plot`,
-		'/query-meta': `/plot`,
+	private destinationByPage: { [key: string]: string } = {
+		[ROUTE.CHANNEL_SEARCH]: `/`,
+		[ROUTE.PLOT]: `/search`,
+		[ROUTE.PLOT_SETTINGS]: `/plot`,
+		[ROUTE.QUERY_META]: `/plot`,
 	}
 
 	shouldUpdate(changedProperties: PropertyValues) {
-		if (changedProperties.has('pathname')) {
-			const v = this.router(this.pathname)
-			this.destination = v === null ? '' : v.page
+		if (changedProperties.has('page')) {
+			this.destination = this.destinationByPage[this.page] ?? ''
 		}
 		return changedProperties.has('destination')
 	}

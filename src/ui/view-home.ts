@@ -6,17 +6,14 @@ import {
 	css,
 	query,
 } from 'lit-element'
-import { connect } from '@captaincodeman/redux-connect-element'
+import { connect } from '@captaincodeman/rdx'
 import '@material/mwc-button'
 import '@material/mwc-textfield'
 import { TextField } from '@material/mwc-textfield'
 
-import { store, RootState } from '../store'
+import { store, AppState } from '../state/store'
 
-import {
-	ChannelSearchSelectors,
-	ChannelSearchActions,
-} from '../store/channelsearch'
+import { channelsearchSelectors } from '../state/models/channelsearch'
 
 @customElement('view-home')
 export class HomeElement extends connect(store, LitElement) {
@@ -26,17 +23,9 @@ export class HomeElement extends connect(store, LitElement) {
 	@query('#query')
 	private __query!: TextField
 
-	mapState(state: RootState) {
+	mapState(state: AppState) {
 		return {
-			pattern: ChannelSearchSelectors.pattern(state),
-		}
-	}
-
-	mapEvents() {
-		return {
-			'search-click': () => ChannelSearchActions.searchChannel(),
-			'pattern-change': (e: CustomEvent<{ pattern: string }>) =>
-				ChannelSearchActions.patternChange(e.detail.pattern),
+			pattern: channelsearchSelectors.pattern(state),
 		}
 	}
 
@@ -60,11 +49,7 @@ export class HomeElement extends connect(store, LitElement) {
 						label="Search for EPICS channels"
 						helper="Search supports regular expressions"
 						@change=${() =>
-							this.dispatchEvent(
-								new CustomEvent('pattern-change', {
-									detail: { pattern: this.__query.value },
-								})
-							)}
+							store.dispatch.channelsearch.patternChange(this.__query.value)}
 						@keyup=${(e: KeyboardEvent): void => {
 							if (e.key === 'Enter') this.__search()
 						}}
@@ -114,8 +99,7 @@ export class HomeElement extends connect(store, LitElement) {
 
 	private __search(): void {
 		if (!this.__query.value) return
-		const e = new CustomEvent('search-click')
-		this.dispatchEvent(e)
+		store.dispatch.channelsearch.runSearch()
 	}
 
 	static get styles() {

@@ -33,7 +33,7 @@ describe('module util.ts', () => {
 
 	describe('omitFromArray', () => {
 		it('returns empty array on empty array', () => {
-			const input = []
+			const input: string[] = []
 			for (let i = 0; i < 3; i++) {
 				expect(omitFromArray(input, i)).to.deep.equal(
 					[],

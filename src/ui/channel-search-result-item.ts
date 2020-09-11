@@ -4,11 +4,11 @@ import type { Checkbox } from 'weightless/checkbox'
 import 'weightless/list-item'
 import '@psi/databuffer-web-components/daq-pill'
 import '@psi/databuffer-web-components/daq-pill-list'
-import { ChannelWithTags } from '../store/channelsearch'
+import { ChannelWithTags } from '../state/models/channelsearch'
 
 @customElement('channel-search-result-item')
 export class ChannelSearchResultItemElement extends LitElement {
-	@property({ attribute: false }) item: ChannelWithTags = null
+	@property({ attribute: false }) item!: ChannelWithTags
 	@property({ attribute: false }) selectedIndex: number = -1
 	@property({ attribute: false }) activeFilters: string[] = []
 
@@ -20,7 +20,7 @@ export class ChannelSearchResultItemElement extends LitElement {
 					?checked=${this.selectedIndex >= 0}
 					@change=${(e: Event) => {
 						if ((e.target as Checkbox).checked) {
-							return this.dispatchEvent(
+							this.dispatchEvent(
 								new CustomEvent('channel-select', {
 									composed: true,
 									bubbles: true,
@@ -33,6 +33,7 @@ export class ChannelSearchResultItemElement extends LitElement {
 									},
 								})
 							)
+							return
 						}
 						this.dispatchEvent(
 							new CustomEvent('channel-remove', {
@@ -47,7 +48,7 @@ export class ChannelSearchResultItemElement extends LitElement {
 					slot="after"
 					selectable
 					.selected=${this.activeFilters.filter(x =>
-						this.item.tags.includes(x)
+						this.item?.tags.includes(x)
 					)}
 					.value=${this.item.tags}
 				></daq-pill-list>

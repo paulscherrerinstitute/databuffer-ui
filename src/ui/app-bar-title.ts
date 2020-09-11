@@ -1,47 +1,40 @@
 import {
 	LitElement,
 	customElement,
-	html,
 	property,
-	css,
 	PropertyValues,
 } from 'lit-element'
-import createMatcher from '@captaincodeman/router'
-import type { Matcher } from '@captaincodeman/router'
-import { connect } from '@captaincodeman/redux-connect-element'
-import { store, RootState, RoutingSelectors } from '../store'
+import { connect } from '@captaincodeman/rdx'
+import { store, AppState } from '../state/store'
 import { baseStyles } from './shared-styles'
+import { ROUTE } from '../state/routing'
 
 @customElement('app-bar-title')
 export class AppBarTitleElement extends connect(store, LitElement) {
-	@property({ attribute: false }) pathname: string
-	@property({ attribute: false }) title: string
+	@property({ attribute: false }) page: string = ''
+	@property({ attribute: false }) title: string = ''
 
-	mapState(state: RootState) {
+	mapState(state: AppState) {
 		return {
-			pathname: RoutingSelectors.pathname(state),
+			page: state.routing.page,
 		}
 	}
 
 	constructor() {
 		super()
-		this.router = createMatcher(this.routes)
 	}
 
-	private router: Matcher
-
-	private routes = {
-		'/': `Databuffer UI`,
-		'/search': `Search`,
-		'/plot': `Plot`,
-		'/plot-settings': `Plot settings`,
-		'/query-meta': `About data query`,
+	private titleByPage: { [key: string]: string } = {
+		[ROUTE.HOME]: `Databuffer UI`,
+		[ROUTE.CHANNEL_SEARCH]: `Search`,
+		[ROUTE.PLOT_SETTINGS]: `Plot`,
+		[ROUTE.PLOT_SETTINGS]: `Plot settings`,
+		[ROUTE.QUERY_META]: `About data query`,
 	}
 
 	shouldUpdate(changedProperties: PropertyValues) {
-		if (changedProperties.has('pathname')) {
-			const v = this.router(this.pathname)
-			this.title = v === null ? `Databuffer UI` : v.page
+		if (changedProperties.has('page')) {
+			this.title = this.titleByPage[this.page] ?? `Databuffer UI`
 		}
 		return changedProperties.has('title')
 	}
