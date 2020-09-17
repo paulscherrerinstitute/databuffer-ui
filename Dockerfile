@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------
-FROM node:12-alpine AS build-step
+FROM node:12-alpine AS build-ui
 
 COPY  ./ /databuffer-ui
 
@@ -10,8 +10,6 @@ RUN npm install
 RUN npm run build
 
 # ----------------------------------------------------------------------
-FROM nginx:alpine
+FROM docker.psi.ch:5000/simple-spa-server
 
-VOLUME [ "/app", "/app/config" ]
-COPY --from=build-step /databuffer-ui/public /app
-COPY ./docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build-ui /databuffer-ui/public /data/docroot

@@ -6,7 +6,27 @@ This is the web GUI for the databuffer DAQ system.
 
 The online manual is [located here](./docs/index.md).
 
-## Developer documentation
+## Running the UI with docker
+
+**Note:** You need access to PSI's internal docker registry at `docker.psi.ch:5000` to initially `docker pull` the image.
+
+Just run the image `docker.psi.ch:5000/databuffer-ui` and provide the API endpoints `QUERY_API` and `DISPATCHER_API` through the environment. Example:
+
+```sh
+docker run --rm -i -t -e QUERY_API="http://localhost:8001" -e DISPATCHER_API="http://localhost:8002" -p 3000:8080 docker.psi.ch:5000/databuffer-ui
+```
+
+The above command will
+
+- `docker pull` the image
+- Run a container with the image
+- Set the query API endpoint to `http://localhost:8001`
+- Set the dispatcher API endpoint to `http://localhost:8002`
+- Expose the containers port 8080 on the local port 3000
+
+So, to see databuffer-ui in action, open http://localhost:3000.
+
+## Maintainer documentation
 
 As a prerequisite you must install [nodejs]. I use the most current LTS version, which was version 12 at the time of writing. I strongly recommend getting [nodejs] through [nvm], if possible.
 
