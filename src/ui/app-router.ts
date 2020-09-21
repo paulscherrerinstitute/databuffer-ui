@@ -37,7 +37,8 @@ export class AppRouterElement extends connect(store, LitElement) {
 
 	shouldUpdate(changedProperties: PropertyValues) {
 		if (changedProperties.has('page')) {
-			this.view = this.viewByPage[this.page] ?? `<view-error></view-error>`
+			this.view =
+				this.viewByPage[this.page] ?? `<view-not-found></view-not-found>`
 		}
 		return changedProperties.has('view')
 	}
