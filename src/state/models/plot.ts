@@ -466,6 +466,9 @@ export const plot = createModel({
 							}
 							dispatch.plot.changeEndTime(endTime)
 							dispatch.plot.changeStartTime(startTime)
+							if (payload.queries && payload.queries.title) {
+								dispatch.plot.changePlotTitle(payload.queries.title as string)
+							}
 							dispatch.plot.drawPlot()
 							// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 							// @ts-ignore
@@ -730,8 +733,9 @@ export namespace plotSelectors {
 			channels,
 			startTime,
 			endTime,
+			plotTitle,
 		],
-		(dataSeriesConfig, absTimes, channels, startTime, endTime) => {
+		(dataSeriesConfig, absTimes, channels, startTime, endTime, plotTitle) => {
 			const params = channels
 				.slice(0, 16)
 				.map((ch, i) => `c${i + 1}=${encodeURIComponent(channelToId(ch))}`)
@@ -745,6 +749,9 @@ export namespace plotSelectors {
 				params.push(`endTime=${endTime}`)
 			} else {
 				params.push(`duration=${endTime - startTime}`)
+			}
+			if (plotTitle) {
+				params.push(`title=${encodeURIComponent(plotTitle)}`)
 			}
 			return `${window.location.origin}/preselect?${params.join('&')}`
 		}
