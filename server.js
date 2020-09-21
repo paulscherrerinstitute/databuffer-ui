@@ -6,6 +6,7 @@ const historyApiFallback = require('connect-history-api-fallback')
 const logger = require('connect-logger')
 const compression = require('compression')
 const zlib = require('zlib')
+require('dotenv').config()
 
 browserSync.init({
 	cwd: 'public',
@@ -18,5 +19,14 @@ browserSync.init({
 		logger(),
 		compression({ level: zlib.Z_BEST_COMPRESSION }),
 		historyApiFallback(),
+	],
+	rewriteRules: [
+		{
+			match: /\$\{([A-Za-z0-9_]+)\}/g,
+			fn: function (req, res, match) {
+				const varName = match.substring(2, match.length - 1)
+				return process.env[varName]
+			},
+		},
 	],
 })

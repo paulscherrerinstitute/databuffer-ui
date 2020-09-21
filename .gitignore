@@ -1,6 +1,7 @@
 # PROJECT SPECIFIC STUFF
 # ----------------------------------------------------------------------
 
+.env
 .nyc_output/
 coverage/
 public/online-manual/
