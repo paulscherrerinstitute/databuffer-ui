@@ -15,6 +15,7 @@ package-app.sh
 # PROJECT SPECIFIC STUFF
 # ----------------------------------------------------------------------
 
+.env
 .nyc_output/
 coverage/
 public/scripts/
