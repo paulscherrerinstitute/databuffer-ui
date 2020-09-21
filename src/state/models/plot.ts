@@ -829,11 +829,17 @@ export namespace plotSelectors {
 	)
 
 	export const dialogDownloadCurlCommand = createSelector(
-		[downloadQuery],
-		q =>
-			`curl -L -H 'Content-Type: application/json' -X POST -d '${JSON.stringify(
+		[downloadQuery, startTime, endTime],
+		(q, startTime, endTime) => {
+			// for curl, replace millisecond timestamps with ISO strings
+			q.range = {
+				startDate: formatDate(startTime, 'T'),
+				endDate: formatDate(endTime, 'T'),
+			}
+			return `curl -L -H 'Content-Type: application/json' -X POST -d '${JSON.stringify(
 				q
 			)}' ${window.DatabufferUi.QUERY_API}/query`
+		}
 	)
 }
 //#endregion

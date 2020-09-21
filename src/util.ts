@@ -3,7 +3,7 @@
  *
  * @param ts the timestamp to be formatted (milliseconds since)
  */
-export function formatDate(ts: number) {
+export function formatDate(ts: number, separator: string = ' ') {
 	const zeroPad2 = (n: number) => (n < 10 ? '0' + n : n)
 	const zeroPad3 = (n: number) => (n < 10 ? '00' + n : n < 100 ? '0' + n : n)
 	const date = new Date(ts)
@@ -14,7 +14,7 @@ export function formatDate(ts: number) {
 	const M = zeroPad2(date.getMinutes())
 	const S = zeroPad2(date.getSeconds())
 	const SSS = zeroPad3(date.getMilliseconds())
-	return `${y}-${m}-${d} ${H}:${M}:${S}.${SSS}`
+	return `${y}-${m}-${d}${separator}${H}:${M}:${S}.${SSS}`
 }
 
 /**
