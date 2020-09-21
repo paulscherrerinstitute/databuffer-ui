@@ -1137,7 +1137,7 @@ describe('plot model', () => {
 			it('matches the colors of labels and title', () => {
 				const labelColors = plotSelectors
 					.highchartsYAxes(state)
-					.map(x => x.labels.style.color)
+					.map(x => x.labels?.style?.color)
 				expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
 					'[0].title.style.color',
 					labelColors[0]
