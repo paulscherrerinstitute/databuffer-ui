@@ -705,7 +705,7 @@ export namespace plotSelectors {
 						'<span style="font-size: 10px">{point.key}</span><table><tr><td>Series</td><td>Bin size</td><td>min</td><td>mean</td><td>max</td></tr>',
 					footerFormat: '</table>',
 				} as Highcharts.TooltipOptions,
-			} as Highcharts.ChartOptions)
+			} as Highcharts.Options)
 	)
 
 	export const queryRangeShowing = createSelector(
