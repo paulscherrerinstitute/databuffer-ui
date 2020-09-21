@@ -602,20 +602,26 @@ export namespace plotSelectors {
 	)
 
 	export const highchartsYAxes = createSelector([yAxes], yAxes =>
-		yAxes.map((yaxis, idx) => ({
-			labels: {
-				format: `{value}${yaxis.unit ? ' ' + yaxis.unit : ''}`,
-				style: { color: getColor(idx) },
-			},
-			title: {
-				text: yaxis.title,
-				style: { color: getColor(idx) },
-			},
-			opposite: yaxis.side !== 'left',
-			min: yaxis.min,
-			max: yaxis.max,
-			type: yaxis.type,
-		}))
+		yAxes.map(
+			(yaxis, idx) =>
+				({
+					labels: {
+						format: `{value}${yaxis.unit ? ' ' + yaxis.unit : ''}`,
+						style: { color: getColor(idx) },
+					},
+					title: {
+						text: yaxis.title,
+						style: { color: getColor(idx) },
+					},
+					opposite: yaxis.side !== 'left',
+					min: yaxis.min,
+					max: yaxis.max,
+					type: yaxis.type,
+					gridLineWidth: idx === 0 ? 1 : 0,
+					startOnTick: false,
+					endOnTick: false,
+				} as Highcharts.YAxisOptions)
+		)
 	)
 
 	export const highchartsDataSeries = createSelector(
@@ -686,19 +692,20 @@ export namespace plotSelectors {
 			highchartsTitle,
 			highchartsSubTitle,
 		],
-		(yAxis, series, title, subtitle) => ({
-			yAxis,
-			series,
-			title,
-			subtitle,
-			tooltip: {
-				useHTML: true,
-				valueDecimals: 4,
-				headerFormat:
-					'<span style="font-size: 10px">{point.key}</span><table><tr><td>Series</td><td>Bin size</td><td>min</td><td>mean</td><td>max</td></tr>',
-				fiiterFormat: '</table>',
-			},
-		})
+		(yAxis, series, title, subtitle) =>
+			({
+				yAxis,
+				series,
+				title,
+				subtitle,
+				tooltip: {
+					useHTML: true,
+					valueDecimals: 4,
+					headerFormat:
+						'<span style="font-size: 10px">{point.key}</span><table><tr><td>Series</td><td>Bin size</td><td>min</td><td>mean</td><td>max</td></tr>',
+					footerFormat: '</table>',
+				} as Highcharts.TooltipOptions,
+			} as Highcharts.ChartOptions)
 	)
 
 	export const queryRangeShowing = createSelector(
