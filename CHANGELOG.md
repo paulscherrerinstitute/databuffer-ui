@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.4.0](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.3.0...v4.4.0) (2020-09-24)
+
+### Features
+
+- retain custom title for plot when sharing ([b322cc2](https://github.com/paulscherrerinstitute/databuffer-ui/commit/b322cc2ebce239e7d7b10f6683236652247124d5)), closes [#65](https://github.com/paulscherrerinstitute/databuffer-ui/issues/65)
+- use ISO8601 times in curl command ([2ff922f](https://github.com/paulscherrerinstitute/databuffer-ui/commit/2ff922fdd4aad1d4e1fcf7ba7494231d649ab9c9)), closes [#77](https://github.com/paulscherrerinstitute/databuffer-ui/issues/77)
+
+### Bug Fixes
+
+- add view-not-found element ([47c8903](https://github.com/paulscherrerinstitute/databuffer-ui/commit/47c89030b55ad270e165c8709b7f32b529ea864f)), closes [#58](https://github.com/paulscherrerinstitute/databuffer-ui/issues/58)
+- circumvent race condition for browser location ([302e1b1](https://github.com/paulscherrerinstitute/databuffer-ui/commit/302e1b1ade1d16c0efde314899a9b75cf7e309ae)), closes [#6](https://github.com/paulscherrerinstitute/databuffer-ui/issues/6)
+- download plot data as CSV ([2e31589](https://github.com/paulscherrerinstitute/databuffer-ui/commit/2e31589cf48f6ad1f1ca141ca6c476e18e8dcd74))
+- manual scaling of y axis ([d8c0471](https://github.com/paulscherrerinstitute/databuffer-ui/commit/d8c04718b31fa0d9cc5ace21ff6ebe026bb4cf18)), closes [#74](https://github.com/paulscherrerinstitute/databuffer-ui/issues/74)
+- use correct type ([71fd54d](https://github.com/paulscherrerinstitute/databuffer-ui/commit/71fd54d58bd87210be0bafb7b37e74f4b1ca9573))
+
 ## [4.3.0](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.2.0...v4.3.0) (2020-06-25)
 
 ### Features
