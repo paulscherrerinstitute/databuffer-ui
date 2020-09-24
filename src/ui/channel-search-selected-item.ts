@@ -1,7 +1,7 @@
 import { LitElement, customElement, css, html, property } from 'lit-element'
 import 'weightless/list-item'
 import '@material/mwc-icon-button'
-import '@psi/databuffer-web-components/daq-pill'
+import '@paulscherrerinstitute/databuffer-web-components/daq-pill'
 
 @customElement('channel-search-selected-item')
 export class ChannelSearchSelectedItemElement extends LitElement {

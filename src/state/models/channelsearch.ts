@@ -1,9 +1,9 @@
 import {
 	ChannelConfig,
 	ChannelConfigsQuery,
-} from '@psi/databuffer-query-js/query-channel-configs'
+} from '@paulscherrerinstitute/databuffer-query-js/query-channel-configs'
 import { createModel, RoutingState } from '@captaincodeman/rdx'
-import { channelToId } from '@psi/databuffer-query-js/channel'
+import { channelToId } from '@paulscherrerinstitute/databuffer-query-js/channel'
 import { createSelector } from 'reselect'
 import { EffectsStore, AppState } from '../store'
 import { queryRestApi } from '../../api/queryrest'

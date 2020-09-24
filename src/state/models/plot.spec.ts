@@ -21,7 +21,7 @@ import {
 	AggregationType,
 	DataQuery,
 	DataResponseFormatType,
-} from '@psi/databuffer-query-js/query-data'
+} from '@paulscherrerinstitute/databuffer-query-js/query-data'
 import { formatDate } from '../../util'
 import sinon from 'sinon'
 import { EffectFns, RoutingState } from '@captaincodeman/rdx'

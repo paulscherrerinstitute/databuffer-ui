@@ -5,7 +5,6 @@ COPY  ./ /databuffer-ui
 
 WORKDIR /databuffer-ui
 
-RUN npm config set '@psi:registry' http://npm.psi.ch
 RUN npm install
 RUN npm run build
 

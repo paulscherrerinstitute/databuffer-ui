@@ -13,13 +13,13 @@ import pluralize from 'pluralize'
 
 import './channel-search-result-item'
 
-import '@psi/databuffer-web-components/daq-pill'
-import type { DaqPillSelectedEvent } from '@psi/databuffer-web-components/daq-pill'
-import '@psi/databuffer-web-components/daq-pill-list'
+import '@paulscherrerinstitute/databuffer-web-components/daq-pill'
+import type { DaqPillSelectedEvent } from '@paulscherrerinstitute/databuffer-web-components/daq-pill'
+import '@paulscherrerinstitute/databuffer-web-components/daq-pill-list'
 import type {
 	DaqPillListElement,
 	DaqPillListSelectedEvent,
-} from '@psi/databuffer-web-components/daq-pill-list'
+} from '@paulscherrerinstitute/databuffer-web-components/daq-pill-list'
 import {
 	ChannelWithTags,
 	channelsearchSelectors,

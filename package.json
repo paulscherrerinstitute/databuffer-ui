@@ -1,5 +1,5 @@
 {
-	"name": "@psi/databuffer-ui",
+	"name": "@paulscherrerinstitute/databuffer-ui",
 	"version": "4.3.0",
 	"description": "Databuffer UI",
 	"scripts": {
@@ -77,8 +77,8 @@
 		"@material/mwc-snackbar": "^0.18.0",
 		"@material/mwc-textfield": "^0.18.0",
 		"@material/mwc-top-app-bar-fixed": "^0.18.0",
-		"@psi/databuffer-query-js": "^0.6.1",
-		"@psi/databuffer-web-components": "^1.0.0",
+		"@paulscherrerinstitute/databuffer-query-js": "^0.6.1",
+		"@paulscherrerinstitute/databuffer-web-components": "^1.0.0",
 		"date-fns": "^2.16.1",
 		"file-saver": "^2.0.2",
 		"highcharts": "^8.2.0",

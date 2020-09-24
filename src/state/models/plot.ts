@@ -11,8 +11,11 @@ import {
 	AggregationOperation,
 	DataResponseFormatType,
 	AggregationSpecification,
-} from '@psi/databuffer-query-js/query-data'
-import { channelToId, idToChannel } from '@psi/databuffer-query-js/channel'
+} from '@paulscherrerinstitute/databuffer-query-js/query-data'
+import {
+	channelToId,
+	idToChannel,
+} from '@paulscherrerinstitute/databuffer-query-js/channel'
 import { DataResponse, queryRestApi } from '../../api/queryrest'
 import { EffectsStore, AppState } from '../store'
 import { formatDate } from '../../util'

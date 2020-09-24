@@ -2,8 +2,8 @@ import { LitElement, css, customElement, html, property } from 'lit-element'
 import 'weightless/checkbox'
 import type { Checkbox } from 'weightless/checkbox'
 import 'weightless/list-item'
-import '@psi/databuffer-web-components/daq-pill'
-import '@psi/databuffer-web-components/daq-pill-list'
+import '@paulscherrerinstitute/databuffer-web-components/daq-pill'
+import '@paulscherrerinstitute/databuffer-web-components/daq-pill-list'
 import { ChannelWithTags } from '../state/models/channelsearch'
 
 @customElement('channel-search-result-item')
