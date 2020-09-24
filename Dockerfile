@@ -1,14 +1,5 @@
-# ----------------------------------------------------------------------
-FROM node:12-alpine AS build-ui
+FROM ghcr.io/paulscherrerinstitute/simple-spa-server
 
-COPY  ./ /databuffer-ui
+ENV SSS_APP_NAME=databuffer-ui
 
-WORKDIR /databuffer-ui
-
-RUN npm install
-RUN npm run build
-
-# ----------------------------------------------------------------------
-FROM docker.psi.ch:5000/simple-spa-server
-
-COPY --from=build-ui /databuffer-ui/public /data/docroot
+COPY ./public /data/docroot
