@@ -36,7 +36,7 @@ jobs:
       - name: Build UI
         run: npm run build
       - name: Upload build artifacts
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v2
         with:
           name: build artifacts
           path: public/
@@ -48,7 +48,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Download build artifacts
-        uses: actions/download-artifacts@v2
+        uses: actions/download-artifact@v2
         with:
           name: build artifacts
       - name: Prepare
