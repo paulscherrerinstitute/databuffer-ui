@@ -7,15 +7,30 @@ import minifyHTML from 'rollup-plugin-minify-html-literals'
 import typescript from 'rollup-plugin-typescript'
 import { terser } from 'rollup-plugin-terser'
 
-import { version as pkgVersion } from './package.json'
+// Is this build running inside a GitHub Actions workflow?
+const github = process.env.GITHUB_ACTIONS
+	? {
+			ref: process.env.GITHUB_REF,
+			sha: process.env.GITHUB_SHA,
+			tag: /^refs\/tags\/v[0-9]+\.[0-9]+\.[0-9]+$/.test(process.env.GITHUB_REF)
+				? process.env.GITHUB_REF.substr(10)
+				: '',
+	  }
+	: undefined
 
 // assume production mode for normal build, dev if watched
 // flag is used to enable / disable HTML & JS minification
-const production = !process.env.ROLLUP_WATCH
-const appVersion = production
-	? `v${process.env.APP_VERSION || pkgVersion}`
-	: `v${process.env.APP_VERSION || pkgVersion}-dev`
-const gitRef = production ? appVersion : 'master'
+const production = github || !process.env.ROLLUP_WATCH
+
+// which app version to display
+const appVersion = github
+	? github.tag
+		? github.tag // use version from git tag, just in case package.json was not updated
+		: `[edge version sha-${github.sha.substr(0, 8)}]`
+	: `[local dev version]`
+
+// which documentation / commits to reference
+const gitRef = github && github.tag ? github.tag : 'master'
 
 export default {
 	input: 'src/index.ts',
@@ -27,7 +42,6 @@ export default {
 	},
 	plugins: [
 		replace({
-			'process.env.NODE_ENV': JSON.stringify('production'),
 			APP_VERSION_STRING: appVersion,
 			GIT_COMMIT_REF: gitRef,
 		}),
