@@ -32,7 +32,7 @@ Note, that the above command does not specify a tag, and hence docker will use t
 ### Running the docker image
 
 ```sh
-docker run --rm -i -t -e QUERY_API="http://localhost:8001" -e DISPATCHER_API="http://localhost:8002" -p 3000:8080 ghcr.io/paulscherrerinstitute/databuffer-ui
+docker run --rm -i -t -e QUERY_API=http://localhost:8001 -e DISPATCHER_API=http://localhost:8002 -p 3000:8080 ghcr.io/paulscherrerinstitute/databuffer-ui
 ```
 
 The above commands will...
