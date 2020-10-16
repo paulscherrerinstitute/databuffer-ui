@@ -6,6 +6,10 @@ databuffer-ui is the web GUI for the databuffer DAQ system.
 
 The online manual is [located here](./docs/index.md).
 
+## Change log
+
+The change log is [located here](./CHANGELOG.md).
+
 ## Running the UI with docker
 
 The recommended way to run the UI (e.g. if you want to test a new backend) is through docker.
