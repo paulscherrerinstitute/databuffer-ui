@@ -7,6 +7,7 @@ import {
 	YAxis,
 	YAxisType,
 	plotSelectors,
+	PlotVariation,
 } from '../state/models/plot'
 
 import { baseStyles } from './shared-styles'
@@ -21,6 +22,8 @@ import { Select } from '@material/mwc-select'
 export class PlotSettingsElement extends connect(store, LitElement) {
 	@property({ attribute: false }) channels: Channel[] = []
 	@property({ attribute: false }) dataSeriesConfig: DataSeries[] = []
+	@property({ attribute: false }) plotVariation: PlotVariation =
+		PlotVariation.SeparateAxes
 	@property({ attribute: false }) plotTitle: string = ''
 	@property({ attribute: false }) yAxes: YAxis[] = []
 
@@ -28,6 +31,7 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 		return {
 			channels: plotSelectors.channels(state),
 			dataSeriesConfig: plotSelectors.dataSeriesConfig(state),
+			plotVariation: plotSelectors.plotVariation(state),
 			plotTitle: plotSelectors.plotTitle(state),
 			yAxes: plotSelectors.yAxes(state),
 		}
@@ -45,6 +49,25 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 					store.dispatch.plot.changePlotTitle(v)
 				}}
 			></mwc-textfield>
+			<h2>Plot variation</h2>
+			<mwc-select
+				@change=${(e: Event) => {
+					if (e.target === null) return
+					const v = (e.target as Select).value
+					store.dispatch.plot.changePlotVariation(v as PlotVariation)
+				}}
+			>
+				<mwc-list-item
+					?selected=${this.plotVariation === PlotVariation.SingleAxis}
+					.value=${PlotVariation.SingleAxis}
+					>Single Y axis</mwc-list-item
+				>
+				<mwc-list-item
+					?selected=${this.plotVariation === PlotVariation.SeparateAxes}
+					.value=${PlotVariation.SeparateAxes}
+					>Separate Y axes</mwc-list-item
+				>
+			</mwc-select>
 			<h2>Data series and axes</h2>
 			<table>
 				<tr>
@@ -76,6 +99,8 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 							</td>
 							<td>
 								<mwc-select
+									?disabled=${idx > 0 &&
+									this.plotVariation === PlotVariation.SingleAxis}
 									@change=${(e: Event) => {
 										if (e.target === null) return
 										const v = (e.target as Select).value
@@ -101,6 +126,8 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 								<mwc-textfield
 									label="Min"
 									placeholder="automatic"
+									?disabled=${idx > 0 &&
+									this.plotVariation === PlotVariation.SingleAxis}
 									.value=${yAxis.min !== null ? yAxis.min.toString() : ''}
 									@change=${(e: Event) => {
 										if (e.target === null) return
@@ -114,6 +141,8 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 								<mwc-textfield
 									label="Max"
 									placeholder="automatic"
+									?disabled=${idx > 0 &&
+									this.plotVariation === PlotVariation.SingleAxis}
 									.value=${yAxis.max !== null ? yAxis.max.toString() : ''}
 									@change=${(e: Event) => {
 										if (e.target === null) return

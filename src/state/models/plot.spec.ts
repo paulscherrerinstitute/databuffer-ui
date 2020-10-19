@@ -10,6 +10,7 @@ import {
 	YAxis,
 	DataSeries,
 	QueryMode,
+	PlotVariation,
 } from './plot'
 import { Channel, channelToId } from '../../shared/channel'
 import { store, AppState, AppDispatch } from '../store'
@@ -73,6 +74,10 @@ const EXAMPLE_RESPONSE: DataResponse = [
 
 describe('plot model', () => {
 	describe('initial state', () => {
+		it('plotVariation', () => {
+			expect(plot.state.plotVariation).to.equal(PlotVariation.SeparateAxes)
+		})
+
 		it('plotTitle', () => {
 			expect(plot.state.plotTitle).to.equal('')
 		})
@@ -233,6 +238,24 @@ describe('plot model', () => {
 					expect(state2.dataSeries).to.deep.equal(state1.dataSeries)
 				})
 			})
+		})
+
+		it('changePlotVariation sets plotVariation', () => {
+			const newState1 = plot.reducers.changePlotVariation(
+				plot.state,
+				PlotVariation.SeparateAxes
+			)
+			const newState2 = plot.reducers.changePlotVariation(
+				plot.state,
+				PlotVariation.SingleAxis
+			)
+			expect(newState1.plotVariation).to.equal(PlotVariation.SeparateAxes)
+			expect(newState2.plotVariation).to.equal(PlotVariation.SingleAxis)
+		})
+
+		it('changePlotTitle sets plotTitle', () => {
+			const newState = plot.reducers.changePlotTitle(plot.state, 'My Plot')
+			expect(newState.plotTitle).to.equal('My Plot')
 		})
 	})
 
@@ -626,6 +649,50 @@ describe('plot model', () => {
 					expect(fake.callCount).to.equal(1)
 					expect(fake.args[0][0]).to.deep.equal('my-plot')
 				})
+
+				it('sets plotVariation if single-axis', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.changePlotVariation = fake
+					const payload: RoutingState = {
+						page: ROUTE.PRESELECT,
+						params: {},
+						queries: {
+							plotVariation: 'single-axis',
+						},
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(1)
+					expect(fake.args[0][0]).to.deep.equal('single-axis')
+				})
+
+				it('sets plotVariation if separate-axes', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.changePlotVariation = fake
+					const payload: RoutingState = {
+						page: ROUTE.PRESELECT,
+						params: {},
+						queries: {
+							plotVariation: 'separate-axes',
+						},
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(1)
+					expect(fake.args[0][0]).to.deep.equal('separate-axes')
+				})
+
+				it('ignores plotVariation if invalid value', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.changePlotVariation = fake
+					const payload: RoutingState = {
+						page: ROUTE.PRESELECT,
+						params: {},
+						queries: {
+							plotVariation: 'not-a-valid-enum-value',
+						},
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(0)
+				})
 			})
 		})
 	})
@@ -634,6 +701,26 @@ describe('plot model', () => {
 		let state: AppState
 		beforeEach(() => {
 			state = store.state
+		})
+
+		it('retrieves plotVariation', () => {
+			const state1 = {
+				...state,
+				plot: { ...state.plot, plotVariation: PlotVariation.SeparateAxes },
+			}
+			const state2 = {
+				...state,
+				plot: {
+					...state.plot,
+					plotVariation: PlotVariation.SingleAxis,
+				},
+			}
+			expect(plotSelectors.plotVariation(state1)).to.equal(
+				PlotVariation.SeparateAxes
+			)
+			expect(plotSelectors.plotVariation(state2)).to.equal(
+				PlotVariation.SingleAxis
+			)
 		})
 
 		it('retrieves plotTitle', () => {
@@ -1110,10 +1197,24 @@ describe('plot model', () => {
 				expect(plotSelectors.highchartsYAxes(state1)).to.deep.equal([])
 			})
 
-			it('returns correct size array', () => {
-				expect(plotSelectors.highchartsYAxes(state))
+			it('returns one axis per channel for PlotVariation.SeparateAxes', () => {
+				const state1 = {
+					...state,
+					plot: { ...state.plot, plotVariation: PlotVariation.SeparateAxes },
+				}
+				expect(plotSelectors.highchartsYAxes(state1))
 					.to.be.an('array')
 					.with.length(2)
+			})
+
+			it('returns exactly one axis for PlotVariation.SingleAxis', () => {
+				const state1 = {
+					...state,
+					plot: { ...state.plot, plotVariation: PlotVariation.SingleAxis },
+				}
+				expect(plotSelectors.highchartsYAxes(state1))
+					.to.be.an('array')
+					.with.length(1)
 			})
 
 			it('puts the unit into the label', () => {
@@ -1302,13 +1403,30 @@ describe('plot model', () => {
 				).to.have.nested.property('[1].type', 'line')
 			})
 
-			it('sets yAxis index', () => {
+			it('sets yAxis index for PlotVariation.SeparateAxes', () => {
+				const state1 = {
+					...state,
+					plot: { ...state.plot, plotVariation: PlotVariation.SeparateAxes },
+				}
 				expect(
-					plotSelectors.highchartsDataSeries(state)
+					plotSelectors.highchartsDataSeries(state1)
 				).to.have.nested.property('[0].yAxis', 0)
 				expect(
-					plotSelectors.highchartsDataSeries(state)
+					plotSelectors.highchartsDataSeries(state1)
 				).to.have.nested.property('[1].yAxis', 1)
+			})
+
+			it('sets yAxis index for PlotVariation.SingleAxis', () => {
+				const state1 = {
+					...state,
+					plot: { ...state.plot, plotVariation: PlotVariation.SingleAxis },
+				}
+				expect(
+					plotSelectors.highchartsDataSeries(state1)
+				).to.have.nested.property('[0].yAxis', 0)
+				expect(
+					plotSelectors.highchartsDataSeries(state1)
+				).to.have.nested.property('[1].yAxis', 0)
 			})
 		})
 
@@ -1691,6 +1809,22 @@ describe('plot model', () => {
 				const params = new URLSearchParams(url.split('?', 2)[1])
 				expect(params.has(`title`)).to.be.true
 				expect(params.get(`title`)).to.equal('my-plot')
+			})
+
+			it('includes plotVariation separate-axes', () => {
+				state.plot.plotVariation = PlotVariation.SeparateAxes
+				const url = plotSelectors.dialogShareLinkUrl(state)
+				const params = new URLSearchParams(url.split('?', 2)[1])
+				expect(params.has(`plotVariation`)).to.be.true
+				expect(params.get(`plotVariation`)).to.equal('separate-axes')
+			})
+
+			it('includes plotVariation single-axis', () => {
+				state.plot.plotVariation = PlotVariation.SingleAxis
+				const url = plotSelectors.dialogShareLinkUrl(state)
+				const params = new URLSearchParams(url.split('?', 2)[1])
+				expect(params.has(`plotVariation`)).to.be.true
+				expect(params.get(`plotVariation`)).to.equal('single-axis')
 			})
 		})
 

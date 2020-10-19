@@ -54,6 +54,17 @@ The default label for any channel is the channel's name.
 | ----------------------------- | ------------------------------------------- |
 | Kühlwassertemperatur Rücklauf | `K%C3%BChlwassertemperatur%20R%C3%BCcklauf` |
 
+## plotVariation
+
+The variation of plot to be used. Only specific constant values are supported:
+
+| Constant        | meaning                                                |
+| --------------- | ------------------------------------------------------ |
+| `separate-axes` | Every channel is plotted on its own Y axis. (Default.) |
+| `single-axis`   | All channels are plotted on a single Y axis.           |
+
+Any other value is being ignored and results in using the default.
+
 ## startTime
 
 Start time of the plot as an absolute timestamp in one of those formats:

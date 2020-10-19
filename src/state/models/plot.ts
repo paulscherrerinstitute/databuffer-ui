@@ -38,6 +38,14 @@ export interface DataPoints {
 	values: number[]
 }
 
+export enum PlotVariation {
+	/** 1 Y axis for all channels */
+	SingleAxis = 'single-axis',
+
+	/** 1 Y axis for each channel */
+	SeparateAxes = 'separate-axes',
+}
+
 /** DataSeries defines a data set to be plotted in the chart */
 export interface DataSeries {
 	/** name allows the data series to use a non-technical label */
@@ -70,6 +78,7 @@ export interface YAxis {
 export type DownloadAggregation = 'as-is' | 'PT5S' | 'PT1M' | 'PT1H' | 'raw'
 
 export interface PlotState {
+	plotVariation: PlotVariation
 	plotTitle: string
 	startTime: number
 	endTime: number
@@ -102,6 +111,7 @@ const isChannelSelected = (state: PlotState, ch: Channel): boolean =>
 
 export const plot = createModel({
 	state: {
+		plotVariation: PlotVariation.SeparateAxes,
 		plotTitle: '',
 		startTime: Date.now() - 60_000,
 		endTime: Date.now(),
@@ -199,6 +209,13 @@ export const plot = createModel({
 					channelIndex: idx,
 					yAxisIndex: idx,
 				})),
+			}
+		},
+
+		changePlotVariation(state, plotVariation: PlotVariation) {
+			return {
+				...state,
+				plotVariation,
 			}
 		},
 
@@ -450,6 +467,17 @@ export const plot = createModel({
 								startTime = strToDate(payload.queries.startTime as string)
 							}
 
+							if (payload.queries && payload.queries.plotVariation) {
+								const s = payload.queries.plotVariation as string
+								if (
+									Object.values(
+										PlotVariation as Record<string, string>
+									).includes(s)
+								) {
+									dispatch.plot.changePlotVariation(s as PlotVariation)
+								}
+							}
+
 							const channels: Channel[] = []
 							const dataSeriesLabels: { index: number; label: string }[] = []
 							for (let i = 1; i <= MAX_CHANNELS; i++) {
@@ -543,6 +571,10 @@ const TOOLTIP_FORMAT_WITHOUT_BINNING =
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace plotSelectors {
+	export const plotVariation = createSelector(
+		[getState],
+		state => state.plotVariation
+	)
 	export const plotTitle = createSelector([getState], state => state.plotTitle)
 	export const startTime = createSelector([getState], state => state.startTime)
 	export const endTime = createSelector([getState], state => state.endTime)
@@ -607,39 +639,47 @@ export namespace plotSelectors {
 			})
 	)
 
-	export const highchartsYAxes = createSelector([yAxes], yAxes =>
-		yAxes.map(
-			(yaxis, idx) =>
-				({
-					labels: {
-						format: `{value}${yaxis.unit ? ' ' + yaxis.unit : ''}`,
-						style: { color: getColor(idx) },
-					},
-					title: {
-						text: yaxis.title,
-						style: { color: getColor(idx) },
-					},
-					opposite: yaxis.side !== 'left',
-					min: yaxis.min,
-					max: yaxis.max,
-					type: yaxis.type,
-					gridLineWidth: idx === 0 ? 1 : 0,
-					startOnTick: false,
-					endOnTick: false,
-				} as Highcharts.YAxisOptions)
-		)
+	export const highchartsYAxes = createSelector(
+		[plotVariation, yAxes],
+		(plotVariation, yAxes) => {
+			const highchartsAxes = [...yAxes]
+			if (plotVariation === PlotVariation.SingleAxis) {
+				highchartsAxes.splice(1, highchartsAxes.length - 1)
+			}
+			return highchartsAxes.map(
+				(yaxis, idx) =>
+					({
+						labels: {
+							format: `{value}${yaxis.unit ? ' ' + yaxis.unit : ''}`,
+							style: { color: getColor(idx) },
+						},
+						title: {
+							text: yaxis.title,
+							style: { color: getColor(idx) },
+						},
+						opposite: yaxis.side !== 'left',
+						min: yaxis.min,
+						max: yaxis.max,
+						type: yaxis.type,
+						gridLineWidth: idx === 0 ? 1 : 0,
+						startOnTick: false,
+						endOnTick: false,
+					} as Highcharts.YAxisOptions)
+			)
+		}
 	)
 
 	export const highchartsDataSeries = createSelector(
-		[dataSeriesConfig, dataPoints],
-		(dataSeriesConfig, dataPoints) => {
+		[plotVariation, dataSeriesConfig, dataPoints],
+		(plotVariation, dataSeriesConfig, dataPoints) => {
 			const result = []
 			for (const cfg of dataSeriesConfig) {
 				const series = {
 					name: cfg.name,
 					type: 'line',
 					step: 'left',
-					yAxis: cfg.yAxisIndex,
+					yAxis:
+						plotVariation === PlotVariation.SingleAxis ? 0 : cfg.yAxisIndex,
 					tooltip: {
 						pointFormat: dataPoints[cfg.channelIndex].needsBinning
 							? TOOLTIP_FORMAT_WITH_BINNING
@@ -656,7 +696,8 @@ export namespace plotSelectors {
 						enableMouseTracking: false,
 						type: 'arearange',
 						step: 'left',
-						yAxis: cfg.yAxisIndex,
+						yAxis:
+							plotVariation === PlotVariation.SingleAxis ? 0 : cfg.yAxisIndex,
 						tooltip: { enabled: false },
 						linkedTo: ':previous',
 						data: dataPoints[
@@ -737,8 +778,17 @@ export namespace plotSelectors {
 			startTime,
 			endTime,
 			plotTitle,
+			plotVariation,
 		],
-		(dataSeriesConfig, absTimes, channels, startTime, endTime, plotTitle) => {
+		(
+			dataSeriesConfig,
+			absTimes,
+			channels,
+			startTime,
+			endTime,
+			plotTitle,
+			plotVariation
+		) => {
 			const params = channels
 				.slice(0, 16)
 				.map((ch, i) => `c${i + 1}=${encodeURIComponent(channelToId(ch))}`)
@@ -755,6 +805,9 @@ export namespace plotSelectors {
 			}
 			if (plotTitle) {
 				params.push(`title=${encodeURIComponent(plotTitle)}`)
+			}
+			if (plotVariation) {
+				params.push(`plotVariation=${encodeURIComponent(plotVariation)}`)
 			}
 			return `${window.location.origin}/preselect?${params.join('&')}`
 		}
