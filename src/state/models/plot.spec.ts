@@ -611,6 +611,21 @@ describe('plot model', () => {
 					// for param `l8` there should not be an effect, as the 8 does not match the 6 (of c6)
 					expect(fake.callCount).to.equal(0)
 				})
+
+				it('sets title if defined', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.changePlotTitle = fake
+					const payload: RoutingState = {
+						page: ROUTE.PRESELECT,
+						params: {},
+						queries: {
+							title: 'my-plot',
+						},
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(1)
+					expect(fake.args[0][0]).to.deep.equal('my-plot')
+				})
 			})
 		})
 	})
@@ -1662,6 +1677,20 @@ describe('plot model', () => {
 				expect(params.get(`l3`)).to.equal('custom-label-1')
 				expect(params.has(`l5`)).to.be.true
 				expect(params.get(`l5`)).to.equal('custom-label-2')
+			})
+
+			it('does not include plotTitle if it is not set', () => {
+				const url = plotSelectors.dialogShareLinkUrl(state)
+				const params = new URLSearchParams(url.split('?', 2)[1])
+				expect(params.has(`title`)).to.be.false
+			})
+
+			it('includes plotTitle if it is set', () => {
+				state.plot.plotTitle = 'my-plot'
+				const url = plotSelectors.dialogShareLinkUrl(state)
+				const params = new URLSearchParams(url.split('?', 2)[1])
+				expect(params.has(`title`)).to.be.true
+				expect(params.get(`title`)).to.equal('my-plot')
 			})
 		})
 
