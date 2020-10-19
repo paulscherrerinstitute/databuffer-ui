@@ -62,3 +62,11 @@ Start time of the plot as an absolute timestamp in one of those formats:
 - A **string value** holding a **ISO8601 time string**, e.g. `2020-04-28T12:10:32.048+02:00`.
 
 Examples: See [endTime](#endtime).
+
+## title
+
+The title of the plot as a string.
+
+| Example                           | Parameter value                              |
+| --------------------------------- | -------------------------------------------- |
+| Kühlwassertemperatur letzte Woche | `K%C3%BChlwassertemperatur%20letzte%20Woche` |
