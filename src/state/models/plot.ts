@@ -44,6 +44,9 @@ export enum PlotVariation {
 
 	/** 1 Y axis for each channel */
 	SeparateAxes = 'separate-axes',
+
+	/** 1 plot (with 1 Y axis) for each channel */
+	SeparatePlots = 'separate-plots',
 }
 
 /** DataSeries defines a data set to be plotted in the chart */

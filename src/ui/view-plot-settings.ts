@@ -67,6 +67,11 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 					.value=${PlotVariation.SeparateAxes}
 					>Separate Y axes</mwc-list-item
 				>
+				<mwc-list-item
+					?selected=${this.plotVariation === PlotVariation.SeparatePlots}
+					.value=${PlotVariation.SeparatePlots}
+					>Separate plots</mwc-list-item
+				>
 			</mwc-select>
 			<h2>Data series and axes</h2>
 			<table>
