@@ -249,8 +249,13 @@ describe('plot model', () => {
 				plot.state,
 				PlotVariation.SingleAxis
 			)
+			const newState3 = plot.reducers.changePlotVariation(
+				plot.state,
+				PlotVariation.SeparatePlots
+			)
 			expect(newState1.plotVariation).to.equal(PlotVariation.SeparateAxes)
 			expect(newState2.plotVariation).to.equal(PlotVariation.SingleAxis)
+			expect(newState3.plotVariation).to.equal(PlotVariation.SeparatePlots)
 		})
 
 		it('changePlotTitle sets plotTitle', () => {
@@ -715,11 +720,21 @@ describe('plot model', () => {
 					plotVariation: PlotVariation.SingleAxis,
 				},
 			}
+			const state3 = {
+				...state,
+				plot: {
+					...state.plot,
+					plotVariation: PlotVariation.SeparatePlots,
+				},
+			}
 			expect(plotSelectors.plotVariation(state1)).to.equal(
 				PlotVariation.SeparateAxes
 			)
 			expect(plotSelectors.plotVariation(state2)).to.equal(
 				PlotVariation.SingleAxis
+			)
+			expect(plotSelectors.plotVariation(state3)).to.equal(
+				PlotVariation.SeparatePlots
 			)
 		})
 
@@ -1207,6 +1222,16 @@ describe('plot model', () => {
 					.with.length(2)
 			})
 
+			it('returns one axis per channel for PlotVariation.SeparatePlots', () => {
+				const state1 = {
+					...state,
+					plot: { ...state.plot, plotVariation: PlotVariation.SeparatePlots },
+				}
+				expect(plotSelectors.highchartsYAxes(state1))
+					.to.be.an('array')
+					.with.length(2)
+			})
+
 			it('returns exactly one axis for PlotVariation.SingleAxis', () => {
 				const state1 = {
 					...state,
@@ -1414,6 +1439,19 @@ describe('plot model', () => {
 				expect(
 					plotSelectors.highchartsDataSeries(state1)
 				).to.have.nested.property('[1].yAxis', 1)
+			})
+
+			it('sets yAxis index for PlotVariation.SeparatePlots', () => {
+				const state1 = {
+					...state,
+					plot: { ...state.plot, plotVariation: PlotVariation.SeparatePlots },
+				}
+				expect(
+					plotSelectors.highchartsDataSeries(state1)
+				).to.have.nested.property('[0].yAxis', 0)
+				expect(
+					plotSelectors.highchartsDataSeries(state1)
+				).to.have.nested.property('[1].yAxis', 0)
 			})
 
 			it('sets yAxis index for PlotVariation.SingleAxis', () => {
@@ -1817,6 +1855,14 @@ describe('plot model', () => {
 				const params = new URLSearchParams(url.split('?', 2)[1])
 				expect(params.has(`plotVariation`)).to.be.true
 				expect(params.get(`plotVariation`)).to.equal('separate-axes')
+			})
+
+			it('includes plotVariation separate-plots', () => {
+				state.plot.plotVariation = PlotVariation.SeparatePlots
+				const url = plotSelectors.dialogShareLinkUrl(state)
+				const params = new URLSearchParams(url.split('?', 2)[1])
+				expect(params.has(`plotVariation`)).to.be.true
+				expect(params.get(`plotVariation`)).to.equal('separate-plots')
 			})
 
 			it('includes plotVariation single-axis', () => {
