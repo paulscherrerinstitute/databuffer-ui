@@ -1102,8 +1102,8 @@ describe('plot model', () => {
 					],
 				},
 			}
-			expect(plotSelectors.dataSeriesConfig(state1)).to.deep.equal([])
-			expect(plotSelectors.dataSeriesConfig(state2)).to.deep.equal([
+			expect(plotSelectors.dataSeriesConfigs(state1)).to.deep.equal([])
+			expect(plotSelectors.dataSeriesConfigs(state2)).to.deep.equal([
 				{
 					name: 'a',
 					channelIndex: 0,

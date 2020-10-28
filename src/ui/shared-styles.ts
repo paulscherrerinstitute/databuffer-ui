@@ -28,4 +28,8 @@ export const baseStyles = css`
 		margin: 0;
 		padding: 0;
 	}
+
+	:host([hidden]) {
+		display: none;
+	}
 `

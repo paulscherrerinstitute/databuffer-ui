@@ -30,7 +30,7 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 	mapState(state: AppState) {
 		return {
 			channels: plotSelectors.channels(state),
-			dataSeriesConfig: plotSelectors.dataSeriesConfig(state),
+			dataSeriesConfig: plotSelectors.dataSeriesConfigs(state),
 			plotVariation: plotSelectors.plotVariation(state),
 			plotTitle: plotSelectors.plotTitle(state),
 			yAxes: plotSelectors.yAxes(state),

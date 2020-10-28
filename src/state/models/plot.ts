@@ -22,6 +22,12 @@ import { formatDate } from '../../util'
 import { parseISO } from 'date-fns'
 import FileSaver from 'file-saver'
 import { ROUTE } from '../routing'
+import {
+	DaqPlotDataPoint,
+	DaqPlotDataSeries,
+	DaqPlotYAxis,
+} from '../../ui/daq-plot/types'
+import { DaqPlotConfig } from '../../ui/daq-plot/types'
 
 export interface Channel {
 	backend: string
@@ -602,6 +608,11 @@ export namespace plotSelectors {
 		[requestFinishedAt, error],
 		(finishedAt, error) => !!finishedAt && !error
 	)
+	export const plotSubTitle = createSelector(
+		[requestFinishedAt],
+		requestFinishedAt =>
+			requestFinishedAt ? `Data retrieved ${formatDate(requestFinishedAt)}` : ''
+	)
 
 	export const channelsWithoutData = createSelector([response], response =>
 		response
@@ -611,7 +622,7 @@ export namespace plotSelectors {
 
 	export const yAxes = createSelector([getState], state => state.yAxes)
 
-	export const dataSeriesConfig = createSelector(
+	export const dataSeriesConfigs = createSelector(
 		[getState],
 		state => state.dataSeries
 	)
@@ -640,6 +651,58 @@ export namespace plotSelectors {
 					data,
 				}
 			})
+	)
+
+	export const daqPlotYAxes = createSelector([yAxes], yAxes =>
+		yAxes.map(
+			y =>
+				({
+					title: y.title,
+					type: y.type,
+					side: y.side,
+					min: y.min,
+					max: y.max,
+					unit: y.unit,
+				} as DaqPlotYAxis)
+		)
+	)
+
+	export const daqPlotDataSeries = createSelector(
+		[channels, response, dataSeriesConfigs],
+		(channels, response, dataSeriesConfigs) => {
+			const result: DaqPlotDataSeries[] = []
+			for (let i = 0; i < channels.length; i++) {
+				const responseIndex = response.findIndex(
+					item => channelToId(item.channel) === channelToId(channels[i])
+				)
+				const s: DaqPlotDataSeries = {
+					name: dataSeriesConfigs[i].name,
+					yAxis: dataSeriesConfigs[i].yAxisIndex,
+					data:
+						responseIndex < 0
+							? []
+							: response[responseIndex].data.map(item => ({
+									x: item.globalMillis as number,
+									min: (item.value as AggregationResult).min as number,
+									max: (item.value as AggregationResult).max as number,
+									mean: (item.value as AggregationResult).mean as number,
+									binSize: item.eventCount as number,
+							  })),
+				}
+				result.push(s)
+			}
+			return result
+		}
+	)
+
+	export const daqPlotConfig = createSelector(
+		[plotTitle, plotSubTitle, daqPlotYAxes, daqPlotDataSeries],
+		(title, subtitle, yAxes, series) => ({
+			title,
+			subtitle,
+			yAxes,
+			series,
+		})
 	)
 
 	export const highchartsYAxes = createSelector(
@@ -673,7 +736,7 @@ export namespace plotSelectors {
 	)
 
 	export const highchartsDataSeries = createSelector(
-		[plotVariation, dataSeriesConfig, dataPoints],
+		[plotVariation, dataSeriesConfigs, dataPoints],
 		(plotVariation, dataSeriesConfig, dataPoints) => {
 			const result = []
 			for (const cfg of dataSeriesConfig) {
@@ -727,11 +790,9 @@ export namespace plotSelectors {
 	}))
 
 	export const highchartsSubTitle = createSelector(
-		[requestFinishedAt],
-		requestFinishedAt => ({
-			text: requestFinishedAt
-				? `Data retrieved ${formatDate(requestFinishedAt)}`
-				: '',
+		[plotSubTitle],
+		plotSubTitle => ({
+			text: plotSubTitle,
 		})
 	)
 
@@ -775,7 +836,7 @@ export namespace plotSelectors {
 
 	export const dialogShareLinkUrl = createSelector(
 		[
-			dataSeriesConfig,
+			dataSeriesConfigs,
 			dialogShareLinkAbsoluteTimes,
 			channels,
 			startTime,

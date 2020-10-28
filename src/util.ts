@@ -29,3 +29,14 @@ export function omitFromArray<T>(arr: T[], index: number) {
 	if (index < 0) index = index + arr.length
 	return [...arr.slice(0, index), ...arr.slice(index + 1)]
 }
+
+/**
+ * Check, if an object is empty, i.e. contains any keys.
+ *
+ * @param obj the object to check
+ */
+export function isEmptyObj(obj: Record<string, unknown>) {
+	// implementation kudos to https://stackoverflow.com/a/59787784/4320236
+	for (const _ in obj) return false
+	return true
+}
