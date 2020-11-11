@@ -38,6 +38,8 @@ export function initChart(container: HTMLElement) {
 		xAxis: {
 			type: 'datetime',
 			crosshair: true,
+			startOnTick: false,
+			endOnTick: false,
 		},
 		time: {
 			useUTC: false,

@@ -15,7 +15,7 @@ import {
 	yAxis2HighchartsYAxisOptions,
 } from './highcharts'
 import { baseStyles } from '../shared-styles'
-import { DaqPlotYAxis, DaqPlotDataSeries } from './types'
+import { DaqPlotYAxis, DaqPlotDataSeries, DaqPlotDataPoint } from './types'
 
 //#region Highcharts manipulations
 
@@ -104,6 +104,27 @@ function highlightPoint(p: Highcharts.Point, event: MouseEvent) {
 	p.series.chart.xAxis[0].drawCrosshair(ptrEvent, p) // Show the crosshair
 }
 
+// taken from the Highcharts demo and adapted
+const syncExtremes: Highcharts.AxisSetExtremesEventCallbackFunction = function (
+	this: Highcharts.Axis,
+	e: Highcharts.AxisSetExtremesEventObject
+) {
+	// prevent feedback loop
+	if (e.trigger === 'syncExtremes') return
+
+	for (const chart of Highcharts.charts as Highcharts.Chart[]) {
+		// skip the axis that triggered the synchronisation
+		if (chart === this.chart) continue
+
+		// setExtremes is null while updating
+		if (chart.xAxis[0].setExtremes === null) continue
+
+		chart.xAxis[0].setExtremes(e.min, e.max, undefined, false, {
+			trigger: 'syncExtremes',
+		})
+	}
+}
+
 declare global {
 	interface HTMLElementTagNameMap {
 		'daq-plot-separate-plots': DaqPlotSeparatePlotsElement
@@ -142,6 +163,7 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 	}
 
 	updated(changedProperties: PropertyValues) {
+		let needsRefitXAxes = false
 		const opts: Highcharts.Options[] = []
 		const currentCount = this.yAxes.length
 		if (changedProperties.has('yAxes') || changedProperties.has('series')) {
@@ -166,6 +188,7 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 				}
 				opts.push(o)
 			}
+			needsRefitXAxes = true
 		}
 		if (currentCount !== this.previousCount) {
 			// re-create all charts
@@ -175,6 +198,7 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 				const container = document.createElement('div')
 				this.chartgroupDiv.appendChild(container)
 				const chart = initChart(container)
+				Highcharts.addEvent(chart.xAxis[0], 'setExtremes', syncExtremes)
 				this.charts.push(chart)
 			}
 			this.updateComplete.then(() => {
@@ -182,7 +206,10 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 					c.reflow()
 				}
 			})
+			needsRefitXAxes = true
+			this.previousCount = currentCount
 		}
+		if (needsRefitXAxes) this.refitXAxes()
 		if (opts.length > 0) {
 			for (let i = 0; i < currentCount; i++) {
 				const chart = this.charts[i]
@@ -199,6 +226,41 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 					c.reflow()
 				}
 			})
+		}
+	}
+
+	/**
+	 * scale all X axes according to the data in the series
+	 */
+	private refitXAxes() {
+		function extractMinMax(dataPoints: DaqPlotDataPoint[]) {
+			const xValues = dataPoints.map(p => p.x)
+			let min = xValues[0]
+			let max = min
+			for (const x of xValues) {
+				if (x < min) min = x
+				if (x > max) max = x
+			}
+			return { min, max }
+		}
+		if (this.series.length === 0) return
+		let firstSeriesWithData
+		for (const s of this.series) {
+			if (s.data.length === 0) continue
+			firstSeriesWithData = s
+			break
+		}
+		if (firstSeriesWithData === undefined) return
+		let { min, max } = extractMinMax(firstSeriesWithData.data)
+		for (const s of this.series) {
+			if (s === firstSeriesWithData) continue
+			if (s.data.length === 0) continue
+			const m = extractMinMax(s.data)
+			if (m.min < min) min = m.min
+			if (m.max > max) max = m.max
+		}
+		for (const chart of this.charts) {
+			chart.xAxis[0].setExtremes(min, max)
 		}
 	}
 
