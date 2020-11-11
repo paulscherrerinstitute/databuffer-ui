@@ -754,6 +754,28 @@ describe('plot model', () => {
 			expect(plotSelectors.plotTitle(state2)).to.equal('Hello, world!')
 		})
 
+		it('retrieves plotSubTitle', () => {
+			const state1: AppState = {
+				...state,
+				plot: {
+					...state.plot,
+					request: { ...state.plot.request, finishedAt: undefined },
+				},
+			}
+			const ts = Date.now()
+			const state2: AppState = {
+				...state,
+				plot: {
+					...state.plot,
+					request: { ...state.plot.request, finishedAt: ts },
+				},
+			}
+			expect(plotSelectors.plotSubTitle(state1)).to.equal('')
+			expect(plotSelectors.plotSubTitle(state2)).to.equal(
+				`Data retrieved ${formatDate(ts)}`
+			)
+		})
+
 		it('retrieves startTime', () => {
 			const state1 = {
 				...state,
@@ -1174,441 +1196,441 @@ describe('plot model', () => {
 			])
 		})
 
-		describe('retrieves highchartsYAxes', () => {
-			let state: AppState
+		// describe('retrieves highchartsYAxes', () => {
+		// 	let state: AppState
 
-			beforeEach(() => {
-				state = {
-					...store.state,
-					plot: {
-						...store.state.plot,
-						yAxes: [
-							{
-								title: 'a',
-								unit: 'mA',
-								side: 'left',
-								min: null,
-								max: null,
-								type: 'linear',
-							},
-							{
-								title: 'b',
-								unit: '', // just a number, no unit
-								side: 'right',
-								min: 3,
-								max: 7,
-								type: 'logarithmic',
-							},
-						],
-					},
-				}
-			})
+		// 	beforeEach(() => {
+		// 		state = {
+		// 			...store.state,
+		// 			plot: {
+		// 				...store.state.plot,
+		// 				yAxes: [
+		// 					{
+		// 						title: 'a',
+		// 						unit: 'mA',
+		// 						side: 'left',
+		// 						min: null,
+		// 						max: null,
+		// 						type: 'linear',
+		// 					},
+		// 					{
+		// 						title: 'b',
+		// 						unit: '', // just a number, no unit
+		// 						side: 'right',
+		// 						min: 3,
+		// 						max: 7,
+		// 						type: 'logarithmic',
+		// 					},
+		// 				],
+		// 			},
+		// 		}
+		// 	})
 
-			it('returns empty array when there are no axes', () => {
-				const state1 = {
-					...state,
-					plot: { ...state.plot, yAxes: [] },
-				}
-				expect(plotSelectors.highchartsYAxes(state1)).to.deep.equal([])
-			})
+		// 	it('returns empty array when there are no axes', () => {
+		// 		const state1 = {
+		// 			...state,
+		// 			plot: { ...state.plot, yAxes: [] },
+		// 		}
+		// 		expect(plotSelectors.highchartsYAxes(state1)).to.deep.equal([])
+		// 	})
 
-			it('returns one axis per channel for PlotVariation.SeparateAxes', () => {
-				const state1 = {
-					...state,
-					plot: { ...state.plot, plotVariation: PlotVariation.SeparateAxes },
-				}
-				expect(plotSelectors.highchartsYAxes(state1))
-					.to.be.an('array')
-					.with.length(2)
-			})
+		// 	it('returns one axis per channel for PlotVariation.SeparateAxes', () => {
+		// 		const state1 = {
+		// 			...state,
+		// 			plot: { ...state.plot, plotVariation: PlotVariation.SeparateAxes },
+		// 		}
+		// 		expect(plotSelectors.highchartsYAxes(state1))
+		// 			.to.be.an('array')
+		// 			.with.length(2)
+		// 	})
 
-			it('returns one axis per channel for PlotVariation.SeparatePlots', () => {
-				const state1 = {
-					...state,
-					plot: { ...state.plot, plotVariation: PlotVariation.SeparatePlots },
-				}
-				expect(plotSelectors.highchartsYAxes(state1))
-					.to.be.an('array')
-					.with.length(2)
-			})
+		// 	it('returns one axis per channel for PlotVariation.SeparatePlots', () => {
+		// 		const state1 = {
+		// 			...state,
+		// 			plot: { ...state.plot, plotVariation: PlotVariation.SeparatePlots },
+		// 		}
+		// 		expect(plotSelectors.highchartsYAxes(state1))
+		// 			.to.be.an('array')
+		// 			.with.length(2)
+		// 	})
 
-			it('returns exactly one axis for PlotVariation.SingleAxis', () => {
-				const state1 = {
-					...state,
-					plot: { ...state.plot, plotVariation: PlotVariation.SingleAxis },
-				}
-				expect(plotSelectors.highchartsYAxes(state1))
-					.to.be.an('array')
-					.with.length(1)
-			})
+		// 	it('returns exactly one axis for PlotVariation.SingleAxis', () => {
+		// 		const state1 = {
+		// 			...state,
+		// 			plot: { ...state.plot, plotVariation: PlotVariation.SingleAxis },
+		// 		}
+		// 		expect(plotSelectors.highchartsYAxes(state1))
+		// 			.to.be.an('array')
+		// 			.with.length(1)
+		// 	})
 
-			it('puts the unit into the label', () => {
-				expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
-					'[0].labels.format',
-					`{value} ${state.plot.yAxes[0].unit}`
-				)
-				expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
-					'[1].labels.format',
-					`{value}`
-				)
-			})
+		// 	it('puts the unit into the label', () => {
+		// 		expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
+		// 			'[0].labels.format',
+		// 			`{value} ${state.plot.yAxes[0].unit}`
+		// 		)
+		// 		expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
+		// 			'[1].labels.format',
+		// 			`{value}`
+		// 		)
+		// 	})
 
-			it('puts the title into the title text', () => {
-				expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
-					'[0].title.text',
-					state.plot.yAxes[0].title
-				)
-				expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
-					'[1].title.text',
-					state.plot.yAxes[1].title
-				)
-			})
+		// 	it('puts the title into the title text', () => {
+		// 		expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
+		// 			'[0].title.text',
+		// 			state.plot.yAxes[0].title
+		// 		)
+		// 		expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
+		// 			'[1].title.text',
+		// 			state.plot.yAxes[1].title
+		// 		)
+		// 	})
 
-			it('maps the side correctly', () => {
-				expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
-					'[0].opposite',
-					false
-				)
-				expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
-					'[1].opposite',
-					true
-				)
-			})
+		// 	it('maps the side correctly', () => {
+		// 		expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
+		// 			'[0].opposite',
+		// 			false
+		// 		)
+		// 		expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
+		// 			'[1].opposite',
+		// 			true
+		// 		)
+		// 	})
 
-			it('matches the colors of labels and title', () => {
-				const labelColors = plotSelectors
-					.highchartsYAxes(state)
-					.map(x => x.labels?.style?.color)
-				expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
-					'[0].title.style.color',
-					labelColors[0]
-				)
-				expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
-					'[1].title.style.color',
-					labelColors[1]
-				)
-			})
+		// 	it('matches the colors of labels and title', () => {
+		// 		const labelColors = plotSelectors
+		// 			.highchartsYAxes(state)
+		// 			.map(x => x.labels?.style?.color)
+		// 		expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
+		// 			'[0].title.style.color',
+		// 			labelColors[0]
+		// 		)
+		// 		expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
+		// 			'[1].title.style.color',
+		// 			labelColors[1]
+		// 		)
+		// 	})
 
-			it('sets min correctly', () => {
-				expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
-					'[0].min',
-					null
-				)
-				expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
-					'[1].min',
-					3
-				)
-			})
+		// 	it('sets min correctly', () => {
+		// 		expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
+		// 			'[0].min',
+		// 			null
+		// 		)
+		// 		expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
+		// 			'[1].min',
+		// 			3
+		// 		)
+		// 	})
 
-			it('sets max correctly', () => {
-				expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
-					'[0].max',
-					null
-				)
-				expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
-					'[1].max',
-					7
-				)
-			})
+		// 	it('sets max correctly', () => {
+		// 		expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
+		// 			'[0].max',
+		// 			null
+		// 		)
+		// 		expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
+		// 			'[1].max',
+		// 			7
+		// 		)
+		// 	})
 
-			it('sets type correctly', () => {
-				expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
-					'[0].type',
-					'linear'
-				)
-				expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
-					'[1].type',
-					'logarithmic'
-				)
-			})
-		})
+		// 	it('sets type correctly', () => {
+		// 		expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
+		// 			'[0].type',
+		// 			'linear'
+		// 		)
+		// 		expect(plotSelectors.highchartsYAxes(state)).to.have.nested.property(
+		// 			'[1].type',
+		// 			'logarithmic'
+		// 		)
+		// 	})
+		// })
 
-		describe('it retrieves highchartsDataSeries', () => {
-			let state: AppState
+		// describe('it retrieves highchartsDataSeries', () => {
+		// 	let state: AppState
 
-			beforeEach(() => {
-				state = {
-					...store.state,
-					plot: {
-						...store.state.plot,
-						channels: EXAMPLE_CHANNELS,
-						response: EXAMPLE_RESPONSE,
-						dataSeries: [
-							{
-								name: 'a',
-								channelIndex: 0,
-								yAxisIndex: 0,
-							},
-							{
-								name: 'b',
-								channelIndex: 1,
-								yAxisIndex: 1,
-							},
-						] as DataSeries[],
-					},
-				}
-			})
+		// 	beforeEach(() => {
+		// 		state = {
+		// 			...store.state,
+		// 			plot: {
+		// 				...store.state.plot,
+		// 				channels: EXAMPLE_CHANNELS,
+		// 				response: EXAMPLE_RESPONSE,
+		// 				dataSeries: [
+		// 					{
+		// 						name: 'a',
+		// 						channelIndex: 0,
+		// 						yAxisIndex: 0,
+		// 					},
+		// 					{
+		// 						name: 'b',
+		// 						channelIndex: 1,
+		// 						yAxisIndex: 1,
+		// 					},
+		// 				] as DataSeries[],
+		// 			},
+		// 		}
+		// 	})
 
-			it('returns empty array when there are no data series', () => {
-				const state1 = {
-					...state,
-					plot: { ...state.plot, dataSeries: [] },
-				}
-				expect(plotSelectors.highchartsDataSeries(state1)).to.deep.equal([])
-			})
+		// 	it('returns empty array when there are no data series', () => {
+		// 		const state1 = {
+		// 			...state,
+		// 			plot: { ...state.plot, dataSeries: [] },
+		// 		}
+		// 		expect(plotSelectors.highchartsDataSeries(state1)).to.deep.equal([])
+		// 	})
 
-			it('returns correct size array', () => {
-				// there are two channels and hence data series
-				// response[0] is not binned (eventCount = 1), but response[1] is binned
-				// this creates an additional data series **for the plot** to add an
-				// area plot of min/max to the background
-				expect(plotSelectors.highchartsDataSeries(state))
-					.to.be.an('array')
-					.with.length(3)
-			})
+		// 	it('returns correct size array', () => {
+		// 		// there are two channels and hence data series
+		// 		// response[0] is not binned (eventCount = 1), but response[1] is binned
+		// 		// this creates an additional data series **for the plot** to add an
+		// 		// area plot of min/max to the background
+		// 		expect(plotSelectors.highchartsDataSeries(state))
+		// 			.to.be.an('array')
+		// 			.with.length(3)
+		// 	})
 
-			it('sets data correctly', () => {
-				expect(
-					plotSelectors.highchartsDataSeries(state)
-				).to.have.deep.nested.property('[0].data[0]', {
-					eventCount: EXAMPLE_RESPONSE[0].data[0].eventCount,
-					x: EXAMPLE_RESPONSE[0].data[0].globalMillis,
-					y: (EXAMPLE_RESPONSE[0].data[0].value as AggregationResult).mean,
-				})
-				expect(
-					plotSelectors.highchartsDataSeries(state)
-				).to.have.deep.nested.property('[1].data[0]', {
-					eventCount: EXAMPLE_RESPONSE[1].data[0].eventCount,
-					x: EXAMPLE_RESPONSE[1].data[0].globalMillis,
-					y: (EXAMPLE_RESPONSE[1].data[0].value as AggregationResult).mean,
-					max: (EXAMPLE_RESPONSE[1].data[0].value as AggregationResult).max,
-					mean: (EXAMPLE_RESPONSE[1].data[0].value as AggregationResult).mean,
-					min: (EXAMPLE_RESPONSE[1].data[0].value as AggregationResult).min,
-				})
-			})
+		// 	it('sets data correctly', () => {
+		// 		expect(
+		// 			plotSelectors.highchartsDataSeries(state)
+		// 		).to.have.deep.nested.property('[0].data[0]', {
+		// 			eventCount: EXAMPLE_RESPONSE[0].data[0].eventCount,
+		// 			x: EXAMPLE_RESPONSE[0].data[0].globalMillis,
+		// 			y: (EXAMPLE_RESPONSE[0].data[0].value as AggregationResult).mean,
+		// 		})
+		// 		expect(
+		// 			plotSelectors.highchartsDataSeries(state)
+		// 		).to.have.deep.nested.property('[1].data[0]', {
+		// 			eventCount: EXAMPLE_RESPONSE[1].data[0].eventCount,
+		// 			x: EXAMPLE_RESPONSE[1].data[0].globalMillis,
+		// 			y: (EXAMPLE_RESPONSE[1].data[0].value as AggregationResult).mean,
+		// 			max: (EXAMPLE_RESPONSE[1].data[0].value as AggregationResult).max,
+		// 			mean: (EXAMPLE_RESPONSE[1].data[0].value as AggregationResult).mean,
+		// 			min: (EXAMPLE_RESPONSE[1].data[0].value as AggregationResult).min,
+		// 		})
+		// 	})
 
-			it('sets name of data series', () => {
-				expect(
-					plotSelectors.highchartsDataSeries(state)
-				).to.have.nested.property('[0].name', 'a')
-				expect(
-					plotSelectors.highchartsDataSeries(state)
-				).to.have.nested.property('[1].name', 'b')
-			})
+		// 	it('sets name of data series', () => {
+		// 		expect(
+		// 			plotSelectors.highchartsDataSeries(state)
+		// 		).to.have.nested.property('[0].name', 'a')
+		// 		expect(
+		// 			plotSelectors.highchartsDataSeries(state)
+		// 		).to.have.nested.property('[1].name', 'b')
+		// 	})
 
-			it('sets step to left', () => {
-				expect(
-					plotSelectors.highchartsDataSeries(state)
-				).to.have.nested.property('[0].step', 'left')
-				expect(
-					plotSelectors.highchartsDataSeries(state)
-				).to.have.nested.property('[1].step', 'left')
-			})
+		// 	it('sets step to left', () => {
+		// 		expect(
+		// 			plotSelectors.highchartsDataSeries(state)
+		// 		).to.have.nested.property('[0].step', 'left')
+		// 		expect(
+		// 			plotSelectors.highchartsDataSeries(state)
+		// 		).to.have.nested.property('[1].step', 'left')
+		// 	})
 
-			it('sets tooltip', () => {
-				// non-aggregated value point
-				expect(plotSelectors.highchartsDataSeries(state))
-					.to.have.nested.property('[0].tooltip.pointFormat')
-					.include('{point.y}')
-				// aggregated data point
-				expect(plotSelectors.highchartsDataSeries(state))
-					.to.have.nested.property('[1].tooltip.pointFormat')
-					.include('{point.min}')
-					.include('{point.mean}')
-					.include('{point.max}')
-					.and.not.include('{point.y}')
-			})
+		// 	it('sets tooltip', () => {
+		// 		// non-aggregated value point
+		// 		expect(plotSelectors.highchartsDataSeries(state))
+		// 			.to.have.nested.property('[0].tooltip.pointFormat')
+		// 			.include('{point.y}')
+		// 		// aggregated data point
+		// 		expect(plotSelectors.highchartsDataSeries(state))
+		// 			.to.have.nested.property('[1].tooltip.pointFormat')
+		// 			.include('{point.min}')
+		// 			.include('{point.mean}')
+		// 			.include('{point.max}')
+		// 			.and.not.include('{point.y}')
+		// 	})
 
-			it('sets type to line', () => {
-				expect(
-					plotSelectors.highchartsDataSeries(state)
-				).to.have.nested.property('[0].type', 'line')
-				expect(
-					plotSelectors.highchartsDataSeries(state)
-				).to.have.nested.property('[1].type', 'line')
-			})
+		// 	it('sets type to line', () => {
+		// 		expect(
+		// 			plotSelectors.highchartsDataSeries(state)
+		// 		).to.have.nested.property('[0].type', 'line')
+		// 		expect(
+		// 			plotSelectors.highchartsDataSeries(state)
+		// 		).to.have.nested.property('[1].type', 'line')
+		// 	})
 
-			it('sets yAxis index for PlotVariation.SeparateAxes', () => {
-				const state1 = {
-					...state,
-					plot: { ...state.plot, plotVariation: PlotVariation.SeparateAxes },
-				}
-				expect(
-					plotSelectors.highchartsDataSeries(state1)
-				).to.have.nested.property('[0].yAxis', 0)
-				expect(
-					plotSelectors.highchartsDataSeries(state1)
-				).to.have.nested.property('[1].yAxis', 1)
-			})
+		// 	it('sets yAxis index for PlotVariation.SeparateAxes', () => {
+		// 		const state1 = {
+		// 			...state,
+		// 			plot: { ...state.plot, plotVariation: PlotVariation.SeparateAxes },
+		// 		}
+		// 		expect(
+		// 			plotSelectors.highchartsDataSeries(state1)
+		// 		).to.have.nested.property('[0].yAxis', 0)
+		// 		expect(
+		// 			plotSelectors.highchartsDataSeries(state1)
+		// 		).to.have.nested.property('[1].yAxis', 1)
+		// 	})
 
-			it('sets yAxis index for PlotVariation.SeparatePlots', () => {
-				const state1 = {
-					...state,
-					plot: { ...state.plot, plotVariation: PlotVariation.SeparatePlots },
-				}
-				expect(
-					plotSelectors.highchartsDataSeries(state1)
-				).to.have.nested.property('[0].yAxis', 0)
-				expect(
-					plotSelectors.highchartsDataSeries(state1)
-				).to.have.nested.property('[1].yAxis', 0)
-			})
+		// 	it('sets yAxis index for PlotVariation.SeparatePlots', () => {
+		// 		const state1 = {
+		// 			...state,
+		// 			plot: { ...state.plot, plotVariation: PlotVariation.SeparatePlots },
+		// 		}
+		// 		expect(
+		// 			plotSelectors.highchartsDataSeries(state1)
+		// 		).to.have.nested.property('[0].yAxis', 0)
+		// 		expect(
+		// 			plotSelectors.highchartsDataSeries(state1)
+		// 		).to.have.nested.property('[1].yAxis', 0)
+		// 	})
 
-			it('sets yAxis index for PlotVariation.SingleAxis', () => {
-				const state1 = {
-					...state,
-					plot: { ...state.plot, plotVariation: PlotVariation.SingleAxis },
-				}
-				expect(
-					plotSelectors.highchartsDataSeries(state1)
-				).to.have.nested.property('[0].yAxis', 0)
-				expect(
-					plotSelectors.highchartsDataSeries(state1)
-				).to.have.nested.property('[1].yAxis', 0)
-			})
-		})
+		// 	it('sets yAxis index for PlotVariation.SingleAxis', () => {
+		// 		const state1 = {
+		// 			...state,
+		// 			plot: { ...state.plot, plotVariation: PlotVariation.SingleAxis },
+		// 		}
+		// 		expect(
+		// 			plotSelectors.highchartsDataSeries(state1)
+		// 		).to.have.nested.property('[0].yAxis', 0)
+		// 		expect(
+		// 			plotSelectors.highchartsDataSeries(state1)
+		// 		).to.have.nested.property('[1].yAxis', 0)
+		// 	})
+		// })
 
-		describe('it retrieves highchartsTitle', () => {
-			it('uses plotTitle selector', () => {
-				const state1 = {
-					...state,
-					plot: {
-						...state.plot,
-						channels: EXAMPLE_CHANNELS,
-						response: EXAMPLE_RESPONSE,
-						plotTitle: 'example plot',
-					},
-				}
-				const expected = { text: plotSelectors.plotTitle(state1) }
-				expect(plotSelectors.highchartsTitle(state1)).to.deep.equal(expected)
-			})
-		})
+		// describe('it retrieves highchartsTitle', () => {
+		// 	it('uses plotTitle selector', () => {
+		// 		const state1 = {
+		// 			...state,
+		// 			plot: {
+		// 				...state.plot,
+		// 				channels: EXAMPLE_CHANNELS,
+		// 				response: EXAMPLE_RESPONSE,
+		// 				plotTitle: 'example plot',
+		// 			},
+		// 		}
+		// 		const expected = { text: plotSelectors.plotTitle(state1) }
+		// 		expect(plotSelectors.highchartsTitle(state1)).to.deep.equal(expected)
+		// 	})
+		// })
 
-		describe('it retrieves highchartsSubTitle', () => {
-			let state: AppState
+		// describe('it retrieves highchartsSubTitle', () => {
+		// 	let state: AppState
 
-			beforeEach(() => {
-				state = {
-					...store.state,
-					plot: {
-						...store.state.plot,
-						channels: EXAMPLE_CHANNELS,
-						response: EXAMPLE_RESPONSE,
-						request: {
-							sentAt: 1590153856725,
-							finishedAt: 1590153857725,
-						},
-					},
-				}
-			})
+		// 	beforeEach(() => {
+		// 		state = {
+		// 			...store.state,
+		// 			plot: {
+		// 				...store.state.plot,
+		// 				channels: EXAMPLE_CHANNELS,
+		// 				response: EXAMPLE_RESPONSE,
+		// 				request: {
+		// 					sentAt: 1590153856725,
+		// 					finishedAt: 1590153857725,
+		// 				},
+		// 			},
+		// 		}
+		// 	})
 
-			it('uses requestFinishedAt selector', () => {
-				const expected = {
-					text:
-						'Data retrieved ' +
-						formatDate(plotSelectors.requestFinishedAt(state)!),
-				}
-				expect(plotSelectors.highchartsSubTitle(state)).to.deep.equal(expected)
-			})
+		// 	it('uses requestFinishedAt selector', () => {
+		// 		const expected = {
+		// 			text:
+		// 				'Data retrieved ' +
+		// 				formatDate(plotSelectors.requestFinishedAt(state)!),
+		// 		}
+		// 		expect(plotSelectors.highchartsSubTitle(state)).to.deep.equal(expected)
+		// 	})
 
-			it('is empty, when request is not finished yet', () => {
-				const state1 = { ...state }
-				state1.plot.request.finishedAt = undefined
-				const expected = { text: '' }
-				expect(plotSelectors.highchartsSubTitle(state1)).to.deep.equal(expected)
-			})
-		})
+		// 	it('is empty, when request is not finished yet', () => {
+		// 		const state1 = { ...state }
+		// 		state1.plot.request.finishedAt = undefined
+		// 		const expected = { text: '' }
+		// 		expect(plotSelectors.highchartsSubTitle(state1)).to.deep.equal(expected)
+		// 	})
+		// })
 
-		describe('it retrieves highchartsOptions', () => {
-			let state: AppState
-			beforeEach(() => {
-				state = {
-					...store.state,
-					plot: {
-						...store.state.plot,
-						channels: EXAMPLE_CHANNELS,
-						response: EXAMPLE_RESPONSE,
-						plotTitle: 'Hello',
-						yAxes: [
-							{
-								title: 'Axis 1',
-								unit: 'mA',
-								side: 'left',
-								min: null,
-								max: null,
-								type: 'linear',
-							},
-							{
-								title: 'Axis 2',
-								unit: 'V',
-								side: 'right',
-								min: null,
-								max: null,
-								type: 'linear',
-							},
-						],
-						dataSeries: [
-							{
-								name: 'series 1',
-								channelIndex: 0,
-								yAxisIndex: 0,
-							},
-							{
-								name: 'series 2',
-								channelIndex: 1,
-								yAxisIndex: 1,
-							},
-						],
-					},
-				}
-			})
+		// describe('it retrieves highchartsOptions', () => {
+		// 	let state: AppState
+		// 	beforeEach(() => {
+		// 		state = {
+		// 			...store.state,
+		// 			plot: {
+		// 				...store.state.plot,
+		// 				channels: EXAMPLE_CHANNELS,
+		// 				response: EXAMPLE_RESPONSE,
+		// 				plotTitle: 'Hello',
+		// 				yAxes: [
+		// 					{
+		// 						title: 'Axis 1',
+		// 						unit: 'mA',
+		// 						side: 'left',
+		// 						min: null,
+		// 						max: null,
+		// 						type: 'linear',
+		// 					},
+		// 					{
+		// 						title: 'Axis 2',
+		// 						unit: 'V',
+		// 						side: 'right',
+		// 						min: null,
+		// 						max: null,
+		// 						type: 'linear',
+		// 					},
+		// 				],
+		// 				dataSeries: [
+		// 					{
+		// 						name: 'series 1',
+		// 						channelIndex: 0,
+		// 						yAxisIndex: 0,
+		// 					},
+		// 					{
+		// 						name: 'series 2',
+		// 						channelIndex: 1,
+		// 						yAxisIndex: 1,
+		// 					},
+		// 				],
+		// 			},
+		// 		}
+		// 	})
 
-			it('returns empty configuration when there are is no data', () => {
-				const state1 = {
-					...store.state,
-					plot: { ...store.state.plot, yAxes: [], dataSeries: [] },
-				}
-				const options = plotSelectors.highchartsOptions(state1)
-				expect(options).to.have.nested.property('title.text', '')
-				expect(options).to.have.nested.property('subtitle.text', '')
-				expect(options)
-					.to.have.nested.property('yAxis')
-					.to.be.an('array')
-					.of.length(0)
-				expect(options)
-					.to.have.nested.property('series')
-					.to.be.an('array')
-					.of.length(0)
-			})
+		// 	it('returns empty configuration when there are is no data', () => {
+		// 		const state1 = {
+		// 			...store.state,
+		// 			plot: { ...store.state.plot, yAxes: [], dataSeries: [] },
+		// 		}
+		// 		const options = plotSelectors.highchartsOptions(state1)
+		// 		expect(options).to.have.nested.property('title.text', '')
+		// 		expect(options).to.have.nested.property('subtitle.text', '')
+		// 		expect(options)
+		// 			.to.have.nested.property('yAxis')
+		// 			.to.be.an('array')
+		// 			.of.length(0)
+		// 		expect(options)
+		// 			.to.have.nested.property('series')
+		// 			.to.be.an('array')
+		// 			.of.length(0)
+		// 	})
 
-			it('uses title from other selectors', () => {
-				const expected = plotSelectors.highchartsTitle(state)
-				expect(plotSelectors.highchartsOptions(state).title).to.deep.equal(
-					expected
-				)
-			})
+		// 	it('uses title from other selectors', () => {
+		// 		const expected = plotSelectors.highchartsTitle(state)
+		// 		expect(plotSelectors.highchartsOptions(state).title).to.deep.equal(
+		// 			expected
+		// 		)
+		// 	})
 
-			it('uses subtitle from other selectors', () => {
-				const expected = plotSelectors.highchartsSubTitle(state)
-				expect(plotSelectors.highchartsOptions(state).subtitle).to.deep.equal(
-					expected
-				)
-			})
+		// 	it('uses subtitle from other selectors', () => {
+		// 		const expected = plotSelectors.highchartsSubTitle(state)
+		// 		expect(plotSelectors.highchartsOptions(state).subtitle).to.deep.equal(
+		// 			expected
+		// 		)
+		// 	})
 
-			it('uses series from other selectors', () => {
-				const expected = plotSelectors.highchartsDataSeries(state)
-				expect(plotSelectors.highchartsOptions(state).series).to.deep.equal(
-					expected
-				)
-			})
+		// 	it('uses series from other selectors', () => {
+		// 		const expected = plotSelectors.highchartsDataSeries(state)
+		// 		expect(plotSelectors.highchartsOptions(state).series).to.deep.equal(
+		// 			expected
+		// 		)
+		// 	})
 
-			it('uses yAxis from other selectors', () => {
-				const expected = plotSelectors.highchartsYAxes(state)
-				expect(plotSelectors.highchartsOptions(state).yAxis).to.deep.equal(
-					expected
-				)
-			})
-		})
+		// 	it('uses yAxis from other selectors', () => {
+		// 		const expected = plotSelectors.highchartsYAxes(state)
+		// 		expect(plotSelectors.highchartsOptions(state).yAxis).to.deep.equal(
+		// 			expected
+		// 		)
+		// 	})
+		// })
 
 		it('retrieves queryRangeShowing', () => {
 			const state1 = {

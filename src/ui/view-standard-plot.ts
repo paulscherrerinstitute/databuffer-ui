@@ -76,7 +76,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@property({ type: Boolean }) shouldDisplayChart!: boolean
 	@property({ type: Array }) channelsWithoutData: Channel[] = []
 	@property({ type: Boolean }) canPlot: boolean = false
-	@property({ attribute: false }) highchartsOptions!: Highcharts.Options
 	@property({ attribute: false }) queryRangeShowing: boolean = false
 	@property({ attribute: false }) dialogShareLinkShowing: boolean = false
 	@property({ attribute: false }) dialogShareLinkAbsoluteTimes: boolean = false
@@ -148,7 +147,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			endTime: plotSelectors.endTime(state),
 			fetching: plotSelectors.fetching(state),
 			response: plotSelectors.response(state),
-			highchartsOptions: plotSelectors.highchartsOptions(state),
 			requestDuration: plotSelectors.requestDuration(state),
 			requestFinishedAt: plotSelectors.requestFinishedAt(state),
 			shouldDisplayChart: plotSelectors.shouldDisplayChart(state),
@@ -205,9 +203,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	}
 
 	updated(changedProperties: PropertyValues): void {
-		// if (changedProperties.has('highchartsOptions')) {
-		// 	this.__chart.update(this.highchartsOptions, true, true)
-		// }
 		if (changedProperties.has('channelsWithoutData')) {
 			if (this.channelsWithoutData.length === this.channels.length) {
 				this.__snackNoData.show()
