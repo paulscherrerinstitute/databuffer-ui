@@ -25,3 +25,4 @@ Nobody is an expert on everything. So, in order to keep each part of the documen
 The reference material provides **detailed information** where appropriate. These are not ressources for learning, but for looking up, i.e. you'll find _what_ is there, and _where_ can you find it, but _not_ what you might want to use it for.
 
 - [URL parameters for `/preselect`](./reference/url_params_preselect.md)
+- [View: Plot Settings](./reference/view_plot_settings.md)

@@ -22,6 +22,12 @@ import { formatDate } from '../../util'
 import { parseISO } from 'date-fns'
 import FileSaver from 'file-saver'
 import { ROUTE } from '../routing'
+import {
+	DaqPlotDataPoint,
+	DaqPlotDataSeries,
+	DaqPlotYAxis,
+} from '../../ui/daq-plot/types'
+import { DaqPlotConfig } from '../../ui/daq-plot/types'
 
 export interface Channel {
 	backend: string
@@ -44,6 +50,9 @@ export enum PlotVariation {
 
 	/** 1 Y axis for each channel */
 	SeparateAxes = 'separate-axes',
+
+	/** 1 plot (with 1 Y axis) for each channel */
+	SeparatePlots = 'separate-plots',
 }
 
 /** DataSeries defines a data set to be plotted in the chart */
@@ -599,6 +608,11 @@ export namespace plotSelectors {
 		[requestFinishedAt, error],
 		(finishedAt, error) => !!finishedAt && !error
 	)
+	export const plotSubTitle = createSelector(
+		[requestFinishedAt],
+		requestFinishedAt =>
+			requestFinishedAt ? `Data retrieved ${formatDate(requestFinishedAt)}` : ''
+	)
 
 	export const channelsWithoutData = createSelector([response], response =>
 		response
@@ -608,7 +622,7 @@ export namespace plotSelectors {
 
 	export const yAxes = createSelector([getState], state => state.yAxes)
 
-	export const dataSeriesConfig = createSelector(
+	export const dataSeriesConfigs = createSelector(
 		[getState],
 		state => state.dataSeries
 	)
@@ -639,120 +653,56 @@ export namespace plotSelectors {
 			})
 	)
 
-	export const highchartsYAxes = createSelector(
-		[plotVariation, yAxes],
-		(plotVariation, yAxes) => {
-			const highchartsAxes = [...yAxes]
-			if (plotVariation === PlotVariation.SingleAxis) {
-				highchartsAxes.splice(1, highchartsAxes.length - 1)
-			}
-			return highchartsAxes.map(
-				(yaxis, idx) =>
-					({
-						labels: {
-							format: `{value}${yaxis.unit ? ' ' + yaxis.unit : ''}`,
-							style: { color: getColor(idx) },
-						},
-						title: {
-							text: yaxis.title,
-							style: { color: getColor(idx) },
-						},
-						opposite: yaxis.side !== 'left',
-						min: yaxis.min,
-						max: yaxis.max,
-						type: yaxis.type,
-						gridLineWidth: idx === 0 ? 1 : 0,
-						startOnTick: false,
-						endOnTick: false,
-					} as Highcharts.YAxisOptions)
-			)
-		}
+	export const daqPlotYAxes = createSelector([yAxes], yAxes =>
+		yAxes.map(
+			y =>
+				({
+					title: y.title,
+					type: y.type,
+					side: y.side,
+					min: y.min,
+					max: y.max,
+					unit: y.unit,
+				} as DaqPlotYAxis)
+		)
 	)
 
-	export const highchartsDataSeries = createSelector(
-		[plotVariation, dataSeriesConfig, dataPoints],
-		(plotVariation, dataSeriesConfig, dataPoints) => {
-			const result = []
-			for (const cfg of dataSeriesConfig) {
-				const series = {
-					name: cfg.name,
-					type: 'line',
-					step: 'left',
-					yAxis:
-						plotVariation === PlotVariation.SingleAxis ? 0 : cfg.yAxisIndex,
-					tooltip: {
-						pointFormat: dataPoints[cfg.channelIndex].needsBinning
-							? TOOLTIP_FORMAT_WITH_BINNING
-							: TOOLTIP_FORMAT_WITHOUT_BINNING,
-					},
-					data: dataPoints[cfg.channelIndex].data,
-					color: getColor(cfg.yAxisIndex),
-					zIndex: 1,
+	export const daqPlotDataSeries = createSelector(
+		[channels, response, dataSeriesConfigs],
+		(channels, response, dataSeriesConfigs) => {
+			const result: DaqPlotDataSeries[] = []
+			for (let i = 0; i < channels.length; i++) {
+				const responseIndex = response.findIndex(
+					item => channelToId(item.channel) === channelToId(channels[i])
+				)
+				const s: DaqPlotDataSeries = {
+					name: dataSeriesConfigs[i].name,
+					yAxis: dataSeriesConfigs[i].yAxisIndex,
+					data:
+						responseIndex < 0
+							? []
+							: response[responseIndex].data.map(item => ({
+									x: item.globalMillis as number,
+									min: (item.value as AggregationResult).min as number,
+									max: (item.value as AggregationResult).max as number,
+									mean: (item.value as AggregationResult).mean as number,
+									binSize: item.eventCount as number,
+							  })),
 				}
-				result.push(series)
-				if (dataPoints[cfg.channelIndex].needsBinning) {
-					const series = {
-						name: `${cfg.name} - min/max`,
-						enableMouseTracking: false,
-						type: 'arearange',
-						step: 'left',
-						yAxis:
-							plotVariation === PlotVariation.SingleAxis ? 0 : cfg.yAxisIndex,
-						tooltip: { enabled: false },
-						linkedTo: ':previous',
-						data: dataPoints[
-							cfg.channelIndex
-						].data.map((item: HighChartsDataPointWithBinning) => [
-							item.x,
-							item.min,
-							item.max,
-						]),
-						color: getColor(cfg.yAxisIndex),
-						fillOpacity: 0.3,
-						marker: { enabled: false },
-						zIndex: 0,
-					}
-					result.push(series)
-				}
+				result.push(s)
 			}
 			return result
 		}
 	)
 
-	export const highchartsTitle = createSelector([plotTitle], plotTitle => ({
-		text: plotTitle,
-	}))
-
-	export const highchartsSubTitle = createSelector(
-		[requestFinishedAt],
-		requestFinishedAt => ({
-			text: requestFinishedAt
-				? `Data retrieved ${formatDate(requestFinishedAt)}`
-				: '',
+	export const daqPlotConfig = createSelector(
+		[plotTitle, plotSubTitle, daqPlotYAxes, daqPlotDataSeries],
+		(title, subtitle, yAxes, series) => ({
+			title,
+			subtitle,
+			yAxes,
+			series,
 		})
-	)
-
-	export const highchartsOptions = createSelector(
-		[
-			highchartsYAxes,
-			highchartsDataSeries,
-			highchartsTitle,
-			highchartsSubTitle,
-		],
-		(yAxis, series, title, subtitle) =>
-			({
-				yAxis,
-				series,
-				title,
-				subtitle,
-				tooltip: {
-					useHTML: true,
-					valueDecimals: 4,
-					headerFormat:
-						'<span style="font-size: 10px">{point.key}</span><table><tr><td>Series</td><td>Bin size</td><td>min</td><td>mean</td><td>max</td></tr>',
-					footerFormat: '</table>',
-				} as Highcharts.TooltipOptions,
-			} as Highcharts.Options)
 	)
 
 	export const queryRangeShowing = createSelector(
@@ -772,7 +722,7 @@ export namespace plotSelectors {
 
 	export const dialogShareLinkUrl = createSelector(
 		[
-			dataSeriesConfig,
+			dataSeriesConfigs,
 			dialogShareLinkAbsoluteTimes,
 			channels,
 			startTime,

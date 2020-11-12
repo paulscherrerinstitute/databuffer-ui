@@ -29,19 +29,29 @@ import '@material/mwc-textfield'
 import { TextField } from '@material/mwc-textfield'
 import '@material/mwc-snackbar'
 import { Snackbar } from '@material/mwc-snackbar'
+import './daq-plot/daq-plot-separate-axes'
+import './daq-plot/daq-plot-separate-plots'
+import './daq-plot/daq-plot-single-axis'
 
 import { formatDate } from '../util'
 import { AppState, store } from '../state/store'
 import {
 	Channel,
+	DataSeries,
 	DownloadAggregation,
 	plotSelectors,
+	PlotVariation,
 } from '../state/models/plot'
 
 import * as datefns from 'date-fns'
 import type { DataResponse } from '../api/queryrest'
 import { baseStyles } from './shared-styles'
 import { connect } from '@captaincodeman/rdx'
+import type {
+	DaqPlotConfig,
+	DaqPlotDataSeries,
+	DaqPlotYAxis,
+} from './daq-plot/types'
 
 const TIMESTAMP_PATTERN = `^\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}\\.\\d{3}$`
 const TIMESTAMP_REGEX = new RegExp(TIMESTAMP_PATTERN)
@@ -66,7 +76,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@property({ type: Boolean }) shouldDisplayChart!: boolean
 	@property({ type: Array }) channelsWithoutData: Channel[] = []
 	@property({ type: Boolean }) canPlot: boolean = false
-	@property({ attribute: false }) highchartsOptions!: Highcharts.Options
 	@property({ attribute: false }) queryRangeShowing: boolean = false
 	@property({ attribute: false }) dialogShareLinkShowing: boolean = false
 	@property({ attribute: false }) dialogShareLinkAbsoluteTimes: boolean = false
@@ -76,6 +85,8 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@property({ attribute: false })
 	dialogDownloadShowing: boolean = false
 	@property({ attribute: false }) dialogDownloadAggregation!: string
+	@property({ attribute: false }) plotVariation!: PlotVariation
+	@property({ attribute: false }) daqPlotConfig!: DaqPlotConfig
 
 	private dialogDownloadCurlCommand = ''
 
@@ -136,7 +147,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			endTime: plotSelectors.endTime(state),
 			fetching: plotSelectors.fetching(state),
 			response: plotSelectors.response(state),
-			highchartsOptions: plotSelectors.highchartsOptions(state),
 			requestDuration: plotSelectors.requestDuration(state),
 			requestFinishedAt: plotSelectors.requestFinishedAt(state),
 			shouldDisplayChart: plotSelectors.shouldDisplayChart(state),
@@ -153,47 +163,46 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			dialogDownloadShowing: plotSelectors.dialogDownloadShowing(state),
 			dialogDownloadAggregation: plotSelectors.dialogDownloadAggregation(state),
 			dialogDownloadCurlCommand: plotSelectors.dialogDownloadCurlCommand(state),
+			plotVariation: plotSelectors.plotVariation(state),
+			daqPlotConfig: plotSelectors.daqPlotConfig(state),
 		}
 	}
 
 	firstUpdated() {
-		this.__chart = Highcharts.chart(this.__chartContainer, {
-			chart: {
-				type: 'line',
-				events: {
-					selection: (e: Highcharts.ChartSelectionContextObject): boolean => {
-						if (reloadOnZoom) {
-							this.__setTimeRange(e.xAxis[0].min, e.xAxis[0].max)
-							this.__plot()
-							return false
-						}
-						return true
-					},
-				},
-				panKey: 'shift',
-				panning: {
-					enabled: true,
-					type: 'xy',
-				},
-				zoomType: 'xy',
-			},
-			series: [],
-			xAxis: {
-				type: 'datetime',
-				crosshair: true,
-			},
-			time: {
-				useUTC: false,
-			},
-			tooltip: { shared: true },
-		})
+		// this.__chart = Highcharts.chart(this.__chartContainer, {
+		// 	chart: {
+		// 		type: 'line',
+		// 		events: {
+		// 			selection: (e: Highcharts.ChartSelectionContextObject): boolean => {
+		// 				if (reloadOnZoom) {
+		// 					this.__setTimeRange(e.xAxis[0].min, e.xAxis[0].max)
+		// 					this.__plot()
+		// 					return false
+		// 				}
+		// 				return true
+		// 			},
+		// 		},
+		// 		panKey: 'shift',
+		// 		panning: {
+		// 			enabled: true,
+		// 			type: 'xy',
+		// 		},
+		// 		zoomType: 'xy',
+		// 	},
+		// 	series: [],
+		// 	xAxis: {
+		// 		type: 'datetime',
+		// 		crosshair: true,
+		// 	},
+		// 	time: {
+		// 		useUTC: false,
+		// 	},
+		// 	tooltip: { shared: true },
+		// })
 		this.canPlot = this.__calcCanPlot()
 	}
 
 	updated(changedProperties: PropertyValues): void {
-		if (changedProperties.has('highchartsOptions')) {
-			this.__chart.update(this.highchartsOptions, true, true)
-		}
 		if (changedProperties.has('channelsWithoutData')) {
 			if (this.channelsWithoutData.length === this.channels.length) {
 				this.__snackNoData.show()
@@ -333,6 +342,37 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		reloadOnZoom = false
 	}
 
+	private renderPlot() {
+		switch (this.plotVariation) {
+			case PlotVariation.SeparatePlots:
+				return html`<daq-plot-separate-plots
+					.title=${this.daqPlotConfig.title}
+					.subtitle=${this.daqPlotConfig.subtitle}
+					.yAxes=${this.daqPlotConfig.yAxes}
+					.series=${this.daqPlotConfig.series}
+				></daq-plot-separate-plots>`
+
+			case PlotVariation.SeparateAxes:
+				return html`<daq-plot-separate-axes
+					.title=${this.daqPlotConfig.title}
+					.subtitle=${this.daqPlotConfig.subtitle}
+					.yAxes=${this.daqPlotConfig.yAxes}
+					.series=${this.daqPlotConfig.series}
+				></daq-plot-separate-axes>`
+
+			case PlotVariation.SingleAxis:
+				return html`<daq-plot-single-axis
+					.title=${this.daqPlotConfig.title}
+					.subtitle=${this.daqPlotConfig.subtitle}
+					.yAxes=${this.daqPlotConfig.yAxes}
+					.series=${this.daqPlotConfig.series}
+				></daq-plot-single-axis>`
+
+			default:
+				return html``
+		}
+	}
+
 	render() {
 		return html`
 			${this.__renderQueryRange()} ${this.__renderQuickDial()}
@@ -342,7 +382,9 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				There was an error:
 				<p>${this.error ? this.error.message : ''}</p>
 			</div>
-			<div id="chart" ?hidden="${!this.shouldDisplayChart}"></div>
+			<div id="chart" ?hidden="${!this.shouldDisplayChart}">
+				${this.renderPlot()}
+			</div>
 			<mwc-snackbar
 				id="badtimeformat"
 				labelText="Date format invalid! Correct format is: yyyy-mm-dd HH:MM:DD.SSS"
@@ -648,6 +690,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					height: 100%;
 					padding: 8px;
 					display: block;
+					overflow-y: auto;
 				}
 				#queryrange {
 					position: absolute;

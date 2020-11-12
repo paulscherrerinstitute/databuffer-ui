@@ -30,7 +30,7 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 	mapState(state: AppState) {
 		return {
 			channels: plotSelectors.channels(state),
-			dataSeriesConfig: plotSelectors.dataSeriesConfig(state),
+			dataSeriesConfig: plotSelectors.dataSeriesConfigs(state),
 			plotVariation: plotSelectors.plotVariation(state),
 			plotTitle: plotSelectors.plotTitle(state),
 			yAxes: plotSelectors.yAxes(state),
@@ -66,6 +66,11 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 					?selected=${this.plotVariation === PlotVariation.SeparateAxes}
 					.value=${PlotVariation.SeparateAxes}
 					>Separate Y axes</mwc-list-item
+				>
+				<mwc-list-item
+					?selected=${this.plotVariation === PlotVariation.SeparatePlots}
+					.value=${PlotVariation.SeparatePlots}
+					>Separate plots</mwc-list-item
 				>
 			</mwc-select>
 			<h2>Data series and axes</h2>
