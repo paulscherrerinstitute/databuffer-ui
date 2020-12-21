@@ -1,10 +1,10 @@
 'use strict'
 
-import resolve from 'rollup-plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
-import replace from 'rollup-plugin-replace'
+import resolve from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
+import replace from '@rollup/plugin-replace'
 import minifyHTML from 'rollup-plugin-minify-html-literals'
-import typescript from 'rollup-plugin-typescript'
+import typescript from '@rollup/plugin-typescript'
 import { terser } from 'rollup-plugin-terser'
 
 // Is this build running inside a GitHub Actions workflow?
