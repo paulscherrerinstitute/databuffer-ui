@@ -430,7 +430,7 @@ export const plot = createModel({
 				FileSaver.saveAs(blob, fname)
 			},
 
-			async 'routing/change'(payload: RoutingState) {
+			async 'routing/change'(payload: RoutingState<ROUTE>) {
 				switch (payload.page) {
 					case ROUTE.PLOT:
 						// automatically display the query range pop up,

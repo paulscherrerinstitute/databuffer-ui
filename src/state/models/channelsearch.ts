@@ -112,7 +112,7 @@ export const channelsearch = createModel({
 				}
 			},
 
-			async 'routing/change'(payload: RoutingState) {
+			async 'routing/change'(payload: RoutingState<ROUTE>) {
 				switch (payload.page) {
 					case ROUTE.CHANNEL_SEARCH:
 						if (payload.queries && payload.queries.q) {

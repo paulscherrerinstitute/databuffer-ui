@@ -1,4 +1,4 @@
-import createMatcher from '@captaincodeman/router'
+import createMatcher, { Routes } from '@captaincodeman/router'
 import { routingPlugin, withQuerystring } from '@captaincodeman/rdx'
 
 export enum ROUTE {
@@ -12,7 +12,7 @@ export enum ROUTE {
 	NOT_FOUND = 'not-found',
 }
 
-const routes = {
+const routes: Routes<ROUTE> = {
 	'/': ROUTE.HOME,
 	'/search': ROUTE.CHANNEL_SEARCH,
 	'/preselect': ROUTE.PRESELECT,

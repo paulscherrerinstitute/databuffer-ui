@@ -301,7 +301,7 @@ describe('plot model', () => {
 				it('sets the selected channels', async () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.setSelectedChannels = fake
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PLOT_SINGLE_CHANEL,
 						params: { backend: 'be1', name: 'ch1' },
 					}
@@ -317,7 +317,7 @@ describe('plot model', () => {
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 					// @ts-ignore
 					rdxTest.dispatch.routing.replace = fake
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PLOT_SINGLE_CHANEL,
 						params: { backend: 'be1', name: 'ch1' },
 					}
@@ -344,7 +344,7 @@ describe('plot model', () => {
 					const expectedChannels: Channel[] = []
 					const expectedEndTime = Date.now()
 					const expectedStartTime = expectedEndTime - 12 * 60 * 60 * 1000 // default = 12 hours
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {},
@@ -372,7 +372,7 @@ describe('plot model', () => {
 				it('dispatches drawPlot', async () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.drawPlot = fake
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {},
@@ -386,7 +386,7 @@ describe('plot model', () => {
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 					// @ts-ignore
 					rdxTest.dispatch.routing.replace = fake
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {},
@@ -417,7 +417,7 @@ describe('plot model', () => {
 						{ backend: 'be02', name: 'ch15' },
 						{ backend: 'be01', name: 'ch16' },
 					]
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {},
@@ -438,7 +438,7 @@ describe('plot model', () => {
 						{ backend: 'be02', name: 'ch02' },
 						{ backend: 'be03', name: 'ch03' },
 					]
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
@@ -459,7 +459,7 @@ describe('plot model', () => {
 						{ backend: 'be01', name: 'ch01' },
 						{ backend: 'be02', name: 'ch02' },
 					]
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
@@ -479,7 +479,7 @@ describe('plot model', () => {
 				it('reads parameter endTime as ISO string', async () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changeEndTime = fake
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
@@ -497,7 +497,7 @@ describe('plot model', () => {
 				it('reads parameter startTime as ISO string', async () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changeStartTime = fake
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
@@ -516,7 +516,7 @@ describe('plot model', () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changeEndTime = fake
 					const expectedEndTime = 200000
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
@@ -532,7 +532,7 @@ describe('plot model', () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changeStartTime = fake
 					const expectedStartTime = 100000
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
@@ -552,7 +552,7 @@ describe('plot model', () => {
 					rdxTest.dispatch.plot.changeEndTime = fakeEndTime
 					const fakeStartTime = sinon.fake()
 					rdxTest.dispatch.plot.changeStartTime = fakeStartTime
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
@@ -570,7 +570,7 @@ describe('plot model', () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changeEndTime = fake
 					const expectedEndTime = 200000
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
@@ -587,7 +587,7 @@ describe('plot model', () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changeStartTime = fake
 					const expectedStartTime = 100000
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
@@ -603,7 +603,7 @@ describe('plot model', () => {
 				it('sets labels if defined', async () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changeDataSeriesLabel = fake
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
@@ -627,7 +627,7 @@ describe('plot model', () => {
 				it('ignores labels without matching channel', async () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changeDataSeriesLabel = fake
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
@@ -643,7 +643,7 @@ describe('plot model', () => {
 				it('sets title if defined', async () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changePlotTitle = fake
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
@@ -658,7 +658,7 @@ describe('plot model', () => {
 				it('sets plotVariation if single-axis', async () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changePlotVariation = fake
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
@@ -673,7 +673,7 @@ describe('plot model', () => {
 				it('sets plotVariation if separate-axes', async () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changePlotVariation = fake
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {
@@ -688,7 +688,7 @@ describe('plot model', () => {
 				it('ignores plotVariation if invalid value', async () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changePlotVariation = fake
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.PRESELECT,
 						params: {},
 						queries: {

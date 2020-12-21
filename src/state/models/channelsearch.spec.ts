@@ -237,7 +237,7 @@ describe('channelsearch model', () => {
 				it('sets the search pattern', async () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.channelsearch.patternChange = fake
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.CHANNEL_SEARCH,
 						params: {},
 						queries: { q: 'foo' },
@@ -250,7 +250,7 @@ describe('channelsearch model', () => {
 				it('triggers the search', async () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.channelsearch.runSearch = fake
-					const payload: RoutingState = {
+					const payload: RoutingState<ROUTE> = {
 						page: ROUTE.CHANNEL_SEARCH,
 						params: {},
 						queries: { q: 'foo' },
