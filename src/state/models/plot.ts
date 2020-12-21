@@ -418,11 +418,7 @@ export const plot = createModel({
 				const aggregationSelection = plotSelectors.dialogDownloadAggregation(
 					store.getState()
 				)
-				const query = plotSelectors.plotQuery(store.getState())
-				query.response = {
-					...query.response,
-					format: DataResponseFormatType.CSV,
-				}
+				const query = plotSelectors.downloadQuery(store.getState())
 				const response = await queryRestApi.queryDataRaw(query)
 				const blob = await response.blob()
 				const ts = formatDate(Date.now())
