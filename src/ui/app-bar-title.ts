@@ -25,16 +25,19 @@ export class AppBarTitleElement extends connect(store, LitElement) {
 	}
 
 	private titleByPage: { [key: string]: string } = {
-		[ROUTE.HOME]: `Databuffer UI`,
+		[ROUTE.HOME]: ``,
 		[ROUTE.CHANNEL_SEARCH]: `Search`,
-		[ROUTE.PLOT_SETTINGS]: `Plot`,
+		[ROUTE.PLOT]: `Plot`,
 		[ROUTE.PLOT_SETTINGS]: `Plot settings`,
 		[ROUTE.QUERY_META]: `About data query`,
 	}
 
 	shouldUpdate(changedProperties: PropertyValues) {
 		if (changedProperties.has('page')) {
-			this.title = this.titleByPage[this.page] ?? `Databuffer UI`
+			const pageTitle = this.titleByPage[this.page] ?? ``
+			this.title = pageTitle
+				? `${window.DatabufferUi.TITLE} – ${pageTitle}`
+				: window.DatabufferUi.TITLE
 		}
 		return changedProperties.has('title')
 	}

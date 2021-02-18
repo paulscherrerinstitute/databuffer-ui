@@ -18,10 +18,22 @@ The recommended way to run the UI (e.g. if you want to test a new backend) is th
 
 The docker image is configured through environment variables:
 
-| Environment variable | Description                              | Example                                   |
-| -------------------- | ---------------------------------------- | ----------------------------------------- |
-| `DISPATCHER_API`     | Full URL to the dispatcher API endpoint. | https://my-dispatcher.example.org/foo/bar |
-| `QUERY_API`          | Full URL to the data query API endpoint. | https://my-data-api.example.org/foo/bar   |
+| Environment variable          | Description                                             | Example                                         |
+| ----------------------------- | ------------------------------------------------------- | ----------------------------------------------- |
+| `DATA_UI_DISPATCHER_API`      | Full URL to the dispatcher API endpoint.                | https://my-dispatcher.example.org/foo/bar       |
+| `DATA_UI_QUERY_API`           | Full URL to the data query API endpoint.                | https://my-data-api.example.org/foo/bar         |
+| `DATA_UI_TITLE`               | Application Title                                       | BETA Databuffer UI                              |
+| `DATA_UI_COLOR_PRIMARY_HUE`   | Hue of primary color (number between 0 and 360)         | 90                                              |
+| `DATA_UI_COLOR_ON_PRIMARY`    | CSS color string for text _on_ primary color elements   | `#ffffff` or `white` or `rgb(100%, 100%, 100%)` |
+| `DATA_UI_COLOR_SECONDARY_HUE` | Hue of secondary color (number between 0 and 360)       | 90                                              |
+| `DATA_UI_COLOR_ON_SECONDARY`  | CSS color string for text _on_ secondary color elements | `#ffffff` or `white` or `rgb(100%, 100%, 100%)` |
+
+**⚠️ A note on the colors**
+
+- **It is usually sufficient to only provide `DATA_UI_COLOR_PRIMARY_HUE` to visually distinguish two instances.**
+- Only the colors you specify are injected through the environment; the others are left untouched.
+- The primary and secondary color **must** be configured through the hue (angle on the color wheel). This is because one of the components sets we use sets color through setting the hue.
+- The "on ..." color can be any valid [CSS color value](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value) as a string.
 
 ### Downloading and updating the docker image
 

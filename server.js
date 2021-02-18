@@ -25,7 +25,7 @@ browserSync.init({
 			match: /\$\{([A-Za-z0-9_]+)\}/g,
 			fn: function (req, res, match) {
 				const varName = match.substring(2, match.length - 1)
-				return process.env[varName]
+				return varName in process.env ? process.env[varName] : ''
 			},
 		},
 	],

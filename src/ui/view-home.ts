@@ -145,7 +145,7 @@ export class HomeElement extends connect(store, LitElement) {
 
 				#bottom a,
 				#bottom a:visited {
-					color: var(--dui-secondary-light);
+					color: var(--dui-secondary);
 				}
 
 				#footer {

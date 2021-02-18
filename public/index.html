@@ -112,6 +112,7 @@
 			}
 		</style>
 		<link href="style.css" rel="stylesheet" />
+		<script type="module"></script>
 		<link
 			href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400,700|Roboto+Slab:300,400,700"
 			rel="stylesheet"
@@ -126,10 +127,42 @@
 		<script src="https://polyfill.io/v3/polyfill.min.js?flags=gated&features=WebAnimations,requestIdleCallback"></script>
 
 		<script>
+			/*
+			 * inject values from the environment into the window
+			 *
+			 * string substitution is done on the server!
+			 */
 			window.DatabufferUi = {
-				QUERY_API: '${QUERY_API}',
-				DISPATCHER_API: '${DISPATCHER_API}',
+				TITLE: '${DATA_UI_TITLE}',
+				QUERY_API: '${DATA_UI_QUERY_API}',
+				DISPATCHER_API: '${DATA_UI_DISPATCHER_API}',
 			}
+			// ensure consistency:
+			// - if title is set in the env, make sure the document matches
+			// - else make sure the title in the app settings matches the document
+			if (window.DatabufferUi.TITLE) {
+				document.title = window.DatabufferUi.TITLE
+			} else {
+				window.DatabufferUi.TITLE = document.title
+			}
+
+			function injectCssVars(vars) {
+				const cssVars = vars.filter(v => v.val !== '')
+
+				if (cssVars.length === 0) return
+				const style = document.createElement('style')
+				style.textContent = `:root { ${cssVars
+					.map(cssVar => `  ${cssVar.name}: ${cssVar.val};`)
+					.join('\n  ')} }`
+				const el = document.head.appendChild(style)
+			}
+
+			injectCssVars([
+				{ name: '--dui-primary-hue', val: '${DATA_UI_COLOR_PRIMARY_HUE}' },
+				{ name: '--dui-on-primary', val: '${DATA_UI_COLOR_ON_PRIMARY}' },
+				{ name: '--dui-secondary-hue', val: '${DATA_UI_COLOR_SECONDARY_HUE}' },
+				{ name: '--dui-on-secondary', val: '${DATA_UI_COLOR_ON_SECONDARY}' },
+			])
 		</script>
 		<script async src="/scripts/databuffer-ui.min.js"></script>
 	</head>
