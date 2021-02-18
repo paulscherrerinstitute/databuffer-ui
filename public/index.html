@@ -151,9 +151,18 @@
 
 				if (cssVars.length === 0) return
 				const style = document.createElement('style')
-				style.textContent = `:root { ${cssVars
-					.map(cssVar => `  ${cssVar.name}: ${cssVar.val};`)
-					.join('\n  ')} }`
+				// **ATTENTION**   DO NOT USE STRING INTERPOLATION !!!
+				//
+				// use string concatenation instead; otherwise the SPA server might
+				// break your JS code by textually replacing ${...} with empty strings
+				//
+				// see https://github.com/paulscherrerinstitute/databuffer-ui/issues/98
+				style.textContent =
+					':root {\n  ' +
+					cssVars
+						.map(cssVar => '  ' + cssVar.name + ': ' + cssVar.val + ';')
+						.join('\n  ') +
+					'\n}'
 				const el = document.head.appendChild(style)
 			}
 
