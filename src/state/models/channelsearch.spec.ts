@@ -14,6 +14,7 @@ import { store, AppDispatch, AppState } from '../store'
 import { createTestEnv, RdxTestEnv } from '../rdx-test-util'
 import { EffectFns, RoutingState } from '@captaincodeman/rdx'
 import { ROUTE } from '../routing'
+import { be } from 'date-fns/locale'
 
 describe('channelsearch model', () => {
 	describe('initial state', () => {
@@ -21,6 +22,12 @@ describe('channelsearch model', () => {
 			expect(channelsearch.state.availableBackends)
 				.to.be.an('array')
 				.of.length(0)
+		})
+		it('availableBackendsFetching === false', () => {
+			expect(channelsearch.state.availableBackendsFetching).to.be.false
+		})
+		it('availableBackendsError === undefined', () => {
+			expect(channelsearch.state.availableBackendsError).to.be.undefined
 		})
 		it('selectedBackends = []', () => {
 			expect(channelsearch.state.selectedBackends)
@@ -49,6 +56,74 @@ describe('channelsearch model', () => {
 					'foobar'
 				)
 				expect(newState.pattern).to.equal('foobar')
+			})
+		})
+
+		describe('availableBackendsRequest', () => {
+			it('sets availableBackendsFetching = true', () => {
+				const newState = channelsearch.reducers.availableBackendsRequest(
+					channelsearch.state
+				)
+				expect(newState.availableBackendsFetching).to.be.true
+			})
+			it('sets availableBackends = []', () => {
+				const newState = channelsearch.reducers.availableBackendsRequest(
+					channelsearch.state
+				)
+				expect(newState.availableBackends).to.be.an('array').of.length(0)
+			})
+			it('sets availableBackendsError = undefined', () => {
+				const newState = channelsearch.reducers.availableBackendsRequest(
+					channelsearch.state
+				)
+				expect(newState.availableBackendsError).to.be.undefined
+			})
+		})
+
+		describe('availableBackendsSuccess', () => {
+			let backends: string[]
+
+			beforeEach(() => {
+				backends = ['b1', 'b2']
+			})
+			it('sets availableBackendsFetching = false', () => {
+				const newState = channelsearch.reducers.availableBackendsSuccess(
+					channelsearch.state,
+					backends
+				)
+				expect(newState.availableBackendsFetching).to.be.false
+			})
+			it('sets availableBackends', () => {
+				const newState = channelsearch.reducers.availableBackendsSuccess(
+					channelsearch.state,
+					backends
+				)
+				expect(newState.availableBackends).to.deep.equal(backends)
+			})
+		})
+
+		describe('availableBackendsError', () => {
+			let error: Error
+
+			beforeEach(() => {
+				error = new Error('oops')
+			})
+
+			it('sets fetching = false', () => {
+				const newState = channelsearch.reducers.availableBackendsError(
+					channelsearch.state,
+					error
+				)
+				expect(newState.fetching).to.be.false
+			})
+			it('sets error', () => {
+				const newState = channelsearch.reducers.availableBackendsError(
+					channelsearch.state,
+					error
+				)
+				expect(newState.availableBackendsError)
+					.to.be.an('Error')
+					.that.deep.equals(error)
 			})
 		})
 
@@ -183,6 +258,21 @@ describe('channelsearch model', () => {
 		afterEach(() => {
 			sinon.restore()
 			rdxTest.cleanup()
+		})
+
+		describe('init', () => {
+			it('dispatches availableBackendsRequest', async () => {
+				const fake = sinon.fake()
+				rdxTest.dispatch.channelsearch.availableBackendsRequest = fake
+				await effects.init()
+				expect(fake.callCount).to.equal(1)
+			})
+			xit('dispatches availableBackendsSuccess on success', async () => {
+				// TODO: implement
+			})
+			xit('dispatches availableBackendsError on failure', async () => {
+				// TODO: implement
+			})
 		})
 
 		describe('runSearch', () => {
@@ -567,7 +657,7 @@ describe('channelsearch model', () => {
 			)
 		})
 
-		it('retrieves available backends', () => {
+		it('sorts available backends', () => {
 			const state1 = {
 				...state,
 				channelsearch: { ...state.channelsearch, availableBackends: [] },
@@ -576,7 +666,7 @@ describe('channelsearch model', () => {
 				...state,
 				channelsearch: {
 					...state.channelsearch,
-					availableBackends: ['a', 'b', 'c'],
+					availableBackends: ['b', 'c', 'a'],
 				},
 			}
 			expect(channelsearchSelectors.availableBackends(state1)).to.deep.equal([])
@@ -585,6 +675,49 @@ describe('channelsearch model', () => {
 				'b',
 				'c',
 			])
+		})
+
+		it('retrieves availableBackendsFetching', () => {
+			const state1 = {
+				...state,
+				channelsearch: {
+					...state.channelsearch,
+					availableBackendsFetching: true,
+				},
+			}
+			const state2 = {
+				...state,
+				channelsearch: {
+					...state.channelsearch,
+					availableBackendsFetching: false,
+				},
+			}
+			expect(channelsearchSelectors.availableBackendsFetching(state1)).to.be
+				.true
+			expect(channelsearchSelectors.availableBackendsFetching(state2)).to.be
+				.false
+		})
+
+		it('retrieves availableBackendsError', () => {
+			const state1 = {
+				...state,
+				channelsearch: {
+					...state.channelsearch,
+					availableBackendsError: undefined,
+				},
+			}
+			expect(channelsearchSelectors.availableBackendsError(state1)).to.be
+				.undefined
+			const state2 = {
+				...state,
+				channelsearch: {
+					...state.channelsearch,
+					availableBackendsError: new Error('example error'),
+				},
+			}
+			const err = channelsearchSelectors.availableBackendsError(state2)!
+			expect(err).to.be.instanceOf(Error)
+			expect(err.message).to.equal('example error')
 		})
 
 		it('retrieves selected backends', () => {

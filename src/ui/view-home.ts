@@ -10,6 +10,7 @@ import { connect } from '@captaincodeman/rdx'
 import '@material/mwc-button'
 import '@material/mwc-textfield'
 import { TextField } from '@material/mwc-textfield'
+import '@paulscherrerinstitute/databuffer-web-components/daq-pill-list'
 
 import { store, AppState } from '../state/store'
 
@@ -20,11 +21,25 @@ export class HomeElement extends connect(store, LitElement) {
 	@property({ attribute: false })
 	pattern: string = ''
 
+	@property({ attribute: false })
+	availableBackends: string[] = []
+	@property({ attribute: false })
+	availableBackendsFetching: boolean = false
+	@property({ attribute: false })
+	availableBackendsError?: Error = undefined
+
 	@query('#query')
 	private __query!: TextField
 
 	mapState(state: AppState) {
 		return {
+			availableBackends: channelsearchSelectors.availableBackends(state),
+			availableBackendsFetching: channelsearchSelectors.availableBackendsFetching(
+				state
+			),
+			availableBackendsError: channelsearchSelectors.availableBackendsError(
+				state
+			),
 			pattern: channelsearchSelectors.pattern(state),
 		}
 	}
@@ -58,6 +73,18 @@ export class HomeElement extends connect(store, LitElement) {
 					<mwc-button icon="search" raised @click=${this.__search}
 						>Search</mwc-button
 					>
+
+					<div style="margin-top:3rem">
+						<p>Available backends:</p>
+						<p ?hidden=${!this.availableBackendsFetching}>Loading...</p>
+						<daq-pill-list
+							?hidden=${this.availableBackendsFetching}
+							.value=${this.availableBackends}
+						></daq-pill-list>
+						<p ?hidden=${this.availableBackendsError === undefined}>
+							There was an error fetching the backends from the API
+						</p>
+					</div>
 				</div>
 			</div>
 			<div id="bottom">
