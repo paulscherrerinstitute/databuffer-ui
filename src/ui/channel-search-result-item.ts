@@ -14,7 +14,7 @@ export class ChannelSearchResultItemElement extends LitElement {
 
 	public render() {
 		return html`
-			<wl-list-item>
+			<wl-list-item ?disabled=${this.item.type === 'string'}>
 				<wl-checkbox
 					slot="before"
 					?checked=${this.selectedIndex >= 0}
