@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.5.0](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.4.0...v4.5.0) (2021-02-24)
+
+### Features
+
+- add channel type as tag ([fc580cc](https://github.com/paulscherrerinstitute/databuffer-ui/commit/fc580ccd23a4f50c3ab43548271252d4a60b4aa2)), closes [#104](https://github.com/paulscherrerinstitute/databuffer-ui/issues/104)
+- customize visual appearance from environment ([f7ad8ef](https://github.com/paulscherrerinstitute/databuffer-ui/commit/f7ad8ef096dbec34bb411eec98f09a9a868dbc52)), closes [#94](https://github.com/paulscherrerinstitute/databuffer-ui/issues/94)
+- list available backend on home view ([0ee7261](https://github.com/paulscherrerinstitute/databuffer-ui/commit/0ee7261bbd9a1e3e0ab65c44677a46fc149d2bd5)), closes [#99](https://github.com/paulscherrerinstitute/databuffer-ui/issues/99)
+- option to plot all channels on single axis ([b2cd4d4](https://github.com/paulscherrerinstitute/databuffer-ui/commit/b2cd4d4acec25b976ffe643d4dac95eadffc7463)), closes [#66](https://github.com/paulscherrerinstitute/databuffer-ui/issues/66)
+- prevent string channels from being selected ([ef1b978](https://github.com/paulscherrerinstitute/databuffer-ui/commit/ef1b9784d555de9b622f326c8faf7dccebbedb0c)), closes [#103](https://github.com/paulscherrerinstitute/databuffer-ui/issues/103)
+- retain custom axis settings when sharing ([c22379f](https://github.com/paulscherrerinstitute/databuffer-ui/commit/c22379f652efb18de594e98cf371916ac27de80d)), closes [#88](https://github.com/paulscherrerinstitute/databuffer-ui/issues/88)
+- separate plots per channel ([59f3766](https://github.com/paulscherrerinstitute/databuffer-ui/commit/59f37660eddca467e41aa25418e1f43cc79c0b06)), closes [#67](https://github.com/paulscherrerinstitute/databuffer-ui/issues/67)
+
+### Bug Fixes
+
+- axis types and limits not picked up from shared link ([754e80e](https://github.com/paulscherrerinstitute/databuffer-ui/commit/754e80e6915120745bf56d1ca438689ac9160ea6)), closes [#88](https://github.com/paulscherrerinstitute/databuffer-ui/issues/88)
+- env expansion broke index.html ([a9e9535](https://github.com/paulscherrerinstitute/databuffer-ui/commit/a9e9535cc5d2692a8aaa955d5f10b158c6fb762d)), closes [#98](https://github.com/paulscherrerinstitute/databuffer-ui/issues/98)
+- use correct query for csv download ([f1a342b](https://github.com/paulscherrerinstitute/databuffer-ui/commit/f1a342b54ed7fd1f0fabf9093065fdfca1dfd123)), closes [#92](https://github.com/paulscherrerinstitute/databuffer-ui/issues/92)
+
 ## [4.4.0](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.3.0...v4.4.0) (2020-09-24)
 
 ### Features
