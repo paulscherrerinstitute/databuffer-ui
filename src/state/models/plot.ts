@@ -492,7 +492,13 @@ export const plot = createModel({
 							}
 
 							const channels: Channel[] = []
+							// we have to buffer the params into arrays, because we need to
+							// add the channels to the selection first; otherwise there are
+							// no dataseries and no axes are available
 							const dataSeriesLabels: { index: number; label: string }[] = []
+							const yAxisTypes: { index: number; type: YAxisType }[] = []
+							const yAxisMins: { index: number; min: number }[] = []
+							const yAxisMaxs: { index: number; max: number }[] = []
 							for (let i = 1; i <= MAX_CHANNELS; i++) {
 								let paramName = `c${i}`
 								if (!q[paramName]) continue
@@ -509,10 +515,7 @@ export const plot = createModel({
 								if (q[paramName]) {
 									const s = q[paramName] as string
 									if (isYAxisType(s)) {
-										dispatch.plot.setAxisType({
-											index,
-											type: s,
-										})
+										yAxisTypes.push({ index, type: s })
 									}
 								}
 								paramName = `min${i}`
@@ -520,7 +523,7 @@ export const plot = createModel({
 									const s = q[paramName] as string
 									const n = Number.parseFloat(s)
 									if (!isNaN(n)) {
-										dispatch.plot.setAxisMin({
+										yAxisMins.push({
 											index,
 											min: n,
 										})
@@ -531,7 +534,7 @@ export const plot = createModel({
 									const s = q[paramName] as string
 									const n = Number.parseFloat(s)
 									if (!isNaN(n)) {
-										dispatch.plot.setAxisMax({
+										yAxisMaxs.push({
 											index,
 											max: n,
 										})
@@ -541,6 +544,15 @@ export const plot = createModel({
 							dispatch.plot.setSelectedChannels(channels)
 							for (const item of dataSeriesLabels) {
 								dispatch.plot.changeDataSeriesLabel(item)
+							}
+							for (const item of yAxisTypes) {
+								dispatch.plot.setAxisType(item)
+							}
+							for (const item of yAxisMins) {
+								dispatch.plot.setAxisMin(item)
+							}
+							for (const item of yAxisMaxs) {
+								dispatch.plot.setAxisMax(item)
 							}
 							dispatch.plot.changeEndTime(endTime)
 							dispatch.plot.changeStartTime(startTime)
