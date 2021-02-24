@@ -54,6 +54,10 @@ export enum PlotVariation {
 	/** 1 plot (with 1 Y axis) for each channel */
 	SeparatePlots = 'separate-plots',
 }
+export function isPlotVariation(val: any): val is PlotVariation {
+	if (typeof val !== 'string') return false
+	return Object.values(PlotVariation as Record<string, string>).includes(val)
+}
 
 /** DataSeries defines a data set to be plotted in the chart */
 export interface DataSeries {
@@ -67,6 +71,10 @@ export interface DataSeries {
 
 /** type of YAxis */
 export type YAxisType = 'linear' | 'logarithmic'
+export function isYAxisType(val: any): val is YAxisType {
+	if (typeof val !== 'string') return false
+	return val === 'linear' || val === 'logarithmic'
+}
 
 /** YAxis is a value axis of the chart */
 export interface YAxis {
@@ -451,35 +459,35 @@ export const plot = createModel({
 
 					case ROUTE.PRESELECT:
 						{
+							// if there are no query params, start over at home view
+							if (payload.queries === null) {
+								dispatch.routing.replace('/')
+								break
+							}
+							const q = payload.queries as {
+								[key: string]: string[] | string
+							}
 							const MAX_CHANNELS = 16
 							const strToDate = (s: string): number =>
 								/^\d+$/.test(s) ? Number.parseInt(s, 10) : parseISO(s).getTime()
-
 							let duration = 12 * 60 * 60 * 1000 // 12 hours
 							let endTime = Date.now()
 							let startTime = endTime - duration
-							if (payload.queries && payload.queries.duration) {
-								duration = Number.parseInt(
-									payload.queries.duration as string,
-									10
-								)
+							if (q.duration) {
+								duration = Number.parseInt(q.duration as string, 10)
 								startTime = endTime - duration
 							}
-							if (payload.queries && payload.queries.endTime) {
-								endTime = strToDate(payload.queries.endTime as string)
+							if (q.endTime) {
+								endTime = strToDate(q.endTime as string)
 							}
-							if (payload.queries && payload.queries.startTime) {
-								startTime = strToDate(payload.queries.startTime as string)
+							if (q.startTime) {
+								startTime = strToDate(q.startTime as string)
 							}
 
-							if (payload.queries && payload.queries.plotVariation) {
-								const s = payload.queries.plotVariation as string
-								if (
-									Object.values(
-										PlotVariation as Record<string, string>
-									).includes(s)
-								) {
-									dispatch.plot.changePlotVariation(s as PlotVariation)
+							if (q.plotVariation) {
+								const s = q.plotVariation as string
+								if (isPlotVariation(s)) {
+									dispatch.plot.changePlotVariation(s)
 								}
 							}
 
@@ -487,14 +495,48 @@ export const plot = createModel({
 							const dataSeriesLabels: { index: number; label: string }[] = []
 							for (let i = 1; i <= MAX_CHANNELS; i++) {
 								let paramName = `c${i}`
-								if (!payload.queries || !payload.queries[paramName]) continue
-								channels.push(idToChannel(payload.queries[paramName] as string))
+								if (!q[paramName]) continue
+								channels.push(idToChannel(q[paramName] as string))
+								const index = channels.length - 1
 								paramName = `l${i}`
-								if (!payload.queries[paramName]) continue
-								dataSeriesLabels.push({
-									index: channels.length - 1,
-									label: payload.queries[paramName] as string,
-								})
+								if (q[paramName]) {
+									dispatch.plot.changeDataSeriesLabel({
+										index,
+										label: q[paramName] as string,
+									})
+								}
+								paramName = `y${i}`
+								if (q[paramName]) {
+									const s = q[paramName] as string
+									if (isYAxisType(s)) {
+										dispatch.plot.setAxisType({
+											index,
+											type: s,
+										})
+									}
+								}
+								paramName = `min${i}`
+								if (q[paramName]) {
+									const s = q[paramName] as string
+									const n = Number.parseFloat(s)
+									if (!isNaN(n)) {
+										dispatch.plot.setAxisMin({
+											index,
+											min: n,
+										})
+									}
+								}
+								paramName = `max${i}`
+								if (q[paramName]) {
+									const s = q[paramName] as string
+									const n = Number.parseFloat(s)
+									if (!isNaN(n)) {
+										dispatch.plot.setAxisMax({
+											index,
+											max: n,
+										})
+									}
+								}
 							}
 							dispatch.plot.setSelectedChannels(channels)
 							for (const item of dataSeriesLabels) {
@@ -502,8 +544,8 @@ export const plot = createModel({
 							}
 							dispatch.plot.changeEndTime(endTime)
 							dispatch.plot.changeStartTime(startTime)
-							if (payload.queries && payload.queries.title) {
-								dispatch.plot.changePlotTitle(payload.queries.title as string)
+							if (q.title) {
+								dispatch.plot.changePlotTitle(q.title as string)
 							}
 							dispatch.plot.drawPlot()
 							// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -719,6 +761,7 @@ export namespace plotSelectors {
 	export const dialogShareLinkUrl = createSelector(
 		[
 			dataSeriesConfigs,
+			yAxes,
 			dialogShareLinkAbsoluteTimes,
 			channels,
 			startTime,
@@ -728,6 +771,7 @@ export namespace plotSelectors {
 		],
 		(
 			dataSeriesConfig,
+			yAxes,
 			absTimes,
 			channels,
 			startTime,
@@ -739,8 +783,28 @@ export namespace plotSelectors {
 				.slice(0, 16)
 				.map((ch, i) => `c${i + 1}=${encodeURIComponent(channelToId(ch))}`)
 			dataSeriesConfig.slice(0, 16).forEach((cfg, i) => {
-				if (cfg.name === channels[cfg.channelIndex].name) return
-				params.push(`l${i + 1}=${encodeURIComponent(cfg.name)}`)
+				if (cfg.name !== channels[cfg.channelIndex].name) {
+					params.push(`l${i + 1}=${encodeURIComponent(cfg.name)}`)
+				}
+				if (yAxes[cfg.yAxisIndex].type !== 'linear') {
+					params.push(
+						`y${i + 1}=${encodeURIComponent(yAxes[cfg.yAxisIndex].type)}`
+					)
+				}
+				if (yAxes[cfg.yAxisIndex].min !== null) {
+					params.push(
+						`min${i + 1}=${encodeURIComponent(
+							yAxes[cfg.yAxisIndex].min!.toString(10)
+						)}`
+					)
+				}
+				if (yAxes[cfg.yAxisIndex].max !== null) {
+					params.push(
+						`max${i + 1}=${encodeURIComponent(
+							yAxes[cfg.yAxisIndex].max!.toString(10)
+						)}`
+					)
+				}
 			})
 
 			if (absTimes) {

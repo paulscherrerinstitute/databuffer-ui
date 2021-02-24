@@ -640,6 +640,123 @@ describe('plot model', () => {
 					expect(fake.callCount).to.equal(0)
 				})
 
+				it('sets axis type if defined', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.setAxisType = fake
+					const payload: RoutingState<ROUTE> = {
+						page: ROUTE.PRESELECT,
+						params: {},
+						queries: {
+							c1: 'be01/ch01',
+							c2: 'be02/ch02',
+							y2: 'logarithmic',
+							c5: 'be01/ch03',
+							y5: 'linear',
+							c6: 'be99/ch99',
+						},
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(2)
+					expect(fake.args[0][0]).to.deep.equal({
+						index: 1,
+						type: 'logarithmic',
+					})
+					expect(fake.args[1][0]).to.deep.equal({
+						index: 2,
+						type: 'linear',
+					})
+				})
+
+				it('ignores axis type without matching channel', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.setAxisType = fake
+					const payload: RoutingState<ROUTE> = {
+						page: ROUTE.PRESELECT,
+						params: {},
+						queries: {
+							c6: 'be99/ch99',
+							y8: 'logarithmic', // <-- should not have an effect
+						},
+					}
+					await effects['routing/change'](payload)
+					// for param `y8` there should not be an effect, as the 8 does not match the 6 (of c6)
+					expect(fake.callCount).to.equal(0)
+				})
+
+				it('sets axis min if defined', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.setAxisMin = fake
+					const payload: RoutingState<ROUTE> = {
+						page: ROUTE.PRESELECT,
+						params: {},
+						queries: {
+							c1: 'be01/ch01',
+							c2: 'be02/ch02',
+							min2: '10',
+							c5: 'be01/ch03',
+							min5: '20',
+							c6: 'be99/ch99',
+						},
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(2)
+					expect(fake.args[0][0]).to.deep.equal({ index: 1, min: 10 })
+					expect(fake.args[1][0]).to.deep.equal({ index: 2, min: 20 })
+				})
+
+				it('ignores axis min without matching channel', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.setAxisMin = fake
+					const payload: RoutingState<ROUTE> = {
+						page: ROUTE.PRESELECT,
+						params: {},
+						queries: {
+							c6: 'be99/ch99',
+							min8: '10', // <-- should not have an effect
+						},
+					}
+					await effects['routing/change'](payload)
+					// for param `min8` there should not be an effect, as the 8 does not match the 6 (of c6)
+					expect(fake.callCount).to.equal(0)
+				})
+
+				it('sets axis max if defined', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.setAxisMax = fake
+					const payload: RoutingState<ROUTE> = {
+						page: ROUTE.PRESELECT,
+						params: {},
+						queries: {
+							c1: 'be01/ch01',
+							c2: 'be02/ch02',
+							max2: '100',
+							c5: 'be01/ch03',
+							max5: '200',
+							c6: 'be99/ch99',
+						},
+					}
+					await effects['routing/change'](payload)
+					expect(fake.callCount).to.equal(2)
+					expect(fake.args[0][0]).to.deep.equal({ index: 1, max: 100 })
+					expect(fake.args[1][0]).to.deep.equal({ index: 2, max: 200 })
+				})
+
+				it('ignores axis max without matching channel', async () => {
+					const fake = sinon.fake()
+					rdxTest.dispatch.plot.setAxisMax = fake
+					const payload: RoutingState<ROUTE> = {
+						page: ROUTE.PRESELECT,
+						params: {},
+						queries: {
+							c6: 'be99/ch99',
+							max8: 'index number does not match', // <-- should not have an effect
+						},
+					}
+					await effects['routing/change'](payload)
+					// for param `max8` there should not be an effect, as the 8 does not match the 6 (of c6)
+					expect(fake.callCount).to.equal(0)
+				})
+
 				it('sets title if defined', async () => {
 					const fake = sinon.fake()
 					rdxTest.dispatch.plot.changePlotTitle = fake
@@ -1739,6 +1856,14 @@ describe('plot model', () => {
 							channelIndex: idx,
 							yAxisIndex: idx,
 						})),
+						yAxes: EXAMPLE_CHANNELS.map((ch, idx) => ({
+							title: ch.name,
+							side: idx % 2 === 0 ? 'left' : 'right',
+							unit: '',
+							min: null,
+							max: null,
+							type: 'linear',
+						})),
 						channels: EXAMPLE_CHANNELS,
 						startTime: 100000,
 						endTime: 300000,
@@ -1753,7 +1878,7 @@ describe('plot model', () => {
 					.that.contains('/preselect?')
 			})
 
-			it('sets uses startTime and endTime when absolute times are used', () => {
+			it('uses startTime and endTime when absolute times are used', () => {
 				state.plot.dialogShareLinkAbsoluteTimes = true
 				const url = plotSelectors.dialogShareLinkUrl(state)
 				const params = new URLSearchParams(url.split('?', 2)[1])
@@ -1762,7 +1887,7 @@ describe('plot model', () => {
 				expect(params.has('duration')).to.be.false
 			})
 
-			it('sets uses duration when relative time is used', () => {
+			it('uses duration when relative time is used', () => {
 				state.plot.dialogShareLinkAbsoluteTimes = false
 				const url = plotSelectors.dialogShareLinkUrl(state)
 				const params = new URLSearchParams(url.split('?', 2)[1])
@@ -1855,6 +1980,63 @@ describe('plot model', () => {
 				expect(params.get(`l3`)).to.equal('custom-label-1')
 				expect(params.has(`l5`)).to.be.true
 				expect(params.get(`l5`)).to.equal('custom-label-2')
+			})
+
+			it('does not include y1...y16 if the yAxis.type == linear', () => {
+				const url = plotSelectors.dialogShareLinkUrl(state)
+				const params = new URLSearchParams(url.split('?', 2)[1])
+				for (let i = 1; i <= 16; i++) {
+					expect(params.has(`y${i}`)).to.be.false
+				}
+			})
+
+			it('does include y1...y16 if the yAxis.type != linear', () => {
+				state.plot.yAxes[2].type = 'logarithmic'
+				state.plot.yAxes[4].type = 'logarithmic'
+				const url = plotSelectors.dialogShareLinkUrl(state)
+				const params = new URLSearchParams(url.split('?', 2)[1])
+				expect(params.has(`y3`)).to.be.true
+				expect(params.get(`y3`)).to.equal('logarithmic')
+				expect(params.has(`y5`)).to.be.true
+				expect(params.get(`y5`)).to.equal('logarithmic')
+			})
+
+			it('does not include min1...min16 if the yAxis.min == null', () => {
+				const url = plotSelectors.dialogShareLinkUrl(state)
+				const params = new URLSearchParams(url.split('?', 2)[1])
+				for (let i = 1; i <= 16; i++) {
+					expect(params.has(`min${i}`)).to.be.false
+				}
+			})
+
+			it('does include min1...min16 if the yAxis.min != null', () => {
+				state.plot.yAxes[2].min = 10
+				state.plot.yAxes[4].min = 20
+				const url = plotSelectors.dialogShareLinkUrl(state)
+				const params = new URLSearchParams(url.split('?', 2)[1])
+				expect(params.has(`min3`)).to.be.true
+				expect(params.get(`min3`)).to.equal('10')
+				expect(params.has(`min5`)).to.be.true
+				expect(params.get(`min5`)).to.equal('20')
+			})
+
+			it('does not include max1...max16 if the yAxis.max == null', () => {
+				const url = plotSelectors.dialogShareLinkUrl(state)
+				const params = new URLSearchParams(url.split('?', 2)[1])
+				for (let i = 1; i <= 16; i++) {
+					expect(params.has(`max${i}`)).to.be.false
+				}
+			})
+
+			it('does include max1...max16 if the yAxis.max != null', () => {
+				state.plot.yAxes[2].max = 10
+				state.plot.yAxes[4].max = 20
+				const url = plotSelectors.dialogShareLinkUrl(state)
+				const params = new URLSearchParams(url.split('?', 2)[1])
+				expect(params.has(`max3`)).to.be.true
+				expect(params.get(`max3`)).to.equal('10')
+				expect(params.has(`max5`)).to.be.true
+				expect(params.get(`max5`)).to.equal('20')
 			})
 
 			it('does not include plotTitle if it is not set', () => {

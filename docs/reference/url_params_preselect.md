@@ -54,6 +54,18 @@ The default label for any channel is the channel's name.
 | ----------------------------- | ------------------------------------------- |
 | Kühlwassertemperatur Rücklauf | `K%C3%BChlwassertemperatur%20R%C3%BCcklauf` |
 
+## max1 ... max16
+
+You can specify the Y axis maximum for channels `c1` through `c16`. The index number of the label must match the index number of the channel. E.g. `max3` will be the label for channel `c3`.
+
+The default for any channel is to determine the maximum automaticaly.
+
+## min1 ... min16
+
+You can specify the Y axis minimum for channels `c1` through `c16`. The index number of the label must match the index number of the channel. E.g. `min3` will be the label for channel `c3`.
+
+The default for any channel is to determine the minimum automaticaly.
+
 ## plotVariation
 
 The variation of plot to be used. Only specific constant values are supported:
@@ -82,3 +94,14 @@ The title of the plot as a string.
 | Example                           | Parameter value                              |
 | --------------------------------- | -------------------------------------------- |
 | Kühlwassertemperatur letzte Woche | `K%C3%BChlwassertemperatur%20letzte%20Woche` |
+
+## y1 ... y16
+
+You can specify the Y axis type for channels `c1` through `c16`. The index number of the axis type must match the index number of the channel. E.g. `y3` will be the label for channel `3`.
+
+| Constant      | meaning                                  |
+| ------------- | ---------------------------------------- |
+| `linear`      | The Y axis uses linear steps. (Default.) |
+| `logarithmic` | The Y axis uses logarithmic steps.       |
+
+Any other value is being ignored and results in using the default.
