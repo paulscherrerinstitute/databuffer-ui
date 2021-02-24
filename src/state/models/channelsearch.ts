@@ -206,7 +206,7 @@ export namespace channelsearchSelectors {
 	)
 
 	export const resultsWithTags = createSelector([results], results =>
-		results.map(x => ({ ...x, tags: [x.backend, getShapeName(x)] }))
+		results.map(x => ({ ...x, tags: [x.backend, getShapeName(x), x.type] }))
 	)
 
 	export const availableTags = createSelector(
