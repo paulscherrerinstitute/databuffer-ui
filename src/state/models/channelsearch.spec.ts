@@ -514,6 +514,51 @@ describe('channelsearch model', () => {
 			expect(val[1].tags).to.include('backend2')
 		})
 
+		it('includes channel type as tag', () => {
+			const state1 = {
+				...state,
+				channelsearch: {
+					...state.channelsearch,
+					entities: {
+						'backend1/channel1': {
+							name: 'channel1',
+							backend: 'backend1',
+							description: 'a',
+							source: 'tcp://localhost:1001',
+							unit: 'A',
+							shape: [1],
+							type: 'uint16',
+						},
+						'backend1/channel2': {
+							name: 'channel2',
+							backend: 'backend1',
+							description: 'b',
+							source: 'tcp://localhost:1002',
+							unit: 'B',
+							shape: [10],
+							type: 'float32',
+						},
+						'backend1/channel3': {
+							name: 'channel3',
+							backend: 'backend1',
+							description: 'c',
+							source: 'tcp://localhost:1003',
+							unit: 'C',
+							shape: [10, 20],
+							type: 'uint16',
+						},
+					},
+				},
+			}
+			const val = channelsearchSelectors
+				.resultsWithTags(state1)
+				.map(x => ({ name: x.name, backend: x.backend, tags: x.tags }))
+			expect(val).to.be.an('array').of.length(3)
+			expect(val[0].tags).to.include('uint16')
+			expect(val[1].tags).to.include('float32')
+			expect(val[2].tags).to.include('uint16')
+		})
+
 		it('includes shape name as tag', () => {
 			const state1 = {
 				...state,
@@ -602,6 +647,8 @@ describe('channelsearch model', () => {
 					'backend1',
 					'backend2',
 					'backend3',
+					'float32',
+					'uint16',
 					ShapeName.SCALAR,
 					ShapeName.WAVEFORM,
 					ShapeName.IMAGE,
@@ -653,6 +700,8 @@ describe('channelsearch model', () => {
 					'backend1',
 					'backend2',
 					'backend3',
+					'float32',
+					'uint16',
 				].sort()
 			)
 		})
