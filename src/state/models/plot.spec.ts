@@ -9,7 +9,6 @@ import {
 	NR_OF_BINS,
 	YAxis,
 	DataSeries,
-	QueryMode,
 	PlotVariation,
 } from './plot'
 import { Channel, channelToId } from '../../shared/channel'
@@ -97,15 +96,6 @@ describe('plot model', () => {
 			expect(plot.state.endTime - plot.state.startTime).to.equal(
 				expectedDuration
 			)
-		})
-
-		it('startPulse and endPulse', () => {
-			expect(plot.state.startPulse).to.equal(1)
-			expect(plot.state.endPulse).to.equal(2)
-		})
-
-		it('queryMode', () => {
-			expect(plot.state.queryMode).to.equal(QueryMode.TIME)
 		})
 
 		it('channels', () => {
@@ -924,54 +914,6 @@ describe('plot model', () => {
 			expect(plotSelectors.endTime(state1)).to.equal(100)
 			expect(plotSelectors.endTime(state2)).to.equal(200)
 		})
-
-		// it('retrieves startPulse', () => {
-		//   const state1 = {
-		//     ...BASE_STATE,
-		//     plot: { ...BASE_STATE.plot, startPulse: 100 },
-		//   }
-		//   const state2 = {
-		//     ...BASE_STATE,
-		//     plot: {
-		//       ...BASE_STATE.plot,
-		//       startPulse: 200,
-		//     },
-		//   }
-		//   expect(selectors.startPulse(state1)).to.equal(100)
-		//   expect(selectors.startPulse(state2)).to.equal(200)
-		// })
-
-		// it('retrieves endPulse', () => {
-		//   const state1 = {
-		//     ...BASE_STATE,
-		//     plot: { ...BASE_STATE.plot, endPulse: 100 },
-		//   }
-		//   const state2 = {
-		//     ...BASE_STATE,
-		//     plot: {
-		//       ...BASE_STATE.plot,
-		//       endPulse: 200,
-		//     },
-		//   }
-		//   expect(selectors.endPulse(state1)).to.equal(100)
-		//   expect(selectors.endPulse(state2)).to.equal(200)
-		// })
-
-		// it('retrieves queryMode', () => {
-		//   const state1 = {
-		//     ...BASE_STATE,
-		//     plot: { ...BASE_STATE.plot, queryMode: 'time' },
-		//   }
-		//   const state2 = {
-		//     ...BASE_STATE,
-		//     plot: {
-		//       ...BASE_STATE.plot,
-		//       queryMode: 'pulse,
-		//     },
-		//   }
-		//   expect(selectors.queryMode(state1)).to.equal('time')
-		//   expect(selectors.queryMode(state2)).to.equal('pulse')
-		// })
 
 		it('retrieves channels', () => {
 			const state1 = {
@@ -2134,7 +2076,6 @@ describe('plot model', () => {
 				},
 				eventFields: [
 					EventField.GLOBAL_MILLIS,
-					EventField.PULSE_ID,
 					EventField.VALUE,
 					EventField.EVENT_COUNT,
 				],
@@ -2176,7 +2117,6 @@ describe('plot model', () => {
 					},
 					eventFields: [
 						EventField.GLOBAL_DATE,
-						EventField.PULSE_ID,
 						EventField.VALUE,
 						EventField.EVENT_COUNT,
 					],

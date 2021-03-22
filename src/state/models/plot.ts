@@ -34,11 +34,6 @@ export interface Channel {
 	name: string
 }
 
-export enum QueryMode {
-	TIME = 'time',
-	PULSE = 'pulse',
-}
-
 export interface DataPoints {
 	channel: Channel
 	values: number[]
@@ -99,9 +94,6 @@ export interface PlotState {
 	plotTitle: string
 	startTime: number
 	endTime: number
-	startPulse: number
-	endPulse: number
-	queryMode: 'time' | 'pulse'
 	channels: Channel[]
 	fetching: boolean
 	error?: Error
@@ -132,9 +124,6 @@ export const plot = createModel({
 		plotTitle: '',
 		startTime: Date.now() - 60_000,
 		endTime: Date.now(),
-		startPulse: 1,
-		endPulse: 2,
-		queryMode: 'time',
 		channels: [],
 		fetching: false,
 		error: undefined,
@@ -861,7 +850,6 @@ export namespace plotSelectors {
 				},
 				eventFields: [
 					EventField.GLOBAL_MILLIS,
-					EventField.PULSE_ID,
 					EventField.VALUE,
 					EventField.EVENT_COUNT,
 				],
@@ -890,7 +878,6 @@ export namespace plotSelectors {
 				},
 				eventFields: [
 					EventField.GLOBAL_DATE,
-					EventField.PULSE_ID,
 					EventField.VALUE,
 					EventField.EVENT_COUNT,
 				],
