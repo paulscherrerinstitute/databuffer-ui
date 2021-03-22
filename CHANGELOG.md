@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.5.1](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.5.0...v4.5.1) (2021-03-22)
+
+
+### Bug Fixes
+
+* align data by time for csv export ([00175f7](https://github.com/paulscherrerinstitute/databuffer-ui/commit/00175f7fe58bf576bc083906bce55b87322cf75c)), closes [#111](https://github.com/paulscherrerinstitute/databuffer-ui/issues/111)
+
 ## [4.5.0](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.4.0...v4.5.0) (2021-02-24)
 
 ### Features
