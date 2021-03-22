@@ -21,6 +21,7 @@ import {
 	AggregationType,
 	DataQuery,
 	DataResponseFormatType,
+	MappingAlignment,
 } from '@paulscherrerinstitute/databuffer-query-js/query-data'
 import { formatDate } from '../../util'
 import sinon from 'sinon'
@@ -2131,6 +2132,9 @@ describe('plot model', () => {
 					},
 					response: {
 						format: DataResponseFormatType.CSV,
+					},
+					mapping: {
+						alignment: MappingAlignment.BY_TIME,
 					},
 				} as DataQuery)
 			})

@@ -11,6 +11,7 @@ import {
 	AggregationOperation,
 	DataResponseFormatType,
 	AggregationSpecification,
+	MappingAlignment,
 } from '@paulscherrerinstitute/databuffer-query-js/query-data'
 import {
 	channelToId,
@@ -883,6 +884,9 @@ export namespace plotSelectors {
 				],
 				response: {
 					format: DataResponseFormatType.CSV,
+				},
+				mapping: {
+					alignment: MappingAlignment.BY_TIME,
 				},
 			}
 			const aggregation: AggregationSpecification = {
