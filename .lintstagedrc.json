@@ -1,5 +1,5 @@
 {
-  "*.{ts,html,md}": "prettier --write",
-  "*.ts": "eslint --fix",
-  ".*{rc,.json}": "jsonlint  --in-place"
+  "*.{ts,html,md}": "prettier",
+  "*.ts": "eslint",
+  ".*{rc,.json}": "jsonlint"
 }
