@@ -35,6 +35,12 @@ export class DaqPlotSeparateAxesElement extends LitElement {
 	@property({ type: Array })
 	yAxes: DaqPlotYAxis[] = []
 
+	@property({ type: Number })
+	xMax?: number
+
+	@property({ type: Number })
+	xMin?: number
+
 	@property({ type: Array })
 	series: DaqPlotDataSeries[] = []
 
@@ -57,6 +63,9 @@ export class DaqPlotSeparateAxesElement extends LitElement {
 		}
 		if (changedProperties.has('yAxes')) {
 			opts.yAxis = yAxis2HighchartsYAxisOptions(this.yAxes)
+		}
+		if (changedProperties.has('xMax') || changedProperties.has('xMin')) {
+			opts.xAxis = { min: this.xMin, max: this.xMax }
 		}
 		if (changedProperties.has('series')) {
 			opts.series = dataSeries2HighchartsSeriesOptions(this.series)

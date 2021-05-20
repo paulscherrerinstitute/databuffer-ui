@@ -349,6 +349,8 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					.title=${this.daqPlotConfig.title}
 					.subtitle=${this.daqPlotConfig.subtitle}
 					.yAxes=${this.daqPlotConfig.yAxes}
+					.xMin=${this.startTime}
+					.xMax=${this.endTime}
 					.series=${this.daqPlotConfig.series}
 				></daq-plot-separate-plots>`
 
@@ -357,6 +359,8 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					.title=${this.daqPlotConfig.title}
 					.subtitle=${this.daqPlotConfig.subtitle}
 					.yAxes=${this.daqPlotConfig.yAxes}
+					.xMin=${this.startTime}
+					.xMax=${this.endTime}
 					.series=${this.daqPlotConfig.series}
 				></daq-plot-separate-axes>`
 
@@ -365,6 +369,8 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					.title=${this.daqPlotConfig.title}
 					.subtitle=${this.daqPlotConfig.subtitle}
 					.yAxes=${this.daqPlotConfig.yAxes}
+					.xMin=${this.startTime}
+					.xMax=${this.endTime}
 					.series=${this.daqPlotConfig.series}
 				></daq-plot-single-axis>`
 

@@ -142,6 +142,12 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 	@property({ type: Array })
 	yAxes: DaqPlotYAxis[] = []
 
+	@property({ type: Number })
+	xMax?: number
+
+	@property({ type: Number })
+	xMin?: number
+
 	@property({ type: Array })
 	series: DaqPlotDataSeries[] = []
 
@@ -190,6 +196,9 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 			}
 			needsRefitXAxes = true
 		}
+		if (changedProperties.has('xMax') || changedProperties.has('xMin')) {
+			needsRefitXAxes = true
+		}
 		if (currentCount !== this.previousCount) {
 			// re-create all charts
 			this.chartgroupDiv.innerHTML = '' // remove all children
@@ -230,37 +239,11 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 	}
 
 	/**
-	 * scale all X axes according to the data in the series
+	 * scale all X axes according to xMin and xMax
 	 */
 	private refitXAxes() {
-		function extractMinMax(dataPoints: DaqPlotDataPoint[]) {
-			const xValues = dataPoints.map(p => p.x)
-			let min = xValues[0]
-			let max = min
-			for (const x of xValues) {
-				if (x < min) min = x
-				if (x > max) max = x
-			}
-			return { min, max }
-		}
-		if (this.series.length === 0) return
-		let firstSeriesWithData
-		for (const s of this.series) {
-			if (s.data.length === 0) continue
-			firstSeriesWithData = s
-			break
-		}
-		if (firstSeriesWithData === undefined) return
-		let { min, max } = extractMinMax(firstSeriesWithData.data)
-		for (const s of this.series) {
-			if (s === firstSeriesWithData) continue
-			if (s.data.length === 0) continue
-			const m = extractMinMax(s.data)
-			if (m.min < min) min = m.min
-			if (m.max > max) max = m.max
-		}
 		for (const chart of this.charts) {
-			chart.xAxis[0].setExtremes(min, max)
+			chart.xAxis[0].setExtremes(this.xMin, this.xMax)
 		}
 	}
 
