@@ -329,9 +329,12 @@ describe('plot model', () => {
 				})
 
 				it('uses the right defaults', async () => {
-					const fakeSetSelectedChannels = (rdxTest.dispatch.plot.setSelectedChannels = sinon.fake())
-					const fakeChangeEndTime = (rdxTest.dispatch.plot.changeEndTime = sinon.fake())
-					const fakeChangeStartTime = (rdxTest.dispatch.plot.changeStartTime = sinon.fake())
+					const fakeSetSelectedChannels =
+						(rdxTest.dispatch.plot.setSelectedChannels = sinon.fake())
+					const fakeChangeEndTime = (rdxTest.dispatch.plot.changeEndTime =
+						sinon.fake())
+					const fakeChangeStartTime = (rdxTest.dispatch.plot.changeStartTime =
+						sinon.fake())
 					const expectedChannels: Channel[] = []
 					const expectedEndTime = Date.now()
 					const expectedStartTime = expectedEndTime - 12 * 60 * 60 * 1000 // default = 12 hours

@@ -34,12 +34,10 @@ export class HomeElement extends connect(store, LitElement) {
 	mapState(state: AppState) {
 		return {
 			availableBackends: channelsearchSelectors.availableBackends(state),
-			availableBackendsFetching: channelsearchSelectors.availableBackendsFetching(
-				state
-			),
-			availableBackendsError: channelsearchSelectors.availableBackendsError(
-				state
-			),
+			availableBackendsFetching:
+				channelsearchSelectors.availableBackendsFetching(state),
+			availableBackendsError:
+				channelsearchSelectors.availableBackendsError(state),
 			pattern: channelsearchSelectors.pattern(state),
 		}
 	}

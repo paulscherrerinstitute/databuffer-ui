@@ -23,7 +23,7 @@ export const deepCopyState = <T>(obj: T): T => {
 	if (typeof obj === 'function')
 		throw new Error('Your state should not contain functions')
 	if (obj instanceof Array) {
-		return (obj.map(x => deepCopyState(x)) as unknown) as T
+		return obj.map(x => deepCopyState(x)) as unknown as T
 	}
 	if (typeof obj === 'object') {
 		// need to do a few casts to do this type trickery for TS

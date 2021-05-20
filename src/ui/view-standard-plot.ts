@@ -153,13 +153,11 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			channelsWithoutData: plotSelectors.channelsWithoutData(state),
 			queryRangeShowing: plotSelectors.queryRangeShowing(state),
 			dialogShareLinkShowing: plotSelectors.dialogShareLinkShowing(state),
-			dialogShareLinkAbsoluteTimes: plotSelectors.dialogShareLinkAbsoluteTimes(
-				state
-			),
+			dialogShareLinkAbsoluteTimes:
+				plotSelectors.dialogShareLinkAbsoluteTimes(state),
 			dialogShareLinkUrl: plotSelectors.dialogShareLinkUrl(state),
-			dialogShareLinkChannelsTruncated: plotSelectors.dialogShareLinkChannelsTruncated(
-				state
-			),
+			dialogShareLinkChannelsTruncated:
+				plotSelectors.dialogShareLinkChannelsTruncated(state),
 			dialogDownloadShowing: plotSelectors.dialogDownloadShowing(state),
 			dialogDownloadAggregation: plotSelectors.dialogDownloadAggregation(state),
 			dialogDownloadCurlCommand: plotSelectors.dialogDownloadCurlCommand(state),

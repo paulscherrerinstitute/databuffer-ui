@@ -185,16 +185,17 @@ export const plot = createModel({
 					})),
 				dataSeries: state.dataSeries
 					.filter((x, idx) => idx !== index)
-					.map((
-						x // shift the indices for all items after the unselected item
-					) =>
-						x.channelIndex < index
-							? x
-							: {
-									...x,
-									channelIndex: x.channelIndex - 1,
-									yAxisIndex: x.yAxisIndex - 1,
-							  }
+					.map(
+						(
+							x // shift the indices for all items after the unselected item
+						) =>
+							x.channelIndex < index
+								? x
+								: {
+										...x,
+										channelIndex: x.channelIndex - 1,
+										yAxisIndex: x.yAxisIndex - 1,
+								  }
 					),
 			}
 		},

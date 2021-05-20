@@ -39,9 +39,8 @@ declare module 'highcharts' {
 // can't just leave it at that. We have to undo it after removing this
 // type of element. Otherwise the change will affect charts in other
 // elements as well.
-let __orig_pointer_reset:
-	| typeof Highcharts.Pointer.prototype.reset
-	| null = null
+let __orig_pointer_reset: typeof Highcharts.Pointer.prototype.reset | null =
+	null
 
 let __numConnectedElements = 0
 

@@ -65,11 +65,12 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 	}
 
 	private _recalcResultsForDisplay() {
-		this.resultsForDisplay = (this.activeFilters.length === 0
-			? this.searchResults
-			: this.searchResults.filter(x =>
-					this.activeFilters.every(f => x.tags.indexOf(f) >= 0)
-			  )
+		this.resultsForDisplay = (
+			this.activeFilters.length === 0
+				? this.searchResults
+				: this.searchResults.filter(x =>
+						this.activeFilters.every(f => x.tags.indexOf(f) >= 0)
+				  )
 		).slice(0, this.maxResults)
 	}
 
