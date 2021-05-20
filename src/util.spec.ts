@@ -1,7 +1,13 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 
-import { formatDate, omitFromArray } from './util'
+import {
+	formatDate,
+	omitFromArray,
+	timeRangeDay,
+	timeRangeMonth,
+	timeRangeWeek,
+} from './util'
 
 describe('module util.ts', () => {
 	describe('formatDate', () => {
@@ -63,6 +69,44 @@ describe('module util.ts', () => {
 			expect(omitFromArray(input, -3)).to.deep.equal([10, 30, 40])
 			expect(omitFromArray(input, -2)).to.deep.equal([10, 20, 40])
 			expect(omitFromArray(input, -1)).to.deep.equal([10, 20, 30])
+		})
+	})
+
+	describe('timeRangeDay', () => {
+		it('sets the right start and end', () => {
+			const referenceDate = new Date(2021, 4, 19, 12, 34, 56, 789).getTime()
+			const expectedStart = new Date(2021, 4, 19, 0, 0, 0, 0).getTime()
+			const expectedEnd = new Date(2021, 4, 19, 23, 59, 59, 999).getTime()
+			const { start, end } = timeRangeDay(referenceDate)
+			expect(start).to.equal(expectedStart)
+			expect(end).to.equal(expectedEnd)
+		})
+	})
+
+	describe('timeRangeMonth', () => {
+		it('sets the right start and end', () => {
+			const referenceDate = new Date(2021, 4, 19, 12, 34, 56, 789).getTime()
+			const expectedStart = new Date(2021, 4, 1, 0, 0, 0, 0).getTime()
+			// remember the Date constructor has 0-based months (0 == Jan, 1 == Feb, ... 11 == Dec)
+			// so 4 == May --> last day in May == 31
+			const expectedEnd = new Date(2021, 4, 31, 23, 59, 59, 999).getTime()
+			const { start, end } = timeRangeMonth(referenceDate)
+			expect(start).to.equal(expectedStart)
+			expect(end).to.equal(expectedEnd)
+		})
+	})
+
+	describe('timeRangeWeek', () => {
+		it('sets the right start and end', () => {
+			const referenceDate = new Date(2021, 4, 19, 12, 34, 56, 789).getTime()
+			// 2021-05-19 is a Wednesday
+			//   --> expectedStart = 2021-05-17 (Monday)
+			//   --> expectedEnd = 2021-05-23 (Sunday)
+			const expectedStart = new Date(2021, 4, 17, 0, 0, 0, 0).getTime()
+			const expectedEnd = new Date(2021, 4, 23, 23, 59, 59, 999).getTime()
+			const { start, end } = timeRangeWeek(referenceDate)
+			expect(start).to.equal(expectedStart)
+			expect(end).to.equal(expectedEnd)
 		})
 	})
 })

@@ -1,3 +1,5 @@
+import * as datefns from 'date-fns'
+
 /**
  * Format a timestamp in local time in an ISO8601 style format.
  *
@@ -39,4 +41,53 @@ export function isEmptyObj(obj: Record<string, unknown>) {
 	// implementation kudos to https://stackoverflow.com/a/59787784/4320236
 	for (const _ in obj) return false
 	return true
+}
+
+/**
+ * A time range using JS timestamps (milliesconds since 1970-01-01 00:00 UTC)
+ */
+export interface TimeRange {
+	start: number
+	end: number
+}
+
+/**
+ * Return the TimeRange from 00:00:00.000 - 23:59:59.999 for a given baseDate
+ *
+ * @param baseDate msec timestamp for reference
+ * @returns TimeRange object with `start` and `end` timestamps
+ */
+export function timeRangeDay(baseDate: number): TimeRange {
+	const d = new Date(baseDate)
+	const start = d.setHours(0, 0, 0, 0)
+	const end = d.setHours(23, 59, 59, 999)
+	return { start, end }
+}
+
+/**
+ * Return the TimeRange from first-of-month@00:00:00.000 - last-of-month@23:59:59.999 for a given baseDate
+ *
+ * @param baseDate msec timestamp for reference
+ * @returns TimeRange object with `start` and `end` timestamps
+ */
+export function timeRangeMonth(baseDate: number): TimeRange {
+	const start = datefns.setDate(baseDate, 1).setHours(0, 0, 0, 0)
+	const end = datefns.lastDayOfMonth(baseDate).setHours(23, 59, 59, 999)
+	return { start, end }
+}
+
+/**
+ * Return the TimeRange from Monday@00:00:00.000 - Sunday@23:59:59.999 for a given baseDate
+ *
+ * @param baseDate msec timestamp for reference
+ * @returns TimeRange object with `start` and `end` timestamps
+ */
+export function timeRangeWeek(baseDate: number): TimeRange {
+	const start = datefns
+		.setDay(baseDate, 1, { weekStartsOn: 1 })
+		.setHours(0, 0, 0, 0)
+	const end = datefns
+		.lastDayOfWeek(baseDate, { weekStartsOn: 1 })
+		.setHours(23, 59, 59, 999)
+	return { start, end }
 }

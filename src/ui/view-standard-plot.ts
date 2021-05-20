@@ -33,7 +33,13 @@ import './daq-plot/daq-plot-separate-axes'
 import './daq-plot/daq-plot-separate-plots'
 import './daq-plot/daq-plot-single-axis'
 
-import { formatDate } from '../util'
+import {
+	formatDate,
+	TimeRange,
+	timeRangeDay,
+	timeRangeWeek,
+	timeRangeMonth,
+} from '../util'
 import { AppState, store } from '../state/store'
 import {
 	Channel,
@@ -232,73 +238,45 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		this.__quickDial.show()
 	}
 
-	private __setTimeRange(startTime: number, endTime: number) {
-		store.dispatch.plot.changeEndTime(endTime)
-		store.dispatch.plot.changeStartTime(startTime)
+	private __setTimeRange(range: TimeRange) {
+		store.dispatch.plot.changeEndTime(range.end)
+		store.dispatch.plot.changeStartTime(range.start)
 	}
 
 	private __quickDialRelative(deltaMs: number) {
-		const endTime = Date.now()
-		const startTime = endTime - deltaMs
-		this.__setTimeRange(startTime, endTime)
+		const end = Date.now()
+		const start = end - deltaMs
+		this.__setTimeRange({ start, end })
 	}
 
 	private __quickDialYesterday() {
-		const d = datefns.subDays(new Date(), 1)
-		d.setHours(0, 0, 0, 0)
-		const startTime = d.getTime()
-		d.setHours(23, 59, 59, 999)
-		const endTime = d.getTime()
-		this.__setTimeRange(startTime, endTime)
+		const range = timeRangeDay(datefns.subDays(new Date(), 1).getTime())
+		this.__setTimeRange(range)
 	}
 
 	private __quickDialToday() {
-		const d = new Date()
-		d.setHours(0, 0, 0, 0)
-		const startTime = d.getTime()
-		d.setHours(23, 59, 59, 999)
-		const endTime = d.getTime()
-		this.__setTimeRange(startTime, endTime)
+		const range = timeRangeDay(Date.now())
+		this.__setTimeRange(range)
 	}
 
 	private __quickDialLastWeek() {
-		const d = datefns.setDay(datefns.subDays(new Date(), 7), 1, {
-			weekStartsOn: 1,
-		})
-		d.setHours(0, 0, 0, 0)
-		const startTime = d.getTime()
-		d.setHours(23, 59, 59, 999)
-		const endTime = datefns.addDays(d, 6).getTime()
-		this.__setTimeRange(startTime, endTime)
+		const range = timeRangeWeek(datefns.subWeeks(new Date(), 1).getTime())
+		this.__setTimeRange(range)
 	}
 
 	private __quickDialThisWeek() {
-		const d = datefns.setDay(new Date(), 1, {
-			weekStartsOn: 1,
-		})
-		d.setHours(0, 0, 0, 0)
-		const startTime = d.getTime()
-		d.setHours(23, 59, 59, 999)
-		const endTime = datefns.addDays(d, 6).getTime()
-		this.__setTimeRange(startTime, endTime)
+		const range = timeRangeWeek(Date.now())
+		this.__setTimeRange(range)
 	}
 
 	private __quickDialLastMonth() {
-		const d = datefns.setDate(datefns.subMonths(new Date(), 1), 1)
-		d.setHours(0, 0, 0, 0)
-		const startTime = d.getTime()
-		d.setHours(23, 59, 59, 999)
-		const endTime = datefns.lastDayOfMonth(d).getTime()
-		this.__setTimeRange(startTime, endTime)
+		const range = timeRangeMonth(datefns.subMonths(new Date(), 1).getTime())
+		this.__setTimeRange(range)
 	}
 
 	private __quickDialThisMonth() {
-		const d = datefns.setDate(new Date(), 1)
-		d.setHours(0, 0, 0, 0)
-		const startTime = d.getTime()
-		d.setHours(23, 59, 59, 999)
-		const endTime = datefns.lastDayOfMonth(d).getTime()
-		this.__setTimeRange(startTime, endTime)
+		const range = timeRangeMonth(Date.now())
+		this.__setTimeRange(range)
 	}
 
 	private __plot() {
