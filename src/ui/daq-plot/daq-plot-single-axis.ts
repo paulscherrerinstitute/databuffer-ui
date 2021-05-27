@@ -7,7 +7,7 @@ import {
 	property,
 	query,
 } from 'lit-element'
-import { isEmptyObj } from '../../util'
+import { isEmptyObj, TimeRange } from '../../util'
 import { DaqPlotDataSeries, DaqPlotYAxis } from './types'
 
 import {
@@ -44,10 +44,17 @@ export class DaqPlotSingleAxisElement extends LitElement {
 	@property({ type: Array })
 	series: DaqPlotDataSeries[] = []
 
+	// @property({ type: Boolean })
+	// reloadOnZoom: boolean = false
+
 	@query('#chart')
 	private chartDiv!: HTMLDivElement
 
 	private chart!: Highcharts.Chart
+
+	public zoomOut() {
+		this.chart.zoomOut()
+	}
 
 	firstUpdated() {
 		this.chart = initChart(this.chartDiv)

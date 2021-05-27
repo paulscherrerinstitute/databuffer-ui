@@ -49,6 +49,10 @@ export class DaqPlotSeparateAxesElement extends LitElement {
 
 	private chart!: Highcharts.Chart
 
+	public zoomOut() {
+		this.chart.zoomOut()
+	}
+
 	firstUpdated() {
 		this.chart = initChart(this.chartDiv)
 	}

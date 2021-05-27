@@ -157,6 +157,12 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 
 	private previousCount: number = 0
 
+	public zoomOut() {
+		for (const chart of this.charts) {
+			chart.zoomOut()
+		}
+	}
+
 	connectedCallback() {
 		super.connectedCallback()
 		__registerElem()

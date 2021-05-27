@@ -1,5 +1,6 @@
 import Highcharts from 'highcharts'
 import highchartsMore from 'highcharts/highcharts-more'
+import { formatDate, TimeRange } from '../../util'
 import type { DaqPlotDataSeries, DaqPlotYAxis } from './types'
 import { needsBinning } from './util'
 
@@ -17,16 +18,28 @@ export function getColor(idx: number | undefined): string | undefined {
 export function initChart(container: HTMLElement) {
 	return Highcharts.chart(container, {
 		chart: {
-			// events: {
-			// 	selection: (e: Highcharts.ChartSelectionContextObject): boolean => {
-			// 		if (reloadOnZoom) {
-			// 			this.__setTimeRange(e.xAxis[0].min, e.xAxis[0].max)
-			// 			this.__plot()
-			// 			return false
-			// 		}
-			// 		return true
-			// 	},
-			// },
+			events: {
+				selection: (e: Highcharts.ChartSelectionContextObject): boolean => {
+					// e.xAxis and e.yAxis are present when zooming
+					// they are *not* present, when clicking "Reset zoom", but the handler will fire
+					if (e.xAxis && e.yAxis) {
+						const timeRange: TimeRange = {
+							start: e.xAxis[0].min,
+							end: e.xAxis[0].max,
+						}
+						const event = new CustomEvent<TimeRange>('highchartszoom', {
+							composed: true,
+							bubbles: true,
+							cancelable: true,
+							detail: timeRange,
+						})
+						const ret = container.dispatchEvent(event)
+						return ret
+					}
+					// reset zoom has been clicked -- do nothing
+					return true
+				},
+			},
 			panKey: 'shift',
 			panning: {
 				enabled: true,

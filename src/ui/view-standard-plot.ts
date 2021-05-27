@@ -58,13 +58,15 @@ import type {
 	DaqPlotDataSeries,
 	DaqPlotYAxis,
 } from './daq-plot/types'
+import type { DaqPlotSingleAxisElement } from './daq-plot/daq-plot-single-axis'
+import type { DaqPlotSeparateAxesElement } from './daq-plot/daq-plot-separate-axes'
+import type { DaqPlotSeparatePlotsElement } from './daq-plot/daq-plot-separate-plots'
 
 const TIMESTAMP_PATTERN = `^\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}\\.\\d{3}$`
 const TIMESTAMP_REGEX = new RegExp(TIMESTAMP_PATTERN)
 
 const IS_MAC = window.navigator.appVersion.toLowerCase().indexOf('mac') >= 0
 const KEY_RELOAD_ZOOM = IS_MAC ? 'Meta' : 'Ctrl'
-let reloadOnZoom = false
 
 // see https://www.highcharts.com/forum/viewtopic.php?t=35113
 highchartsMore(Highcharts)
@@ -94,6 +96,8 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@property({ attribute: false }) plotVariation!: PlotVariation
 	@property({ attribute: false }) daqPlotConfig!: DaqPlotConfig
 
+	private reloadOnZoom = false
+
 	private dialogDownloadCurlCommand = ''
 
 	private __calcCanPlot(): boolean {
@@ -120,6 +124,12 @@ export class StandardPlotElement extends connect(store, LitElement) {
 
 	@query('#chart')
 	private __chartContainer!: HTMLElement
+
+	@query('#daqplot')
+	private __daqplot!:
+		| DaqPlotSingleAxisElement
+		| DaqPlotSeparateAxesElement
+		| DaqPlotSeparatePlotsElement
 
 	@query('#badtimeformat')
 	private __snackBadTimeFormat!: Snackbar
@@ -173,36 +183,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	}
 
 	firstUpdated() {
-		// this.__chart = Highcharts.chart(this.__chartContainer, {
-		// 	chart: {
-		// 		type: 'line',
-		// 		events: {
-		// 			selection: (e: Highcharts.ChartSelectionContextObject): boolean => {
-		// 				if (reloadOnZoom) {
-		// 					this.__setTimeRange(e.xAxis[0].min, e.xAxis[0].max)
-		// 					this.__plot()
-		// 					return false
-		// 				}
-		// 				return true
-		// 			},
-		// 		},
-		// 		panKey: 'shift',
-		// 		panning: {
-		// 			enabled: true,
-		// 			type: 'xy',
-		// 		},
-		// 		zoomType: 'xy',
-		// 	},
-		// 	series: [],
-		// 	xAxis: {
-		// 		type: 'datetime',
-		// 		crosshair: true,
-		// 	},
-		// 	time: {
-		// 		useUTC: false,
-		// 	},
-		// 	tooltip: { shared: true },
-		// })
 		this.canPlot = this.__calcCanPlot()
 	}
 
@@ -307,21 +287,30 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		store.dispatch.plot.changeEndTime(d)
 	}
 
-	private __keydown(e: KeyboardEvent) {
+	// we must define __keydown with an arrow function, not as a regular method,
+	// to make sure, that `this` is bound correctly
+	// otherwise, it will be the window object (when called at runtime)
+	private __keydown = (e: KeyboardEvent) => {
 		if (e.repeat) return
 		if (e.key !== KEY_RELOAD_ZOOM) return
-		reloadOnZoom = true
+		;(() => {
+			this.reloadOnZoom = true
+		})()
 	}
 
-	private __keyup(e: KeyboardEvent) {
+	// we must define __keyup with an arrow function, not as a regular method,
+	// to make sure, that `this` is bound correctly
+	// otherwise, it will be the window object (when called at runtime)
+	private __keyup = (e: KeyboardEvent) => {
 		if (e.key !== KEY_RELOAD_ZOOM) return
-		reloadOnZoom = false
+		this.reloadOnZoom = false
 	}
 
 	private renderPlot() {
 		switch (this.plotVariation) {
 			case PlotVariation.SeparatePlots:
 				return html`<daq-plot-separate-plots
+					id="daqplot"
 					.title=${this.daqPlotConfig.title}
 					.subtitle=${this.daqPlotConfig.subtitle}
 					.yAxes=${this.daqPlotConfig.yAxes}
@@ -332,6 +321,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 
 			case PlotVariation.SeparateAxes:
 				return html`<daq-plot-separate-axes
+					id="daqplot"
 					.title=${this.daqPlotConfig.title}
 					.subtitle=${this.daqPlotConfig.subtitle}
 					.yAxes=${this.daqPlotConfig.yAxes}
@@ -342,6 +332,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 
 			case PlotVariation.SingleAxis:
 				return html`<daq-plot-single-axis
+					id="daqplot"
 					.title=${this.daqPlotConfig.title}
 					.subtitle=${this.daqPlotConfig.subtitle}
 					.yAxes=${this.daqPlotConfig.yAxes}
@@ -355,6 +346,15 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		}
 	}
 
+	private __onHighchartsZoom(e: CustomEvent<TimeRange>) {
+		if (this.reloadOnZoom) {
+			this.__daqplot.zoomOut()
+			this.__setTimeRange(e.detail)
+			this.__plot()
+			e.preventDefault()
+		}
+	}
+
 	render() {
 		return html`
 			${this.__renderQueryRange()} ${this.__renderQuickDial()}
@@ -364,7 +364,11 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				There was an error:
 				<p>${this.error ? this.error.message : ''}</p>
 			</div>
-			<div id="chart" ?hidden="${!this.shouldDisplayChart}">
+			<div
+				@highchartszoom=${this.__onHighchartsZoom}
+				id="chart"
+				?hidden="${!this.shouldDisplayChart}"
+			>
 				${this.renderPlot()}
 			</div>
 			<mwc-snackbar
