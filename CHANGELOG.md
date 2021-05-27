@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.5.2](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.5.1...v4.5.2) (2021-05-27)
+
+
+### Bug Fixes
+
+* auto focus of search field ([d563224](https://github.com/paulscherrerinstitute/databuffer-ui/commit/d5632243efef5b908a7e62dc08356819a41192cf)), closes [#118](https://github.com/paulscherrerinstitute/databuffer-ui/issues/118)
+* quick selection for month was wrong ([2c14abe](https://github.com/paulscherrerinstitute/databuffer-ui/commit/2c14abefdbbeeea69f81b40b16610be293084134)), closes [#107](https://github.com/paulscherrerinstitute/databuffer-ui/issues/107)
+* time axis synced to query range ([6b30429](https://github.com/paulscherrerinstitute/databuffer-ui/commit/6b30429eaf6af7b03c47b817ba91d1983f2beb1b)), closes [#112](https://github.com/paulscherrerinstitute/databuffer-ui/issues/112)
+* zoom with reload ([e00c2ee](https://github.com/paulscherrerinstitute/databuffer-ui/commit/e00c2ee7a782ade663a1bb0c9d52d82ca857f2f5)), closes [#73](https://github.com/paulscherrerinstitute/databuffer-ui/issues/73)
+
 ### [4.5.1](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.5.0...v4.5.1) (2021-03-22)
 
 
