@@ -10,6 +10,12 @@ The online manual is [located here](./docs/index.md).
 
 The change log is [located here](./CHANGELOG.md).
 
+## Issues
+
+Open issues are [located here](https://github.com/paulscherrerinstitute/databuffer-ui/issues) and organized using [milestones](https://github.com/paulscherrerinstitute/databuffer-ui/milestones). The milestones roughly follow our quarterly users' meetings.
+
+**Note:** Within the milestones view, the issues are **ordered by priority**, i.e. the top most issue has the highest priority and will be worked on next.
+
 ## Running the UI with docker
 
 The recommended way to run the UI (e.g. if you want to test a new backend) is through docker.
