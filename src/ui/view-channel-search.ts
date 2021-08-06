@@ -85,7 +85,7 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 			<div id="search">
 				<mwc-textfield
 					id="query"
-					label="Search for EPICS channels"
+					label="Search Data API"
 					helper="Search supports regular expressions"
 					value="${this.pattern}"
 					@keyup=${(e: KeyboardEvent): void => {

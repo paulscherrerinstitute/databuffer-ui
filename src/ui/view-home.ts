@@ -59,7 +59,7 @@ export class HomeElement extends connect(store, LitElement) {
 
 					<mwc-textfield
 						id="query"
-						label="Search for EPICS channels"
+						label="Search Data API"
 						helper="Search supports regular expressions"
 						@change=${() =>
 							store.dispatch.channelsearch.patternChange(this.__query.value)}
