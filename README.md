@@ -29,6 +29,7 @@ The docker image is configured through environment variables:
 | `DATA_UI_DISPATCHER_API`      | Full URL to the dispatcher API endpoint.                | https://my-dispatcher.example.org/foo/bar       |
 | `DATA_UI_QUERY_API`           | Full URL to the data query API endpoint.                | https://my-data-api.example.org/foo/bar         |
 | `DATA_UI_TITLE`               | Application Title                                       | BETA Databuffer UI                              |
+| `DATA_UI_CONTACT_EMAIL`       | Email address on home page                              | data-ui-support@example.org                     |
 | `DATA_UI_COLOR_PRIMARY_HUE`   | Hue of primary color (number between 0 and 360)         | 90                                              |
 | `DATA_UI_COLOR_ON_PRIMARY`    | CSS color string for text _on_ primary color elements   | `#ffffff` or `white` or `rgb(100%, 100%, 100%)` |
 | `DATA_UI_COLOR_SECONDARY_HUE` | Hue of secondary color (number between 0 and 360)       | 90                                              |

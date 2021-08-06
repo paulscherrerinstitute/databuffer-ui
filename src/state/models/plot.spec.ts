@@ -2194,6 +2194,7 @@ describe('plot model', () => {
 					TITLE: 'unit test ui',
 					QUERY_API: 'http://localhost:8080/query-api',
 					DISPATCHER_API: 'http://localhost:8080/dispatcher-api',
+					CONTACT_EMAIL: 'test@example.org',
 				}
 				state = {
 					...store.state,
