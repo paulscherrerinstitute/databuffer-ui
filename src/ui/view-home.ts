@@ -111,7 +111,7 @@ export class HomeElement extends connect(store, LitElement) {
 						<a
 							href="https://github.com/paulscherrerinstitute/databuffer-ui/issues/"
 							>on GitHub</a
-						>${window.DatabufferUi.CONTACT_EMAIL ? html`
+						> ${window.DatabufferUi.CONTACT_EMAIL ? html`
 						or
 						<a href="mailto:${window.DatabufferUi.CONTACT_EMAIL}?subject=Feedback%20on%20databuffer-ui"
 							>by email</a
