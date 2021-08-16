@@ -19,18 +19,6 @@ import { DaqPlotYAxis, DaqPlotDataSeries, DaqPlotDataPoint } from './types'
 
 //#region Highcharts manipulations
 
-// add type declaration for the internal method `searchPoint`
-//
-// see: https://www.highcharts.com/forum/viewtopic.php?t=42923
-declare module 'highcharts' {
-	interface Series {
-		searchPoint: (
-			event: Highcharts.PointerEventObject,
-			flag: boolean
-		) => Highcharts.Point
-	}
-}
-
 // For synchronizing the charts' crosshairs we need to fix-up various
 // Highcharts prototypes.
 // (see https://www.highcharts.com/demo/synchronized-charts)
