@@ -12,11 +12,11 @@ import {
 	DataResponseFormatType,
 	AggregationSpecification,
 	MappingAlignment,
-} from '@paulscherrerinstitute/databuffer-query-js/query-data'
+} from '@paulscherrerinstitute/databuffer-query-js/api/v0/query-data'
 import {
 	channelToId,
 	idToChannel,
-} from '@paulscherrerinstitute/databuffer-query-js/channel'
+} from '@paulscherrerinstitute/databuffer-query-js/api/v0/channel'
 import { DataResponse, queryRestApi } from '../../api/queryrest'
 import { EffectsStore, AppState } from '../store'
 import { formatDate } from '../../util'
