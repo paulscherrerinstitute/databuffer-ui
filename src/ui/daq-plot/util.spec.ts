@@ -1,6 +1,3 @@
-import { describe, it } from 'mocha'
-import { expect } from 'chai'
-
 import { needsBinning } from './util'
 import { DaqPlotDataPoint } from './types'
 
@@ -17,18 +14,18 @@ describe('module daq-plot/util', () => {
 		})
 
 		it('returns false for empty array', () => {
-			expect(needsBinning([])).to.be.false
+			expect(needsBinning([])).toBe(false)
 		})
 
 		it('returns false if all data points have bin size 1', () => {
-			expect(needsBinning(points)).to.be.false
+			expect(needsBinning(points)).toBe(false)
 		})
 
 		it('returns false if just one data point has bin size >1', () => {
 			for (let i = 0; i < points.length; i++) {
 				const testData = [...points]
 				testData[i].binSize = 2
-				expect(needsBinning(testData)).to.be.true
+				expect(needsBinning(testData)).toBe(true)
 			}
 		})
 	})
