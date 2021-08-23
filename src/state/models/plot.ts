@@ -116,6 +116,7 @@ export interface PlotState {
 	endTime: number
 	channels: Channel[]
 	dataRequests: DataRequestMeta[]
+	pendingRequests: number
 	yAxes: YAxis[]
 	dataSeries: DataSeries[]
 	queryRangeShowing: boolean
@@ -140,7 +141,7 @@ export const plot = createModel({
 		endTime: Date.now(),
 		channels: [],
 		dataRequests: [],
-		response: [],
+		pendingRequests: 0,
 		yAxes: [],
 		dataSeries: [],
 		queryRangeShowing: false,
@@ -271,43 +272,72 @@ export const plot = createModel({
 			}
 		},
 
-		drawPlotRequest(state, sentAt: number) {
+		drawPlotRequest(state, payload: { channelIndex: number; sentAt: number }) {
+			const { channelIndex, sentAt } = payload
 			return {
 				...state,
-				fetching: true,
-				error: undefined,
-				request: {
-					sentAt,
-					finishedAt: undefined,
-				},
-				response: [],
+				dataRequests: state.dataRequests.map((r, idx) =>
+					idx !== channelIndex
+						? r
+						: {
+								..._make_empty_datarequest(),
+								request: {
+									sentAt,
+									finishedAt: undefined,
+								},
+						  }
+				),
+				pendingRequests: state.pendingRequests + 1,
 			}
 		},
 
 		drawPlotSuccess(
 			state,
-			payload: { timestamp: number; response: DataResponse }
+			payload: {
+				channelIndex: number
+				timestamp: number
+				response: DataResponse
+			}
 		) {
 			return {
 				...state,
-				fetching: false,
-				request: {
-					...state.request,
-					finishedAt: payload.timestamp,
-				},
-				response: payload.response,
+				dataRequests: state.dataRequests.map((r, idx) =>
+					idx !== payload.channelIndex
+						? r
+						: {
+								...r,
+								fetching: false,
+								request: {
+									...r.request,
+									finishedAt: payload.timestamp,
+								},
+								response: payload.response,
+						  }
+				),
+				pendingRequests: state.pendingRequests - 1,
 			}
 		},
 
-		drawPlotFailure(state, payload: { timestamp: number; error: Error }) {
+		drawPlotFailure(
+			state,
+			payload: { channelIndex: number; timestamp: number; error: Error }
+		) {
 			return {
 				...state,
-				fetching: false,
-				request: {
-					...state.request,
-					finishedAt: payload.timestamp,
-				},
-				error: payload.error,
+				dataRequests: state.dataRequests.map((r, idx) =>
+					idx !== payload.channelIndex
+						? r
+						: {
+								...r,
+								fetching: false,
+								request: {
+									...r.request,
+									finishedAt: payload.timestamp,
+								},
+								error: payload.error,
+						  }
+				),
+				pendingRequests: state.pendingRequests - 1,
 			}
 		},
 
@@ -415,12 +445,25 @@ export const plot = createModel({
 			async drawPlot() {
 				const query = plotSelectors.plotQuery(store.getState())
 				dispatch.plot.hideQueryRange()
-				dispatch.plot.drawPlotRequest(Date.now())
-				try {
-					const response = await queryRestApi.queryData(query)
-					dispatch.plot.drawPlotSuccess({ timestamp: Date.now(), response })
-				} catch (error) {
-					dispatch.plot.drawPlotFailure({ timestamp: Date.now(), error })
+				const channels = plotSelectors.channels(store.getState())
+				for (let i = 0; i < channels.length; i++) {
+					dispatch.plot.drawPlotRequest({ channelIndex: i, sentAt: Date.now() })
+					queryRestApi
+						.queryData(query) // TODO: this needs adjusting to 1 single channel
+						.then(response => {
+							dispatch.plot.drawPlotSuccess({
+								channelIndex: i,
+								timestamp: Date.now(),
+								response,
+							})
+						})
+						.catch(error => {
+							dispatch.plot.drawPlotFailure({
+								channelIndex: i,
+								timestamp: Date.now(),
+								error,
+							})
+						})
 				}
 			},
 
@@ -640,36 +683,70 @@ export namespace plotSelectors {
 	export const startTime = createSelector([getState], state => state.startTime)
 	export const endTime = createSelector([getState], state => state.endTime)
 	export const channels = createSelector([getState], state => state.channels)
-	export const error = createSelector([getState], state => state.error)
-	export const fetching = createSelector([getState], state => state.fetching)
-	export const response = createSelector([getState], state => state.response)
-	export const requestSentAt = createSelector(
+	export const dataRequests = createSelector(
 		[getState],
-		state => state.request.sentAt
+		state => state.dataRequests
 	)
-	export const requestFinishedAt = createSelector(
+	export const pendingRequests = createSelector(
 		[getState],
-		state => state.request.finishedAt
+		state => state.pendingRequests
 	)
-	export const requestDuration = createSelector(
-		[requestSentAt, requestFinishedAt],
-		(sentAt, finishedAt) =>
-			finishedAt && sentAt ? finishedAt - sentAt : undefined
+	export const requestErrors = createSelector([dataRequests], dataRequests =>
+		dataRequests.map(r => r.error)
+	)
+	export const anyRequestErrors = createSelector(
+		[requestErrors],
+		errors => errors.filter(Boolean).length > 0
+	)
+	export const allRequestsFinished = createSelector(
+		[dataRequests],
+		dataRequests => dataRequests.every(r => !r.fetching)
 	)
 	export const shouldDisplayChart = createSelector(
-		[requestFinishedAt, error],
-		(finishedAt, error) => !!finishedAt && !error
+		[dataRequests],
+		dataRequests => dataRequests.some(r => !r.fetching && r.error === undefined)
+	)
+	/** timestamp of first started request */
+	export const firstRequestSentAt = createSelector(
+		[dataRequests],
+		dataRequests => {
+			const times = dataRequests
+				.map(r => r.request.sentAt)
+				.filter(x => x !== undefined) as number[]
+			if (times.length === 0) return undefined
+			return Math.max(...times)
+		}
+	)
+	/** timestamp of last finished request */
+	export const lastRequestFinishedAt = createSelector(
+		[dataRequests],
+		dataRequests => {
+			const times = dataRequests
+				.map(r => r.request.finishedAt)
+				.filter(x => x !== undefined) as number[]
+			if (times.length === 0) return undefined
+			return Math.max(...times)
+		}
+	)
+	export const totalRequestDuration = createSelector(
+		[firstRequestSentAt, lastRequestFinishedAt],
+		(firstRequestSentAt, lastRequestFinishedAt) =>
+			firstRequestSentAt === undefined || lastRequestFinishedAt === undefined
+				? undefined
+				: lastRequestFinishedAt - firstRequestSentAt
 	)
 	export const plotSubTitle = createSelector(
-		[requestFinishedAt],
+		[lastRequestFinishedAt],
 		requestFinishedAt =>
 			requestFinishedAt ? `Data retrieved ${formatDate(requestFinishedAt)}` : ''
 	)
 
-	export const channelsWithoutData = createSelector([response], response =>
-		response
-			.filter((x: DataResponseItem) => x.data.length === 0)
-			.map(x => x.channel)
+	export const channelsWithoutData = createSelector(
+		[dataRequests],
+		dataRequests =>
+			dataRequests
+				.filter(r => r.response.length === 1)
+				.map(r => r.response[0].channel)
 	)
 
 	export const yAxes = createSelector([getState], state => state.yAxes)
@@ -680,25 +757,16 @@ export namespace plotSelectors {
 	)
 
 	export const dataPoints = createSelector(
-		[channels, response],
-		(channels, response) =>
-			channels.map(x => {
-				const responseIndex = response.findIndex(
-					item => channelToId(item.channel) === channelToId(x)
-				)
-				if (responseIndex === -1)
-					return {
-						responseIndex,
-						needsBinning: false,
-						data: [],
-					}
-				const responseItem = response[responseIndex]
+		[channels, dataRequests],
+		(channels, dataRequests) =>
+			channels.map((x, idx) => {
+				const response = dataRequests[idx].response
+				const responseItem = response[0] // only 1 channel per request
 				const binning = needsBinning(responseItem)
 				const data = binning
 					? responseItem.data.map(mapDataPointWithBinning)
 					: responseItem.data.map(mapDataPointWithoutBinning)
 				return {
-					responseIndex,
 					needsBinning: binning,
 					data,
 				}
@@ -720,31 +788,22 @@ export namespace plotSelectors {
 	)
 
 	export const daqPlotDataSeries = createSelector(
-		[channels, response, dataSeriesConfigs],
-		(channels, response, dataSeriesConfigs) => {
-			const result: DaqPlotDataSeries[] = []
-			for (let i = 0; i < channels.length; i++) {
-				const responseIndex = response.findIndex(
-					item => channelToId(item.channel) === channelToId(channels[i])
-				)
-				const s: DaqPlotDataSeries = {
-					name: dataSeriesConfigs[i].name,
-					yAxis: dataSeriesConfigs[i].yAxisIndex,
-					data:
-						responseIndex < 0
-							? []
-							: response[responseIndex].data.map(item => ({
-									x: item.globalMillis as number,
-									min: (item.value as AggregationResult).min as number,
-									max: (item.value as AggregationResult).max as number,
-									mean: (item.value as AggregationResult).mean as number,
-									binSize: item.eventCount as number,
-							  })),
-				}
-				result.push(s)
-			}
-			return result
-		}
+		[channels, dataRequests, dataSeriesConfigs],
+		(channels, dataRequests, dataSeriesConfigs) =>
+			channels.map((_, i) => ({
+				name: dataSeriesConfigs[i].name,
+				yAxis: dataSeriesConfigs[i].yAxisIndex,
+				data:
+					dataRequests[i].response.length === 0
+						? []
+						: dataRequests[i].response[0].data.map(item => ({
+								x: item.globalMillis as number,
+								min: (item.value as AggregationResult).min as number,
+								max: (item.value as AggregationResult).max as number,
+								mean: (item.value as AggregationResult).mean as number,
+								binSize: item.eventCount as number,
+						  })),
+			}))
 	)
 
 	export const daqPlotConfig = createSelector(

@@ -43,6 +43,7 @@ import {
 import { AppState, store } from '../state/store'
 import {
 	Channel,
+	DataRequestMeta,
 	DataSeries,
 	DownloadAggregation,
 	plotSelectors,
@@ -77,8 +78,9 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@property({ attribute: false }) startTime: number = 1
 	@property({ attribute: false }) endTime: number = 2
 	@property({ attribute: false }) channels: Channel[] = []
-	@property({ attribute: false }) error?: Error
-	@property({ attribute: false }) fetching: boolean = false
+	@property({ attribute: false }) anyRequestErrors: boolean = false
+	@property({ attribute: false }) dataRequests: DataRequestMeta[] = []
+	@property({ attribute: false }) pendingRequests: number = 0
 	@property({ attribute: false }) requestDuration!: number
 	@property({ attribute: false }) requestFinishedAt!: number
 	@property({ type: Boolean }) shouldDisplayChart!: boolean
@@ -157,14 +159,13 @@ export class StandardPlotElement extends connect(store, LitElement) {
 
 	mapState(state: AppState) {
 		return {
-			error: plotSelectors.error(state),
 			channels: plotSelectors.channels(state),
 			startTime: plotSelectors.startTime(state),
 			endTime: plotSelectors.endTime(state),
-			fetching: plotSelectors.fetching(state),
-			response: plotSelectors.response(state),
-			requestDuration: plotSelectors.requestDuration(state),
-			requestFinishedAt: plotSelectors.requestFinishedAt(state),
+			anyRequestErrors: plotSelectors.anyRequestErrors(state),
+			dataRequests: plotSelectors.dataRequests(state),
+			requestDuration: plotSelectors.totalRequestDuration(state),
+			requestFinishedAt: plotSelectors.lastRequestFinishedAt(state),
 			shouldDisplayChart: plotSelectors.shouldDisplayChart(state),
 			channelsWithoutData: plotSelectors.channelsWithoutData(state),
 			queryRangeShowing: plotSelectors.queryRangeShowing(state),
@@ -359,10 +360,13 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		return html`
 			${this.__renderQueryRange()} ${this.__renderQuickDial()}
 			${this.__renderShare()} ${this.__renderDownload()}
-			<wl-progress-spinner ?hidden=${!this.fetching}></wl-progress-spinner>
-			<div class="error" ?hidden=${!this.error}>
-				There was an error:
-				<p>${this.error ? this.error.message : ''}</p>
+			<wl-progress-spinner
+				?hidden=${this.pendingRequests === 0}
+			></wl-progress-spinner>
+			<div class="error" ?hidden=${!this.anyRequestErrors}>
+				${this.dataRequests
+					.filter(r => r.error)
+					.map(r => html`<p>${r.error!.message}</p>`)}
 			</div>
 			<div
 				@highchartszoom=${this.__onHighchartsZoom}
