@@ -90,21 +90,32 @@ export interface YAxis {
 
 export type DownloadAggregation = 'as-is' | 'PT5S' | 'PT1M' | 'PT1H' | 'raw'
 
+export type DataRequestMeta = {
+	fetching: boolean
+	error?: Error
+	request: {
+		sentAt?: number
+		finishedAt?: number
+	}
+	response: DataResponse
+}
+const _make_empty_datarequest = (): DataRequestMeta => ({
+	fetching: false,
+	error: undefined,
+	request: {
+		sentAt: undefined,
+		finishedAt: undefined,
+	},
+	response: [],
+})
+
 export interface PlotState {
 	plotVariation: PlotVariation
 	plotTitle: string
 	startTime: number
 	endTime: number
 	channels: Channel[]
-	dataRequests: {
-		fetching: boolean
-		error?: Error
-		request: {
-			sentAt?: number
-			finishedAt?: number
-		}
-		response: DataResponse
-	}[]
+	dataRequests: DataRequestMeta[]
 	yAxes: YAxis[]
 	dataSeries: DataSeries[]
 	queryRangeShowing: boolean
@@ -128,12 +139,7 @@ export const plot = createModel({
 		startTime: Date.now() - 60_000,
 		endTime: Date.now(),
 		channels: [],
-		fetching: false,
-		error: undefined,
-		request: {
-			sentAt: undefined,
-			finishedAt: undefined,
-		},
+		dataRequests: [],
 		response: [],
 		yAxes: [],
 		dataSeries: [],
@@ -169,6 +175,7 @@ export const plot = createModel({
 								name: channel.name,
 							},
 						],
+						dataRequests: [...state.dataRequests, _make_empty_datarequest()],
 				  }
 		},
 
@@ -199,6 +206,7 @@ export const plot = createModel({
 										yAxisIndex: x.yAxisIndex - 1,
 								  }
 					),
+				dataRequests: state.dataRequests.filter((x, idx) => idx !== index),
 			}
 		},
 
@@ -219,6 +227,7 @@ export const plot = createModel({
 					channelIndex: idx,
 					yAxisIndex: idx,
 				})),
+				dataRequests: channels.map(_make_empty_datarequest),
 			}
 		},
 
