@@ -443,13 +443,19 @@ export const plot = createModel({
 		const dispatch = store.getDispatch()
 		return {
 			async drawPlot() {
-				const query = plotSelectors.plotQuery(store.getState())
 				dispatch.plot.hideQueryRange()
 				const channels = plotSelectors.channels(store.getState())
+				const startDate = new Date(
+					plotSelectors.startTime(store.getState())
+				).toISOString()
+				const endDate = new Date(
+					plotSelectors.endTime(store.getState())
+				).toISOString()
+
 				for (let i = 0; i < channels.length; i++) {
 					dispatch.plot.drawPlotRequest({ channelIndex: i, sentAt: Date.now() })
 					queryRestApi
-						.queryData(query) // TODO: this needs adjusting to 1 single channel
+						.queryData(channels[i], startDate, endDate)
 						.then(response => {
 							dispatch.plot.drawPlotSuccess({
 								channelIndex: i,
@@ -468,15 +474,15 @@ export const plot = createModel({
 			},
 
 			async downloadData() {
-				const aggregationSelection = plotSelectors.dialogDownloadAggregation(
-					store.getState()
-				)
-				const query = plotSelectors.downloadQuery(store.getState())
-				const response = await queryRestApi.queryDataRaw(query)
-				const blob = await response.blob()
-				const ts = formatDate(Date.now())
-				const fname = `export_${ts}_${aggregationSelection}.csv`
-				FileSaver.saveAs(blob, fname)
+				// const aggregationSelection = plotSelectors.dialogDownloadAggregation(
+				// 	store.getState()
+				// )
+				// const query = plotSelectors.downloadQuery(store.getState())
+				// const response = await queryRestApi.queryDataRaw(query)
+				// const blob = await response.blob()
+				// const ts = formatDate(Date.now())
+				// const fname = `export_${ts}_${aggregationSelection}.csv`
+				// FileSaver.saveAs(blob, fname)
 			},
 
 			async 'routing/change'(payload: RoutingState<ROUTE>) {
