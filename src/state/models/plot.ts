@@ -96,13 +96,15 @@ export interface PlotState {
 	startTime: number
 	endTime: number
 	channels: Channel[]
-	fetching: boolean
-	error?: Error
-	request: {
-		sentAt?: number
-		finishedAt?: number
-	}
-	response: DataResponse
+	dataRequests: {
+		fetching: boolean
+		error?: Error
+		request: {
+			sentAt?: number
+			finishedAt?: number
+		}
+		response: DataResponse
+	}[]
 	yAxes: YAxis[]
 	dataSeries: DataSeries[]
 	queryRangeShowing: boolean
