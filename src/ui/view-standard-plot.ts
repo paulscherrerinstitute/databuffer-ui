@@ -592,76 +592,11 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			}}
 		>
 			<div>
-				<mwc-formfield label="Download data of plot (as is)">
-					<mwc-radio
-						name="aggregationmode"
-						?checked=${this.dialogDownloadAggregation == 'as-is'}
-						value="as-is"
-						@change=${this._updateAggregation}
-					></mwc-radio>
-				</mwc-formfield>
-				<hr />
-				<mwc-formfield label="Aggregate by 5 seconds">
-					<mwc-radio
-						name="aggregationmode"
-						?checked=${this.dialogDownloadAggregation == 'PT5S'}
-						value="PT5S"
-						@change=${this._updateAggregation}
-					></mwc-radio>
-				</mwc-formfield>
-				<mwc-formfield label="Aggregate by 1 minute">
-					<mwc-radio
-						name="aggregationmode"
-						?checked=${this.dialogDownloadAggregation == 'PT1M'}
-						value="PT1M"
-						@change=${this._updateAggregation}
-					></mwc-radio>
-				</mwc-formfield>
-				<mwc-formfield label="Aggregate by 1 hour">
-					<mwc-radio
-						name="aggregationmode"
-						?checked=${this.dialogDownloadAggregation == 'PT1H'}
-						value="PT1H"
-						@change=${this._updateAggregation}
-					></mwc-radio>
-				</mwc-formfield>
-				<hr />
-				<mwc-formfield label="Get raw data">
-					<mwc-radio
-						name="aggregationmode"
-						?checked=${this.dialogDownloadAggregation == 'raw'}
-						value="raw"
-						@change=${this._updateAggregation}
-					></mwc-radio>
-				</mwc-formfield>
 				<p>
-					<strong>Please note</strong> that you are about to fetch data from the
-					data API <strong>again</strong>. Depending on the channels and
-					aggregation settings this <strong>may take a long time</strong> and
-					result in a <strong>very large file</strong>.
+					We are very sorry, but the download feature is disabled while we are
+					migrating API versions.
 				</p>
-				<mwc-button
-					icon="content_copy"
-					@click=${async () => {
-						try {
-							await navigator.clipboard.writeText(
-								this.dialogDownloadCurlCommand
-							)
-							this.__snackCurlCopied.show()
-						} catch (e) {
-							console.error(e)
-						}
-					}}
-					>copy curl command to clipboard</mwc-button
-				>
 			</div>
-			<mwc-button
-				raised
-				icon="cloud_download"
-				slot="primaryAction"
-				dialogAction="download"
-				>download</mwc-button
-			>
 			<mwc-button slot="secondaryAction" dialogAction="close">close</mwc-button>
 		</mwc-dialog>`
 	}
