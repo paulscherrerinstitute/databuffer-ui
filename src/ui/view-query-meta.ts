@@ -28,7 +28,7 @@ export class QueryMetaElement extends connect(store, LitElement) {
 			return html`<p>Still ${this.pendingRequests} queries in progress</p>`
 		return html`
 			<h1>Summary</h1>
-			<h2>HTTP requests</h2>
+			<h2>Data requests</h2>
 			<table>
 				<thead>
 					<tr>
