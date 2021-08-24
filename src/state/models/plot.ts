@@ -749,11 +749,11 @@ export namespace plotSelectors {
 	)
 
 	export const channelsWithoutData = createSelector(
-		[dataRequests],
-		dataRequests =>
+		[dataRequests, channels],
+		(dataRequests, channels) =>
 			dataRequests
-				.filter(r => r.response.length === 1)
-				.map(r => r.response[0].channel)
+				.filter(r => r.response.length === 0 || r.response[0].data.length === 0)
+				.map((_, idx) => channels[idx])
 	)
 
 	export const yAxes = createSelector([getState], state => state.yAxes)
