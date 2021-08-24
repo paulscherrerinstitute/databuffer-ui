@@ -294,9 +294,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	private __keydown = (e: KeyboardEvent) => {
 		if (e.repeat) return
 		if (e.key !== KEY_RELOAD_ZOOM) return
-		;(() => {
 			this.reloadOnZoom = true
-		})()
 	}
 
 	// we must define __keyup with an arrow function, not as a regular method,
