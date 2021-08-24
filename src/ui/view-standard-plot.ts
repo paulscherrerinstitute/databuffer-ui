@@ -191,7 +191,10 @@ export class StandardPlotElement extends connect(store, LitElement) {
 
 	updated(changedProperties: PropertyValues): void {
 		if (changedProperties.has('allRequestsFinished')) {
-			if (this.channelsWithoutData.length === this.channels.length) {
+			if (
+				this.channelsWithoutData.length === this.channels.length &&
+				this.channels.length > 0
+			) {
 				this.__snackNoData.show()
 			} else if (this.channelsWithoutData.length > 0) {
 				this.__snackPartialData.show()
