@@ -29,6 +29,7 @@ import {
 	DaqPlotYAxis,
 } from '../../ui/daq-plot/types'
 import { DaqPlotConfig } from '../../ui/daq-plot/types'
+import { make_debug, make_error, make_info } from './applog'
 
 export interface Channel {
 	backend: string
@@ -453,24 +454,45 @@ export const plot = createModel({
 					plotSelectors.endTime(store.getState())
 				).toISOString()
 
+				dispatch.applog.log(
+					make_info(
+						`querying channels: ${channels.map(x => channelToId(x)).join(', ')}`
+					)
+				)
 				for (let i = 0; i < channels.length; i++) {
-					dispatch.plot.drawPlotRequest({ channelIndex: i, sentAt: Date.now() })
-					queryRestApi
-						.queryData(channels[i], startDate, endDate)
-						.then(response => {
+					dispatch.plot.drawPlotRequest({
+						channelIndex: i,
+						sentAt: Date.now(),
+					})
+					;(async () => {
+						const channel = channels[i]
+						const channelId = channelToId(channel)
+						try {
+							dispatch.applog.log(make_debug(`querying data for ${channelId}`))
+							const response = await queryRestApi.queryData(
+								channel,
+								startDate,
+								endDate
+							)
 							dispatch.plot.drawPlotSuccess({
 								channelIndex: i,
 								timestamp: Date.now(),
 								response,
 							})
-						})
-						.catch(error => {
+							dispatch.applog.log(
+								make_debug(`received response for ${channelId}`)
+							)
+						} catch (error) {
 							dispatch.plot.drawPlotFailure({
 								channelIndex: i,
 								timestamp: Date.now(),
 								error,
 							})
-						})
+							dispatch.applog.log(
+								make_error(`error querying ${channelId}: ${error.message}`)
+							)
+						}
+					})()
 				}
 			},
 
