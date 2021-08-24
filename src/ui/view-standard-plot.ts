@@ -81,6 +81,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@property({ attribute: false }) anyRequestErrors: boolean = false
 	@property({ attribute: false }) dataRequests: DataRequestMeta[] = []
 	@property({ attribute: false }) pendingRequests: number = 0
+	@property({ attribute: false }) allRequestsFinished: boolean = true
 	@property({ attribute: false }) requestDuration!: number
 	@property({ attribute: false }) requestFinishedAt!: number
 	@property({ type: Boolean }) shouldDisplayChart!: boolean
@@ -165,9 +166,10 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			anyRequestErrors: plotSelectors.anyRequestErrors(state),
 			dataRequests: plotSelectors.dataRequests(state),
 			requestDuration: plotSelectors.totalRequestDuration(state),
-			requestFinishedAt: plotSelectors.lastRequestFinishedAt(state),
 			shouldDisplayChart: plotSelectors.shouldDisplayChart(state),
 			channelsWithoutData: plotSelectors.channelsWithoutData(state),
+			allRequestsFinished: plotSelectors.allRequestsFinished(state),
+			pendingRequests: plotSelectors.pendingRequests(state),
 			queryRangeShowing: plotSelectors.queryRangeShowing(state),
 			dialogShareLinkShowing: plotSelectors.dialogShareLinkShowing(state),
 			dialogShareLinkAbsoluteTimes:
@@ -188,7 +190,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	}
 
 	updated(changedProperties: PropertyValues): void {
-		if (changedProperties.has('channelsWithoutData')) {
+		if (changedProperties.has('allRequestsFinished')) {
 			if (this.channelsWithoutData.length === this.channels.length) {
 				this.__snackNoData.show()
 			} else if (this.channelsWithoutData.length > 0) {
@@ -294,7 +296,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	private __keydown = (e: KeyboardEvent) => {
 		if (e.repeat) return
 		if (e.key !== KEY_RELOAD_ZOOM) return
-			this.reloadOnZoom = true
+		this.reloadOnZoom = true
 	}
 
 	// we must define __keyup with an arrow function, not as a regular method,
