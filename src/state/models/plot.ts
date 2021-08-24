@@ -281,6 +281,7 @@ export const plot = createModel({
 						? r
 						: {
 								..._make_empty_datarequest(),
+								fetching: true,
 								request: {
 									sentAt,
 									finishedAt: undefined,
