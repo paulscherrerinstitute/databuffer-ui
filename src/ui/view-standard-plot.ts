@@ -137,6 +137,9 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@query('#badtimeformat')
 	private __snackBadTimeFormat!: Snackbar
 
+	@query('#error')
+	private __snackError!: Snackbar
+
 	@query('#nodata')
 	private __snackNoData!: Snackbar
 
@@ -199,6 +202,9 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			} else if (this.channelsWithoutData.length > 0) {
 				this.__snackPartialData.show()
 			}
+		}
+		if (this.anyRequestErrors) {
+			this.__snackError.show()
 		}
 		if (
 			changedProperties.has('startTime') ||
@@ -366,11 +372,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			<wl-progress-spinner
 				?hidden=${this.pendingRequests === 0}
 			></wl-progress-spinner>
-			<div class="error" ?hidden=${!this.anyRequestErrors}>
-				${this.dataRequests
-					.filter(r => r.error)
-					.map(r => html`<p>${r.error!.message}</p>`)}
-			</div>
 			<div
 				@highchartszoom=${this.__onHighchartsZoom}
 				id="chart"
@@ -413,6 +414,13 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				id="curlcopied"
 				labelText="curl command copied to clipboard"
 			></mwc-snackbar>
+			<mwc-snackbar
+				id="error"
+				timeoutMs="-1"
+				labelText="Some data requests reported errors."
+			>
+				<mwc-icon-button icon="close" slot="dismiss"></mwc-icon-button>
+			</mwc-snackbar>
 		`
 	}
 
@@ -662,13 +670,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				#quickdial {
 					max-height: 80vh;
 					--list-item-border-radius: 0;
-				}
-				.error {
-					border: 2px solid rgba(127, 0, 0, 1);
-					border-radius: 4px;
-					margin: 4px;
-					padding: 2rem;
-					background-color: rgba(255, 200, 200, 0.3);
 				}
 				#dialog-share div,
 				#dialog-share mwc-radio {
