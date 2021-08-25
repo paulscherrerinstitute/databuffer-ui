@@ -57,7 +57,7 @@ import type { DaqPlotSeparatePlotsElement } from './daq-plot/daq-plot-separate-p
 import './daq-range-select'
 
 const IS_MAC = window.navigator.appVersion.toLowerCase().indexOf('mac') >= 0
-const KEY_RELOAD_ZOOM = IS_MAC ? 'Meta' : 'Ctrl'
+const KEY_RELOAD_ZOOM = IS_MAC ? 'Meta' : 'Control'
 
 // see https://www.highcharts.com/forum/viewtopic.php?t=35113
 highchartsMore(Highcharts)
