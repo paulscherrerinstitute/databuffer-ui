@@ -3,7 +3,7 @@ import {
 	css,
 	customElement,
 	html,
-	property,
+	state,
 	query,
 	PropertyValues,
 } from 'lit-element'
@@ -18,18 +18,6 @@ import { baseStyles } from '../shared-styles'
 import { DaqPlotYAxis, DaqPlotDataSeries, DaqPlotDataPoint } from './types'
 
 //#region Highcharts manipulations
-
-// add type declaration for the internal method `searchPoint`
-//
-// see: https://www.highcharts.com/forum/viewtopic.php?t=42923
-declare module 'highcharts' {
-	interface Series {
-		searchPoint: (
-			event: Highcharts.PointerEventObject,
-			flag: boolean
-		) => Highcharts.Point
-	}
-}
 
 // For synchronizing the charts' crosshairs we need to fix-up various
 // Highcharts prototypes.
@@ -132,22 +120,22 @@ declare global {
 
 @customElement('daq-plot-separate-plots')
 export class DaqPlotSeparatePlotsElement extends LitElement {
-	@property({ type: String })
+	@state()
 	title: string = ''
 
-	@property({ type: String })
+	@state()
 	subtitle: string = ''
 
-	@property({ type: Array })
+	@state()
 	yAxes: DaqPlotYAxis[] = []
 
-	@property({ type: Number })
+	@state()
 	xMax?: number
 
-	@property({ type: Number })
+	@state()
 	xMin?: number
 
-	@property({ type: Array })
+	@state()
 	series: DaqPlotDataSeries[] = []
 
 	@query('#chartgroup')

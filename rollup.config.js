@@ -44,6 +44,7 @@ export default {
 		replace({
 			APP_VERSION_STRING: appVersion,
 			GIT_COMMIT_REF: gitRef,
+			preventAssignment: true, // as per recommendation
 		}),
 		resolve({
 			dedupe: ['lit-html', 'lit-html/directives/unsafe-html', 'lit-element'],

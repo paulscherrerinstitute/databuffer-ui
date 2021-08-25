@@ -1,9 +1,9 @@
 import {
 	ChannelConfig,
 	ChannelConfigsQuery,
-} from '@paulscherrerinstitute/databuffer-query-js/query-channel-configs'
+} from '@paulscherrerinstitute/databuffer-query-js/api/v0/query-channel-configs'
 import { createModel, RoutingState } from '@captaincodeman/rdx'
-import { channelToId } from '@paulscherrerinstitute/databuffer-query-js/channel'
+import { channelToId } from '@paulscherrerinstitute/databuffer-query-js/api/v0/channel'
 import { createSelector } from 'reselect'
 import { EffectsStore, AppState } from '../store'
 import { queryRestApi } from '../../api/queryrest'
@@ -112,7 +112,7 @@ export const channelsearch = createModel({
 			async init() {
 				dispatch.channelsearch.availableBackendsRequest()
 				try {
-					const backends = await queryRestApi.queryBackends()
+					const backends = await queryRestApi.listBackends()
 					dispatch.channelsearch.availableBackendsSuccess(backends)
 				} catch (err) {
 					dispatch.channelsearch.availableBackendsError(err)
@@ -161,7 +161,7 @@ export const channelsearch = createModel({
 export async function _searchChannel(
 	query: ChannelConfigsQuery
 ): Promise<IdToChannelMap> {
-	const response = await queryRestApi.queryChannelConfigs(query)
+	const response = await queryRestApi.searchChannels(query.regex)
 
 	const result: IdToChannelMap = {}
 

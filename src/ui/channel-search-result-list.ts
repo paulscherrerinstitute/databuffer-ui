@@ -3,7 +3,7 @@ import {
 	css,
 	customElement,
 	html,
-	property,
+	state,
 	query,
 	PropertyValues,
 } from 'lit-element'
@@ -42,14 +42,14 @@ function _onChannelSelect(e: CustomEvent<{ channel: Channel }>) {
 
 @customElement('channel-search-result-list')
 export class ChannelSearchResultListElement extends connect(store, LitElement) {
-	@property({ attribute: false }) pattern: string = ''
-	@property({ attribute: false }) searchResults: ChannelWithTags[] = []
-	@property({ attribute: false }) resultsForDisplay: ChannelWithTags[] = []
-	@property({ attribute: false }) error: Error | null = null
-	@property({ attribute: false }) availableFilters: string[] = []
-	@property({ attribute: false }) activeFilters: string[] = []
-	@property({ attribute: false }) selectedChannels: Channel[] = []
-	@property({ attribute: false }) maxResults: number = 0
+	@state() pattern: string = ''
+	@state() searchResults: ChannelWithTags[] = []
+	@state() resultsForDisplay: ChannelWithTags[] = []
+	@state() error: Error | null = null
+	@state() availableFilters: string[] = []
+	@state() activeFilters: string[] = []
+	@state() selectedChannels: Channel[] = []
+	@state() maxResults: number = 0
 
 	@query('#filterlist')
 	private _filterList!: DaqPillListElement

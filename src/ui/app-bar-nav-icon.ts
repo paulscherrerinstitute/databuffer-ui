@@ -2,7 +2,7 @@ import {
 	LitElement,
 	customElement,
 	html,
-	property,
+	state,
 	PropertyValues,
 } from 'lit-element'
 import { connect } from '@captaincodeman/rdx'
@@ -15,8 +15,8 @@ import { ROUTE } from '../state/routing'
 
 @customElement('app-bar-nav-icon')
 export class AppBarNavIconElement extends connect(store, LitElement) {
-	@property({ attribute: false }) page: string = ''
-	@property({ attribute: false }) destination: string = ''
+	@state() page: string = ''
+	@state() destination: string = ''
 
 	mapState(state: AppState) {
 		return {

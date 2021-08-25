@@ -2,7 +2,7 @@ import {
 	LitElement,
 	customElement,
 	html,
-	property,
+	state,
 	css,
 	PropertyValues,
 } from 'lit-element'
@@ -14,8 +14,8 @@ import { ROUTE } from '../state/routing'
 
 @customElement('app-router')
 export class AppRouterElement extends connect(store, LitElement) {
-	@property({ type: String }) page: string = ''
-	@property({ type: String }) view: string = ''
+	@state() page: string = ''
+	@state() view: string = ''
 
 	mapState(state: AppState) {
 		return {

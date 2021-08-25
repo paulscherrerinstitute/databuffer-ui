@@ -1,12 +1,12 @@
-import { LitElement, customElement, css, html, property } from 'lit-element'
+import { LitElement, customElement, css, html, state } from 'lit-element'
 import 'weightless/list-item'
 import '@material/mwc-icon-button'
 import '@paulscherrerinstitute/databuffer-web-components/daq-pill'
 
 @customElement('channel-search-selected-item')
 export class ChannelSearchSelectedItemElement extends LitElement {
-	@property({ attribute: false }) backend: string = ''
-	@property({ attribute: false }) name: string = ''
+	@state() backend: string = ''
+	@state() name: string = ''
 
 	public render() {
 		return html`<wl-list-item class="hide-buttons-until-hover">

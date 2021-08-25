@@ -1,4 +1,4 @@
-import { LitElement, css, customElement, html, property } from 'lit-element'
+import { LitElement, css, customElement, html, state } from 'lit-element'
 import { connect } from '@captaincodeman/rdx'
 import pluralize from 'pluralize'
 
@@ -21,7 +21,7 @@ export class ChannelSearchSelectedListElement extends connect(
 	store,
 	LitElement
 ) {
-	@property({ attribute: false }) selectedChannels: Channel[] = []
+	@state() selectedChannels: Channel[] = []
 
 	public mapState(state: AppState) {
 		return {

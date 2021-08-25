@@ -1,4 +1,4 @@
-import { LitElement, customElement, html, property, css } from 'lit-element'
+import { LitElement, customElement, html, state, css } from 'lit-element'
 
 import { AppState, store } from '../state/store'
 import {
@@ -20,12 +20,11 @@ import { Select } from '@material/mwc-select'
 
 @customElement('view-plot-settings')
 export class PlotSettingsElement extends connect(store, LitElement) {
-	@property({ attribute: false }) channels: Channel[] = []
-	@property({ attribute: false }) dataSeriesConfig: DataSeries[] = []
-	@property({ attribute: false }) plotVariation: PlotVariation =
-		PlotVariation.SeparateAxes
-	@property({ attribute: false }) plotTitle: string = ''
-	@property({ attribute: false }) yAxes: YAxis[] = []
+	@state() channels: Channel[] = []
+	@state() dataSeriesConfig: DataSeries[] = []
+	@state() plotVariation: PlotVariation = PlotVariation.SeparateAxes
+	@state() plotTitle: string = ''
+	@state() yAxes: YAxis[] = []
 
 	mapState(state: AppState) {
 		return {

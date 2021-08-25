@@ -1,9 +1,4 @@
-import {
-	LitElement,
-	customElement,
-	property,
-	PropertyValues,
-} from 'lit-element'
+import { LitElement, customElement, state, PropertyValues } from 'lit-element'
 import { connect } from '@captaincodeman/rdx'
 import { store, AppState } from '../state/store'
 import { baseStyles } from './shared-styles'
@@ -11,8 +6,8 @@ import { ROUTE } from '../state/routing'
 
 @customElement('app-bar-title')
 export class AppBarTitleElement extends connect(store, LitElement) {
-	@property({ attribute: false }) page: string = ''
-	@property({ attribute: false }) title: string = ''
+	@state() page: string = ''
+	@state() title: string = ''
 
 	mapState(state: AppState) {
 		return {

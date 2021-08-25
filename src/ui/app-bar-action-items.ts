@@ -2,7 +2,7 @@ import {
 	LitElement,
 	customElement,
 	html,
-	property,
+	state,
 	PropertyValues,
 } from 'lit-element'
 import { connect } from '@captaincodeman/rdx'
@@ -15,10 +15,8 @@ import { ROUTE } from '../state/routing'
 
 @customElement('app-bar-action-items')
 export class AppBarActionItemsElement extends connect(store, LitElement) {
-	@property({ attribute: false }) page: string = ''
-	@property({ attribute: false }) templateResult:
-		| TemplateResult
-		| typeof nothing = nothing
+	@state() page: string = ''
+	@state() templateResult: TemplateResult | typeof nothing = nothing
 
 	mapState(state: AppState) {
 		return {

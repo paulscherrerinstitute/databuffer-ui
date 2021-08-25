@@ -1,68 +1,63 @@
-import { LitElement, customElement, html, property, css } from 'lit-element'
+import { LitElement, customElement, html, state, css } from 'lit-element'
 
 import { formatDate } from '../util'
 import { AppState, store } from '../state/store'
-import { Channel, plotSelectors } from '../state/models/plot'
+import { Channel, DataRequestMeta, plotSelectors } from '../state/models/plot'
 
 import type { DataResponse } from '../api/queryrest'
 import { baseStyles } from './shared-styles'
 import { connect } from '@captaincodeman/rdx'
+import { channelToId } from '../shared/channel'
 
 @customElement('view-query-meta')
 export class QueryMetaElement extends connect(store, LitElement) {
-	@property({ attribute: false }) channels: Channel[] = []
-	@property({ attribute: false }) channelsWithoutData: Channel[] = []
-	@property({ attribute: false }) error?: Error
-	@property({ attribute: false }) fetching: boolean = false
-	@property({ attribute: false }) requestDuration!: number
-	@property({ attribute: false }) requestFinishedAt!: number
-	@property({ attribute: false }) response!: DataResponse
+	@state() channels: Channel[] = []
+	@state() pendingRequests!: number
+	@state() dataRequests!: DataRequestMeta[]
 
 	mapState(state: AppState) {
 		return {
 			channels: plotSelectors.channels(state),
-			channelsWithoutData: plotSelectors.channelsWithoutData(state),
-			error: plotSelectors.error(state),
-			fetching: plotSelectors.fetching(state),
-			requestDuration: plotSelectors.requestDuration(state),
-			requestFinishedAt: plotSelectors.requestFinishedAt(state),
-			response: plotSelectors.response(state),
+			pendingRequests: plotSelectors.pendingRequests(state),
+			dataRequests: plotSelectors.dataRequests(state),
 		}
 	}
 
 	render() {
-		if (this.fetching) return html`<p>Query still in progress</p>`
-		if (this.requestDuration === undefined)
-			return html`<p>No query run, yet.</p>`
+		if (this.pendingRequests > 0)
+			return html`<p>Still ${this.pendingRequests} queries in progress</p>`
 		return html`
 			<h1>Summary</h1>
-			<ul>
-				<li>Request finished at: ${formatDate(this.requestFinishedAt)}</li>
-				<li>Duration of request: ${this.requestDuration / 1000} seconds</li>
-				<li>Number of channels in request: ${this.channels.length}</li>
-				<li>Number of channels in response: ${this.response.length}</li>
-				<li>
-					Number of channels in response without data points:
-					${this.channelsWithoutData.length}
-				</li>
-			</ul>
-			<h2>Number of data points in the response</h2>
+			<h2>Data requests</h2>
 			<table>
-				<tr>
-					<th>Backend</th>
-					<th>Channel</th>
-					<th>Data points</th>
-				</tr>
-				${this.response.map(
-					item =>
-						html`
-							<tr>
-								<td>${item.channel.backend}</td>
-								<td>${item.channel.name}</td>
-								<td>${item.data.length}</td>
-							</tr>
-						`
-				)}
+				<thead>
+					<tr>
+						<th>Channel</th>
+						<th>Request sent</th>
+						<th>Request finished</th>
+						<th>Request duration</th>
+						<th>Error</th>
+						<th>Number of data points</th>
+					</tr>
+				</thead>
+				<tbody>
+					${this.dataRequests.map(
+						(r, idx) => html`<tr>
+							<td>${channelToId(this.channels[idx])}</td>
+							<td>${r.request.sentAt ? formatDate(r.request.sentAt) : ''}</td>
+							<td>
+								${r.request.finishedAt ? formatDate(r.request.finishedAt) : ''}
+							</td>
+							<td>
+								${r.request.finishedAt && r.request.sentAt
+									? (r.request.finishedAt - r.request.sentAt) / 1000 + ' sec'
+									: ''}
+							</td>
+							<td>${r.error ? r.error.message : ''}</td>
+							<td>${r.response.length > 0 ? r.response[0].data.length : ''}</td>
+						</tr>`
+					)}
+				</tbody>
 			</table>
 		`
 	}
