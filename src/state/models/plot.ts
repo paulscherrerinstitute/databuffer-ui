@@ -454,40 +454,41 @@ export const plot = createModel({
 						`querying channels: ${channels.map(x => channelToId(x)).join(', ')}`
 					)
 				)
-				for (let i = 0; i < channels.length; i++) {
+				async function handleChannel(index: number, channel: Channel) {
 					dispatch.plot.drawPlotRequest({
-						channelIndex: i,
+						channelIndex: index,
 						sentAt: Date.now(),
 					})
-					;(async () => {
-						const channel = channels[i]
-						const channelId = channelToId(channel)
-						try {
-							dispatch.applog.log(make_debug(`querying data for ${channelId}`))
-							const response = await queryRestApi.queryData(
-								channel,
-								startDate,
-								endDate
-							)
-							dispatch.plot.drawPlotSuccess({
-								channelIndex: i,
-								timestamp: Date.now(),
-								response,
-							})
-							dispatch.applog.log(
-								make_debug(`received response for ${channelId}`)
-							)
-						} catch (error) {
-							dispatch.plot.drawPlotFailure({
-								channelIndex: i,
-								timestamp: Date.now(),
-								error,
-							})
-							dispatch.applog.log(
-								make_error(`error querying ${channelId}: ${error.message}`)
-							)
-						}
-					})()
+					const channelId = channelToId(channel)
+					try {
+						dispatch.applog.log(make_debug(`querying data for ${channelId}`))
+						const response = await queryRestApi.queryData(
+							channel,
+							startDate,
+							endDate
+						)
+						dispatch.plot.drawPlotSuccess({
+							channelIndex: index,
+							timestamp: Date.now(),
+							response,
+						})
+						dispatch.applog.log(
+							make_debug(`received response for ${channelId}`)
+						)
+					} catch (error) {
+						dispatch.plot.drawPlotFailure({
+							channelIndex: index,
+							timestamp: Date.now(),
+							error,
+						})
+						dispatch.applog.log(
+							make_error(`error querying ${channelId}: ${error.message}`)
+						)
+					}
+				}
+				for (let i = 0; i < channels.length; i++) {
+					const channel = channels[i]
+					handleChannel(i, channel)
 				}
 			},
 
