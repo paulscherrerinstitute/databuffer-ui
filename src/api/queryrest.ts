@@ -11,7 +11,8 @@ import {
 	AggregationOperation,
 	EventField,
 } from '@paulscherrerinstitute/databuffer-query-js/api/v0/query-data'
-import { NR_OF_BINS } from '../state/models/plot'
+
+export const NR_OF_BINS = 500
 export type { DataResponse, ChannelNamesResponse }
 
 export class ApiV0QueryProvider {

@@ -17,7 +17,7 @@ import {
 	channelToId,
 	idToChannel,
 } from '@paulscherrerinstitute/databuffer-query-js/api/v0/channel'
-import { DataResponse, queryRestApi } from '../../api/queryrest'
+import { DataResponse, NR_OF_BINS, queryRestApi } from '../../api/queryrest'
 import { EffectsStore, AppState } from '../store'
 import { formatDate } from '../../util'
 import { parseISO } from 'date-fns'
@@ -646,8 +646,6 @@ export const plot = createModel({
 
 //#region selectors
 const getState = (state: AppState) => state.plot
-
-export const NR_OF_BINS = 512
 
 interface HighChartsDataPointWithBinning {
 	x?: number
