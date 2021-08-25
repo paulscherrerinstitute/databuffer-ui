@@ -3,14 +3,13 @@ import {
 	plot,
 	PlotState,
 	plotSelectors,
-	NR_OF_BINS,
 	YAxis,
 	DataSeries,
 	PlotVariation,
 } from './plot'
 import { Channel, channelToId } from '../../shared/channel'
 import { store, AppState, AppDispatch } from '../store'
-import { DataResponse } from '../../api/queryrest'
+import { DataResponse, NR_OF_BINS } from '../../api/queryrest'
 import {
 	AggregationResult,
 	EventField,
@@ -97,24 +96,9 @@ describe('plot model', () => {
 			expect(plot.state.channels.length).toBe(0)
 		})
 
-		it('fetching', () => {
-			expect(plot.state.fetching).toBe(false)
-		})
-
-		it('error', () => {
-			expect(plot.state.error).toBeUndefined()
-		})
-
-		it('request', () => {
-			expect(plot.state.request).toEqual({
-				sentAt: undefined,
-				finishedAt: undefined,
-			})
-		})
-
-		it('response', () => {
-			expect(Array.isArray(plot.state.response)).toBe(true)
-			expect(plot.state.response.length).toBe(0)
+		it('dataRequests', () => {
+			expect(Array.isArray(plot.state.dataRequests)).toBe(true)
+			expect(plot.state.dataRequests.length).toBe(0)
 		})
 
 		it('yAxes', () => {
@@ -867,7 +851,13 @@ describe('plot model', () => {
 				...state,
 				plot: {
 					...state.plot,
-					request: { ...state.plot.request, finishedAt: undefined },
+					dataRequests: [
+						{
+							fetching: false,
+							request: { finishedAt: undefined },
+							response: [],
+						},
+					],
 				},
 			}
 			const ts = Date.now()
@@ -875,7 +865,23 @@ describe('plot model', () => {
 				...state,
 				plot: {
 					...state.plot,
-					request: { ...state.plot.request, finishedAt: ts },
+					dataRequests: [
+						{
+							fetching: false,
+							request: { finishedAt: ts - 10000 },
+							response: [],
+						},
+						{
+							fetching: false,
+							request: { finishedAt: ts },
+							response: [],
+						},
+						{
+							fetching: false,
+							request: { finishedAt: ts - 20000 },
+							response: [],
+						},
+					],
 				},
 			}
 			expect(plotSelectors.plotSubTitle(state1)).toBe('')
@@ -938,125 +944,219 @@ describe('plot model', () => {
 			expect(plotSelectors.channels(state2)).toEqual(state2.plot.channels)
 		})
 
-		it('retrieves error', () => {
+		it('retrieves anyRequestErrors', () => {
 			const state1 = {
 				...state,
-				plot: { ...state.plot, error: undefined },
-			}
+				plot: {
+					...state.plot,
+					dataRequests: [],
+				},
+			} as AppState
 			const state2 = {
 				...state,
 				plot: {
 					...state.plot,
-					error: new Error('example error'),
-				},
-			}
-			expect(plotSelectors.error(state1)).toBeUndefined()
-			expect(plotSelectors.error(state2)).toBeInstanceOf(Error)
-			expect(plotSelectors.error(state2)!.message).toBe('example error')
-		})
-
-		it('retrieves fetching', () => {
-			const state1 = {
-				...state,
-				plot: { ...state.plot, fetching: true },
-			}
-			const state2 = {
-				...state,
-				plot: { ...state.plot, fetching: false },
-			}
-			expect(plotSelectors.fetching(state1)).toBe(true)
-			expect(plotSelectors.fetching(state2)).toBe(false)
-		})
-
-		it('retrieves response', () => {
-			const state1 = {
-				...state,
-				plot: { ...state.plot, response: [] },
-			}
-			const response: DataResponse = [
-				{
-					channel: { backend: 'b1', name: 'ch1' },
-					data: [
+					dataRequests: [
 						{
-							eventCount: 1,
-							globalMillis: 100,
-							value: { min: 10, mean: 20, max: 30 },
-							shape: [1],
+							error: undefined,
+							fetching: false,
+							request: {},
+							response: [],
 						},
 					],
 				},
-			]
-			const state2 = {
+			} as AppState
+			const state3 = {
 				...state,
-				plot: { ...state.plot, response },
-			}
-			expect(plotSelectors.response(state1)).toEqual([])
-			expect(plotSelectors.response(state2)).toEqual(response)
+				plot: {
+					...state.plot,
+					dataRequests: [
+						{
+							error: new Error('test'),
+							fetching: false,
+							request: {},
+							response: [],
+						},
+					],
+				},
+			} as AppState
+			expect(plotSelectors.anyRequestErrors(state1)).toBe(false)
+			expect(plotSelectors.anyRequestErrors(state2)).toBe(false)
+			expect(plotSelectors.anyRequestErrors(state3)).toBe(true)
 		})
 
-		it('retrieves requestSentAt', () => {
+		it('retrieves allRequestsFinished', () => {
+			const state1 = {
+				...state,
+				plot: { ...state.plot, dataRequests: [] },
+			} as AppState
+			const state2 = {
+				...state,
+				plot: {
+					...state.plot,
+					dataRequests: [
+						{
+							fetching: true,
+						},
+					],
+				},
+			} as AppState
+			const state3 = {
+				...state,
+				plot: {
+					...state.plot,
+					dataRequests: [
+						{
+							fetching: false,
+						},
+					],
+				},
+			} as AppState
+			expect(plotSelectors.allRequestsFinished(state1)).toBe(true)
+			expect(plotSelectors.allRequestsFinished(state2)).toBe(false)
+			expect(plotSelectors.allRequestsFinished(state3)).toBe(true)
+		})
+
+		it('retrieves firstRequestSentAt', () => {
 			const state1 = {
 				...state,
 				plot: {
 					...state.plot,
-					request: { sentAt: 100, finishedAt: 300 },
+					dataRequests: [
+						{
+							fetching: false,
+							request: { sentAt: 200, finishedAt: 400 },
+							response: [],
+						},
+						{
+							fetching: false,
+							request: { sentAt: 100, finishedAt: 300 },
+							response: [],
+						},
+					],
 				},
 			}
 			const state2 = {
 				...state,
 				plot: {
 					...state.plot,
-					request: { sentAt: 200, finishedAt: 500 },
+					dataRequests: [
+						{
+							fetching: false,
+							request: { sentAt: 200, finishedAt: 400 },
+							response: [],
+						},
+						{
+							fetching: false,
+							request: { sentAt: 300, finishedAt: 500 },
+							response: [],
+						},
+					],
 				},
 			}
-			expect(plotSelectors.requestSentAt(state1)).toBe(100)
-			expect(plotSelectors.requestSentAt(state2)).toBe(200)
+			expect(plotSelectors.firstRequestSentAt(state1)).toBe(100)
+			expect(plotSelectors.firstRequestSentAt(state2)).toBe(300)
 		})
 
-		it('retrieves requestFinishedAt', () => {
+		it('retrieves lastRequestFinishedAt', () => {
 			const state1 = {
 				...state,
 				plot: {
 					...state.plot,
-					request: { sentAt: 100, finishedAt: 300 },
+					dataRequests: [
+						{
+							fetching: false,
+							request: { sentAt: 200, finishedAt: 400 },
+							response: [],
+						},
+						{
+							fetching: false,
+							request: { sentAt: 100, finishedAt: 300 },
+							response: [],
+						},
+					],
 				},
 			}
 			const state2 = {
 				...state,
 				plot: {
 					...state.plot,
-					request: { sentAt: 200, finishedAt: 500 },
+					dataRequests: [
+						{
+							fetching: false,
+							request: { sentAt: 200, finishedAt: 400 },
+							response: [],
+						},
+						{
+							fetching: false,
+							request: { sentAt: 300, finishedAt: 500 },
+							response: [],
+						},
+					],
 				},
 			}
-			expect(plotSelectors.requestFinishedAt(state1)).toBe(300)
-			expect(plotSelectors.requestFinishedAt(state2)).toBe(500)
+			expect(plotSelectors.lastRequestFinishedAt(state1)).toBe(400)
+			expect(plotSelectors.lastRequestFinishedAt(state2)).toBe(500)
 		})
 
-		it('retrieves requestDuration', () => {
+		it('retrieves totalRequestDuration', () => {
 			const state1 = {
 				...state,
 				plot: {
 					...state.plot,
-					request: { sentAt: 100, finishedAt: 300 },
+					dataRequests: [
+						{
+							fetching: false,
+							request: { sentAt: 200, finishedAt: 400 },
+							response: [],
+						},
+						{
+							fetching: false,
+							request: { sentAt: 100, finishedAt: 300 },
+							response: [],
+						},
+					],
 				},
 			}
 			const state2 = {
 				...state,
 				plot: {
 					...state.plot,
-					request: { sentAt: 200, finishedAt: 500 },
+					dataRequests: [
+						{
+							fetching: false,
+							request: { sentAt: 200, finishedAt: 400 },
+							response: [],
+						},
+						{
+							fetching: false,
+							request: { sentAt: 300, finishedAt: 500 },
+							response: [],
+						},
+					],
 				},
 			}
 			const state3 = {
 				...state,
 				plot: {
 					...state.plot,
-					request: { sentAt: 400, finishedAt: undefined },
+					dataRequests: [
+						{
+							fetching: true,
+							request: { sentAt: 200, finishedAt: undefined },
+							response: [],
+						},
+						{
+							fetching: true,
+							request: { sentAt: 300, finishedAt: undefined },
+							response: [],
+						},
+					],
 				},
 			}
-			expect(plotSelectors.requestDuration(state1)).toBe(200)
-			expect(plotSelectors.requestDuration(state2)).toBe(300)
-			expect(plotSelectors.requestDuration(state3)).toBeUndefined()
+			expect(plotSelectors.totalRequestDuration(state1)).toBe(300)
+			expect(plotSelectors.totalRequestDuration(state2)).toBe(300)
+			expect(plotSelectors.totalRequestDuration(state3)).toBeUndefined()
 		})
 
 		it('retrieves shouldDisplayChart', () => {
