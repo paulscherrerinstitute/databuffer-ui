@@ -193,7 +193,10 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	}
 
 	updated(changedProperties: PropertyValues): void {
-		if (changedProperties.has('allRequestsFinished')) {
+		if (
+			changedProperties.has('allRequestsFinished') &&
+			this.allRequestsFinished
+		) {
 			if (
 				this.channelsWithoutData.length === this.channels.length &&
 				this.channels.length > 0
