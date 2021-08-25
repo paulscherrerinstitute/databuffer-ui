@@ -15,8 +15,6 @@ import 'weightless/card'
 import 'weightless/divider'
 import 'weightless/expansion'
 import 'weightless/list-item'
-import 'weightless/popover'
-import { Popover } from 'weightless/popover'
 import 'weightless/popover-card'
 import 'weightless/progress-spinner'
 import '@material/mwc-button'
@@ -33,13 +31,7 @@ import './daq-plot/daq-plot-separate-axes'
 import './daq-plot/daq-plot-separate-plots'
 import './daq-plot/daq-plot-single-axis'
 
-import {
-	formatDate,
-	TimeRange,
-	timeRangeDay,
-	timeRangeWeek,
-	timeRangeMonth,
-} from '../util'
+import type { TimeRange } from '../util'
 import { AppState, store } from '../state/store'
 import {
 	Channel,
@@ -62,9 +54,7 @@ import type {
 import type { DaqPlotSingleAxisElement } from './daq-plot/daq-plot-single-axis'
 import type { DaqPlotSeparateAxesElement } from './daq-plot/daq-plot-separate-axes'
 import type { DaqPlotSeparatePlotsElement } from './daq-plot/daq-plot-separate-plots'
-
-const TIMESTAMP_PATTERN = `^\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}\\.\\d{3}$`
-const TIMESTAMP_REGEX = new RegExp(TIMESTAMP_PATTERN)
+import './daq-range-select'
 
 const IS_MAC = window.navigator.appVersion.toLowerCase().indexOf('mac') >= 0
 const KEY_RELOAD_ZOOM = IS_MAC ? 'Meta' : 'Ctrl'
@@ -86,7 +76,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@property({ attribute: false }) requestFinishedAt!: number
 	@property({ type: Boolean }) shouldDisplayChart!: boolean
 	@property({ type: Array }) channelsWithoutData: Channel[] = []
-	@property({ type: Boolean }) canPlot: boolean = false
 	@property({ attribute: false }) queryRangeShowing: boolean = false
 	@property({ attribute: false }) dialogShareLinkShowing: boolean = false
 	@property({ attribute: false }) dialogShareLinkAbsoluteTimes: boolean = false
@@ -102,31 +91,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	private reloadOnZoom = false
 
 	private dialogDownloadCurlCommand = ''
-
-	private __calcCanPlot(): boolean {
-		if (this.__txtStartTime === null) return false
-		if (TIMESTAMP_REGEX.test(this.__txtStartTime.value) === false) return false
-		if (this.__txtEndTime === null) return false
-		if (TIMESTAMP_REGEX.test(this.__txtEndTime.value) === false) return false
-		return true
-	}
-
-	private __chart!: Highcharts.Chart
-
-	@query('#queryrange')
-	private __queryRange!: Popover
-
-	@query('#quickdial')
-	private __quickDial!: Popover
-
-	@query('#starttime')
-	private __txtStartTime!: TextField
-
-	@query('#endtime')
-	private __txtEndTime!: TextField
-
-	@query('#chart')
-	private __chartContainer!: HTMLElement
 
 	@query('#daqplot')
 	private __daqplot!:
@@ -188,10 +152,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		}
 	}
 
-	firstUpdated() {
-		this.canPlot = this.__calcCanPlot()
-	}
-
 	updated(changedProperties: PropertyValues): void {
 		if (
 			changedProperties.has('allRequestsFinished') &&
@@ -209,12 +169,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		if (this.anyRequestErrors) {
 			this.__snackError.show()
 		}
-		if (
-			changedProperties.has('startTime') ||
-			changedProperties.has('endTime')
-		) {
-			this.canPlot = this.__calcCanPlot()
-		}
 	}
 
 	connectedCallback() {
@@ -228,78 +182,14 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		window.removeEventListener('keyup', this.__keyup)
 		super.disconnectedCallback()
 	}
-
-	private __showQuickDial() {
-		this.__quickDial.show()
-	}
-
+	
 	private __setTimeRange(range: TimeRange) {
 		store.dispatch.plot.changeEndTime(range.end)
 		store.dispatch.plot.changeStartTime(range.start)
 	}
 
-	private __quickDialRelative(deltaMs: number) {
-		const end = Date.now()
-		const start = end - deltaMs
-		this.__setTimeRange({ start, end })
-	}
-
-	private __quickDialYesterday() {
-		const range = timeRangeDay(datefns.subDays(new Date(), 1).getTime())
-		this.__setTimeRange(range)
-	}
-
-	private __quickDialToday() {
-		const range = timeRangeDay(Date.now())
-		this.__setTimeRange(range)
-	}
-
-	private __quickDialLastWeek() {
-		const range = timeRangeWeek(datefns.subWeeks(new Date(), 1).getTime())
-		this.__setTimeRange(range)
-	}
-
-	private __quickDialThisWeek() {
-		const range = timeRangeWeek(Date.now())
-		this.__setTimeRange(range)
-	}
-
-	private __quickDialLastMonth() {
-		const range = timeRangeMonth(datefns.subMonths(new Date(), 1).getTime())
-		this.__setTimeRange(range)
-	}
-
-	private __quickDialThisMonth() {
-		const range = timeRangeMonth(Date.now())
-		this.__setTimeRange(range)
-	}
-
 	private __plot() {
 		store.dispatch.plot.drawPlot()
-	}
-
-	private __onStartTimeChanged(e: Event) {
-		const txt = e.target as TextField
-		const d = datefns.parseISO(txt.value).getTime()
-		if (isNaN(d)) {
-			txt.focus()
-			this.__snackBadTimeFormat.show()
-			this.canPlot = false
-			return
-		}
-		store.dispatch.plot.changeStartTime(d)
-	}
-
-	private __onEndTimeChanged(e: Event) {
-		const txt = e.target as TextField
-		const d = datefns.parseISO(txt.value).getTime()
-		if (isNaN(d)) {
-			txt.focus()
-			this.__snackBadTimeFormat.show()
-			this.canPlot = false
-			return
-		}
-		store.dispatch.plot.changeEndTime(d)
 	}
 
 	// we must define __keydown with an arrow function, not as a regular method,
@@ -370,8 +260,12 @@ export class StandardPlotElement extends connect(store, LitElement) {
 
 	render() {
 		return html`
-			${this.__renderQueryRange()} ${this.__renderQuickDial()}
 			${this.__renderShare()} ${this.__renderDownload()}
+			<daq-range-select
+				id="queryrange"
+				?hidden=${!this.queryRangeShowing}
+				@badtimeformat=${() => this.__snackBadTimeFormat.show()}
+			></daq-range-select>
 			<wl-progress-spinner
 				?hidden=${this.pendingRequests === 0}
 			></wl-progress-spinner>
@@ -424,106 +318,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			>
 				<mwc-icon-button icon="close" slot="dismiss"></mwc-icon-button>
 			</mwc-snackbar>
-		`
-	}
-
-	private __renderQueryRange(): TemplateResult {
-		return html`
-			<div id="queryrange" ?hidden=${!this.queryRangeShowing}>
-				<div id="queryrangecontainer">
-					<mwc-textfield
-						id="starttime"
-						label="Start"
-						value="${formatDate(this.startTime)}"
-						pattern="${TIMESTAMP_PATTERN}"
-						@change=${this.__onStartTimeChanged}
-						helper="yyyy-mm-dd HH:MM:DD.SSS"
-					></mwc-textfield>
-					<mwc-textfield
-						id="endtime"
-						label="End"
-						value="${formatDate(this.endTime)}"
-						pattern="${TIMESTAMP_PATTERN}"
-						@change=${this.__onEndTimeChanged}
-						helper="yyyy-mm-dd HH:MM:DD.SSS"
-					></mwc-textfield>
-					<div id="buttons">
-						<mwc-icon-button
-							id="btnQuickDial"
-							@click="${this.__showQuickDial}"
-							icon="more_horiz"
-							label="quick-dial"
-						></mwc-icon-button>
-						<mwc-button
-							@click="${this.__plot}"
-							?disabled=${!this.canPlot}
-							icon="show_chart"
-							label="plot"
-							raised
-						></mwc-button>
-					</div>
-				</div>
-			</div>
-		`
-	}
-
-	private __renderQuickDial(): TemplateResult {
-		return html`
-			<wl-popover id="quickdial" closeOnClick fixed anchor="#btnQuickDial">
-				<wl-popover-card>
-					<wl-list-item
-						clickable
-						@click="${() => this.__quickDialRelative(60_000)}"
-						>last 1m</wl-list-item
-					>
-					<wl-list-item
-						clickable
-						@click="${() => this.__quickDialRelative(600_000)}"
-						>last 10m</wl-list-item
-					>
-					<wl-list-item
-						clickable
-						@click="${() => this.__quickDialRelative(3_600_000)}"
-						>last 1h</wl-list-item
-					>
-					<wl-list-item
-						value="43200"
-						clickable
-						@click="${() => this.__quickDialRelative(43_200_000)}"
-						>last 12h</wl-list-item
-					>
-					<wl-list-item
-						clickable
-						@click="${() => this.__quickDialRelative(86_400_000)}"
-						>last 24h</wl-list-item
-					>
-					<wl-list-item
-						value="604800"
-						clickable
-						@click="${() => this.__quickDialRelative(604_800_000)}"
-						>last 7d</wl-list-item
-					>
-					<wl-divider></wl-divider>
-					<wl-list-item clickable @click="${this.__quickDialYesterday}"
-						>yesterday</wl-list-item
-					>
-					<wl-list-item clickable @click="${this.__quickDialToday}"
-						>today</wl-list-item
-					>
-					<wl-list-item clickable @click="${this.__quickDialLastWeek}"
-						>last week</wl-list-item
-					>
-					<wl-list-item clickable @click="${this.__quickDialThisWeek}"
-						>this week</wl-list-item
-					>
-					<wl-list-item clickable @click="${this.__quickDialLastMonth}"
-						>last month</wl-list-item
-					>
-					<wl-list-item clickable @click="${this.__quickDialThisMonth}"
-						>this month</wl-list-item
-					>
-				</wl-popover-card>
-			</wl-popover>
 		`
 	}
 
@@ -631,34 +425,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					display: block;
 					overflow-y: auto;
 				}
-				#queryrange {
-					position: absolute;
-					width: calc(100% - 16px);
-					z-index: 1;
-					background-color: white;
-					box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px,
-						rgba(0, 0, 0, 0.14) 0px 4px 5px 0px,
-						rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
-					border-radius: 2px;
-				}
-				#queryrangecontainer {
-					margin: 8px 0 8px 8px;
-					display: flex;
-					flex-direction: row;
-					align-items: center;
-					gap: 8px;
-				}
-				#queryrangecontainer * {
-					margin-right: 8px;
-				}
-				#starttime,
-				#endtime {
-					flex-grow: 1;
-				}
-				#buttons {
-					margin: 8px 0;
-					display: inline;
-				}
 				wl-progress-spinner {
 					width: 96px;
 					height: 96px;
@@ -667,12 +433,13 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				[hidden] {
 					display: none;
 				}
+				#queryrange {
+					z-index: 1;
+					position: absolute;
+					width: calc(100% - 16px);
+				}
 				#chart {
 					height: 100%;
-				}
-				#quickdial {
-					max-height: 80vh;
-					--list-item-border-radius: 0;
 				}
 				#dialog-share div,
 				#dialog-share mwc-radio {
