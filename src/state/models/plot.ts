@@ -117,7 +117,6 @@ export interface PlotState {
 	endTime: number
 	channels: Channel[]
 	dataRequests: DataRequestMeta[]
-	pendingRequests: number
 	yAxes: YAxis[]
 	dataSeries: DataSeries[]
 	queryRangeShowing: boolean
@@ -142,7 +141,6 @@ export const plot = createModel({
 		endTime: Date.now(),
 		channels: [],
 		dataRequests: [],
-		pendingRequests: 0,
 		yAxes: [],
 		dataSeries: [],
 		queryRangeShowing: false,
@@ -289,7 +287,6 @@ export const plot = createModel({
 								},
 						  }
 				),
-				pendingRequests: state.pendingRequests + 1,
 			}
 		},
 
@@ -316,7 +313,6 @@ export const plot = createModel({
 								response: payload.response,
 						  }
 				),
-				pendingRequests: state.pendingRequests - 1,
 			}
 		},
 
@@ -339,7 +335,6 @@ export const plot = createModel({
 								error: payload.error,
 						  }
 				),
-				pendingRequests: state.pendingRequests - 1,
 			}
 		},
 
@@ -717,8 +712,8 @@ export namespace plotSelectors {
 		state => state.dataRequests
 	)
 	export const pendingRequests = createSelector(
-		[getState],
-		state => state.pendingRequests
+		[dataRequests],
+		dataRequests => dataRequests.filter(r => r.fetching).length
 	)
 	export const requestErrors = createSelector([dataRequests], dataRequests =>
 		dataRequests.map(r => r.error)
