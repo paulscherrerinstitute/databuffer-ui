@@ -4,7 +4,7 @@ import {
 	css,
 	customElement,
 	html,
-	property,
+	state,
 	query,
 } from 'lit-element'
 import { isEmptyObj, TimeRange } from '../../util'
@@ -26,25 +26,25 @@ declare global {
 
 @customElement('daq-plot-single-axis')
 export class DaqPlotSingleAxisElement extends LitElement {
-	@property({ type: String })
+	@state()
 	title: string = ''
 
-	@property({ type: String })
+	@state()
 	subtitle: string = ''
 
-	@property({ type: Array })
+	@state()
 	yAxes: DaqPlotYAxis[] = []
 
-	@property({ type: Number })
+	@state()
 	xMax?: number
 
-	@property({ type: Number })
+	@state()
 	xMin?: number
 
-	@property({ type: Array })
+	@state()
 	series: DaqPlotDataSeries[] = []
 
-	// @property({ type: Boolean })
+	// @state()
 	// reloadOnZoom: boolean = false
 
 	@query('#chart')

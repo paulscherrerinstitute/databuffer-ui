@@ -1,4 +1,4 @@
-import { LitElement, css, customElement, html, property } from 'lit-element'
+import { LitElement, css, customElement, html, state } from 'lit-element'
 import 'weightless/checkbox'
 import type { Checkbox } from 'weightless/checkbox'
 import 'weightless/list-item'
@@ -8,9 +8,9 @@ import { ChannelWithTags } from '../state/models/channelsearch'
 
 @customElement('channel-search-result-item')
 export class ChannelSearchResultItemElement extends LitElement {
-	@property({ attribute: false }) item!: ChannelWithTags
-	@property({ attribute: false }) selectedIndex: number = -1
-	@property({ attribute: false }) activeFilters: string[] = []
+	@state() item!: ChannelWithTags
+	@state() selectedIndex: number = -1
+	@state() activeFilters: string[] = []
 
 	public render() {
 		return html`

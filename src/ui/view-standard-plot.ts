@@ -2,7 +2,7 @@ import {
 	LitElement,
 	customElement,
 	html,
-	property,
+	state,
 	css,
 	query,
 	TemplateResult,
@@ -64,29 +64,29 @@ highchartsMore(Highcharts)
 
 @customElement('view-standard-plot')
 export class StandardPlotElement extends connect(store, LitElement) {
-	@property({ attribute: false }) response: DataResponse = []
-	@property({ attribute: false }) startTime: number = 1
-	@property({ attribute: false }) endTime: number = 2
-	@property({ attribute: false }) channels: Channel[] = []
-	@property({ attribute: false }) anyRequestErrors: boolean = false
-	@property({ attribute: false }) dataRequests: DataRequestMeta[] = []
-	@property({ attribute: false }) pendingRequests: number = 0
-	@property({ attribute: false }) allRequestsFinished: boolean = true
-	@property({ attribute: false }) requestDuration!: number
-	@property({ attribute: false }) requestFinishedAt!: number
-	@property({ type: Boolean }) shouldDisplayChart!: boolean
-	@property({ type: Array }) channelsWithoutData: Channel[] = []
-	@property({ attribute: false }) queryRangeShowing: boolean = false
-	@property({ attribute: false }) dialogShareLinkShowing: boolean = false
-	@property({ attribute: false }) dialogShareLinkAbsoluteTimes: boolean = false
-	@property({ attribute: false }) dialogShareLinkUrl!: string
-	@property({ attribute: false })
+	@state() response: DataResponse = []
+	@state() startTime: number = 1
+	@state() endTime: number = 2
+	@state() channels: Channel[] = []
+	@state() anyRequestErrors: boolean = false
+	@state() dataRequests: DataRequestMeta[] = []
+	@state() pendingRequests: number = 0
+	@state() allRequestsFinished: boolean = true
+	@state() requestDuration!: number
+	@state() requestFinishedAt!: number
+	@state() shouldDisplayChart!: boolean
+	@state() channelsWithoutData: Channel[] = []
+	@state() queryRangeShowing: boolean = false
+	@state() dialogShareLinkShowing: boolean = false
+	@state() dialogShareLinkAbsoluteTimes: boolean = false
+	@state() dialogShareLinkUrl!: string
+	@state()
 	dialogShareLinkChannelsTruncated: boolean = false
-	@property({ attribute: false })
+	@state()
 	dialogDownloadShowing: boolean = false
-	@property({ attribute: false }) dialogDownloadAggregation!: string
-	@property({ attribute: false }) plotVariation!: PlotVariation
-	@property({ attribute: false }) daqPlotConfig!: DaqPlotConfig
+	@state() dialogDownloadAggregation!: string
+	@state() plotVariation!: PlotVariation
+	@state() daqPlotConfig!: DaqPlotConfig
 
 	private reloadOnZoom = false
 
@@ -182,7 +182,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		window.removeEventListener('keyup', this.__keyup)
 		super.disconnectedCallback()
 	}
-	
+
 	private __setTimeRange(range: TimeRange) {
 		store.dispatch.plot.changeEndTime(range.end)
 		store.dispatch.plot.changeStartTime(range.start)

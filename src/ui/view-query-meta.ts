@@ -1,4 +1,4 @@
-import { LitElement, customElement, html, property, css } from 'lit-element'
+import { LitElement, customElement, html, state, css } from 'lit-element'
 
 import { formatDate } from '../util'
 import { AppState, store } from '../state/store'
@@ -11,9 +11,9 @@ import { channelToId } from '../shared/channel'
 
 @customElement('view-query-meta')
 export class QueryMetaElement extends connect(store, LitElement) {
-	@property({ attribute: false }) channels: Channel[] = []
-	@property({ attribute: false }) pendingRequests!: number
-	@property({ attribute: false }) dataRequests!: DataRequestMeta[]
+	@state() channels: Channel[] = []
+	@state() pendingRequests!: number
+	@state() dataRequests!: DataRequestMeta[]
 
 	mapState(state: AppState) {
 		return {

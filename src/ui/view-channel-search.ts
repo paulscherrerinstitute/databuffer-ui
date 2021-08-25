@@ -2,7 +2,7 @@ import {
 	LitElement,
 	customElement,
 	html,
-	property,
+	state,
 	css,
 	query,
 	CSSResultArray,
@@ -32,10 +32,10 @@ const MAX_NUM_RESULTS = 100
 
 @customElement('view-channel-search')
 export class ChannelSearchElement extends connect(store, LitElement) {
-	@property({ attribute: false }) pattern: string = ''
-	@property({ attribute: false }) searchResults: ChannelWithTags[] = []
-	@property({ attribute: false }) fetching: boolean = false
-	@property({ attribute: false }) error: Error | null = null
+	@state() pattern: string = ''
+	@state() searchResults: ChannelWithTags[] = []
+	@state() fetching: boolean = false
+	@state() error: Error | null = null
 
 	@query('#query')
 	private __query!: TextField

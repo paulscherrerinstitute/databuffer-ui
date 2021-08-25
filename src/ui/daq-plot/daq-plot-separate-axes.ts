@@ -3,7 +3,7 @@ import {
 	css,
 	customElement,
 	html,
-	property,
+	state,
 	query,
 	PropertyValues,
 } from 'lit-element'
@@ -26,22 +26,22 @@ declare global {
 
 @customElement('daq-plot-separate-axes')
 export class DaqPlotSeparateAxesElement extends LitElement {
-	@property({ type: String })
+	@state()
 	title: string = ''
 
-	@property({ type: String })
+	@state()
 	subtitle: string = ''
 
-	@property({ type: Array })
+	@state()
 	yAxes: DaqPlotYAxis[] = []
 
-	@property({ type: Number })
+	@state()
 	xMax?: number
 
-	@property({ type: Number })
+	@state()
 	xMin?: number
 
-	@property({ type: Array })
+	@state()
 	series: DaqPlotDataSeries[] = []
 
 	@query('#chart')

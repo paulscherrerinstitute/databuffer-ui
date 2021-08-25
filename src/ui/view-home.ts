@@ -1,11 +1,4 @@
-import {
-	LitElement,
-	customElement,
-	html,
-	property,
-	css,
-	query,
-} from 'lit-element'
+import { LitElement, customElement, html, state, css, query } from 'lit-element'
 import { connect } from '@captaincodeman/rdx'
 import '@material/mwc-button'
 import '@material/mwc-textfield'
@@ -18,14 +11,14 @@ import { channelsearchSelectors } from '../state/models/channelsearch'
 
 @customElement('view-home')
 export class HomeElement extends connect(store, LitElement) {
-	@property({ attribute: false })
+	@state()
 	pattern: string = ''
 
-	@property({ attribute: false })
+	@state()
 	availableBackends: string[] = []
-	@property({ attribute: false })
+	@state()
 	availableBackendsFetching: boolean = false
-	@property({ attribute: false })
+	@state()
 	availableBackendsError?: Error = undefined
 
 	@query('#query')
@@ -114,7 +107,7 @@ export class HomeElement extends connect(store, LitElement) {
 						> ${window.DatabufferUi.CONTACT_EMAIL ? html`
 						or
 						<a href="mailto:${window.DatabufferUi.CONTACT_EMAIL}?subject=Feedback%20on%20databuffer-ui"
-							>by email</a
+										>by email</a
 						>` : ''}.
 					</span>
 				</div>
