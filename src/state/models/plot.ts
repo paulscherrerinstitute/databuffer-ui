@@ -440,7 +440,6 @@ export const plot = createModel({
 		const dispatch = store.getDispatch()
 		return {
 			async drawPlot() {
-				dispatch.plot.hideQueryRange()
 				const channels = plotSelectors.channels(store.getState())
 				const startDate = new Date(
 					plotSelectors.startTime(store.getState())
