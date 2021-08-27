@@ -2,7 +2,6 @@ import { LitElement, customElement, html, state, css } from 'lit-element'
 
 import { AppState, store } from '../state/store'
 import {
-	Channel,
 	DataSeries,
 	YAxis,
 	YAxisType,
@@ -17,10 +16,11 @@ import '@material/mwc-select'
 import '@material/mwc-textfield'
 import { TextField } from '@material/mwc-textfield'
 import { Select } from '@material/mwc-select'
+import { DataUiChannel } from '../shared/channel'
 
 @customElement('view-plot-settings')
 export class PlotSettingsElement extends connect(store, LitElement) {
-	@state() channels: Channel[] = []
+	@state() channels: DataUiChannel[] = []
 	@state() dataSeriesConfig: DataSeries[] = []
 	@state() plotVariation: PlotVariation = PlotVariation.SeparateAxes
 	@state() plotTitle: string = ''

@@ -10,18 +10,14 @@ import './channel-search-selected-item'
 
 import { store, AppState } from '../state/store'
 import { plotSelectors } from '../state/models/plot'
-
-type Channel = {
-	backend: string
-	name: string
-}
+import { DataUiChannel } from '../shared/channel'
 
 @customElement('channel-search-selected-list')
 export class ChannelSearchSelectedListElement extends connect(
 	store,
 	LitElement
 ) {
-	@state() selectedChannels: Channel[] = []
+	@state() selectedChannels: DataUiChannel[] = []
 
 	public mapState(state: AppState) {
 		return {

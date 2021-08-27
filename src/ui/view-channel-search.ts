@@ -18,8 +18,8 @@ import type { Snackbar } from '@material/mwc-snackbar'
 import '@material/mwc-textfield'
 import type { TextField } from '@material/mwc-textfield'
 
+import type { DataUiChannel } from '../shared/channel'
 import { AppState, store } from '../state/store'
-import type { ChannelWithTags } from '../state/models/channelsearch'
 import { channelsearchSelectors } from '../state/models/channelsearch'
 import { TemplateResult } from 'lit-html'
 
@@ -33,7 +33,7 @@ const MAX_NUM_RESULTS = 100
 @customElement('view-channel-search')
 export class ChannelSearchElement extends connect(store, LitElement) {
 	@state() pattern: string = ''
-	@state() searchResults: ChannelWithTags[] = []
+	@state() searchResults: DataUiChannel[] = []
 	@state() fetching: boolean = false
 	@state() error: Error | null = null
 
@@ -46,7 +46,7 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 	mapState(state: AppState) {
 		return {
 			pattern: channelsearchSelectors.pattern(state),
-			searchResults: channelsearchSelectors.resultsWithTags(state),
+			searchResults: channelsearchSelectors.results(state),
 			fetching: channelsearchSelectors.fetching(state),
 			error: channelsearchSelectors.error(state),
 		}

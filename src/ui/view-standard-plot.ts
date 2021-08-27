@@ -34,7 +34,6 @@ import './daq-plot/daq-plot-single-axis'
 import type { TimeRange } from '../util'
 import { AppState, store } from '../state/store'
 import {
-	Channel,
 	DataRequestMeta,
 	DataSeries,
 	DownloadAggregation,
@@ -55,6 +54,7 @@ import type { DaqPlotSingleAxisElement } from './daq-plot/daq-plot-single-axis'
 import type { DaqPlotSeparateAxesElement } from './daq-plot/daq-plot-separate-axes'
 import type { DaqPlotSeparatePlotsElement } from './daq-plot/daq-plot-separate-plots'
 import './daq-range-select'
+import type { DataUiChannel } from '../shared/channel'
 
 const IS_MAC = window.navigator.appVersion.toLowerCase().indexOf('mac') >= 0
 const KEY_RELOAD_ZOOM = IS_MAC ? 'Meta' : 'Control'
@@ -67,7 +67,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@state() response: DataResponse = []
 	@state() startTime: number = 1
 	@state() endTime: number = 2
-	@state() channels: Channel[] = []
+	@state() channels: DataUiChannel[] = []
 	@state() anyRequestErrors: boolean = false
 	@state() dataRequests: DataRequestMeta[] = []
 	@state() pendingRequests: number = 0
@@ -75,7 +75,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@state() requestDuration!: number
 	@state() requestFinishedAt!: number
 	@state() shouldDisplayChart!: boolean
-	@state() channelsWithoutData: Channel[] = []
+	@state() channelsWithoutData: DataUiChannel[] = []
 	@state() queryRangeShowing: boolean = false
 	@state() dialogShareLinkShowing: boolean = false
 	@state() dialogShareLinkAbsoluteTimes: boolean = false

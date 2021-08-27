@@ -20,35 +20,28 @@ import type {
 	DaqPillListElement,
 	DaqPillListSelectedEvent,
 } from '@paulscherrerinstitute/databuffer-web-components/daq-pill-list'
-import {
-	ChannelWithTags,
-	channelsearchSelectors,
-} from '../state/models/channelsearch'
+import { channelsearchSelectors } from '../state/models/channelsearch'
 import { plotSelectors } from '../state/models/plot'
 import { nothing } from 'lit-html'
-
-type Channel = {
-	backend: string
-	name: string
-}
+import { DataUiChannel } from '../shared/channel'
 
 function _onChannelRemove(e: CustomEvent<{ index: number }>) {
 	store.dispatch.plot.unselectChannel(e.detail.index)
 }
 
-function _onChannelSelect(e: CustomEvent<{ channel: Channel }>) {
+function _onChannelSelect(e: CustomEvent<{ channel: DataUiChannel }>) {
 	store.dispatch.plot.selectChannel(e.detail.channel)
 }
 
 @customElement('channel-search-result-list')
 export class ChannelSearchResultListElement extends connect(store, LitElement) {
 	@state() pattern: string = ''
-	@state() searchResults: ChannelWithTags[] = []
-	@state() resultsForDisplay: ChannelWithTags[] = []
+	@state() searchResults: DataUiChannel[] = []
+	@state() resultsForDisplay: DataUiChannel[] = []
 	@state() error: Error | null = null
 	@state() availableFilters: string[] = []
 	@state() activeFilters: string[] = []
-	@state() selectedChannels: Channel[] = []
+	@state() selectedChannels: DataUiChannel[] = []
 	@state() maxResults: number = 0
 
 	@query('#filterlist')
@@ -57,7 +50,7 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 	public mapState(state: AppState) {
 		return {
 			pattern: channelsearchSelectors.pattern(state),
-			searchResults: channelsearchSelectors.resultsWithTags(state),
+			searchResults: channelsearchSelectors.results(state),
 			error: channelsearchSelectors.error(state),
 			availableFilters: channelsearchSelectors.availableTags(state),
 			selectedChannels: plotSelectors.channels(state),
@@ -69,7 +62,7 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 			this.activeFilters.length === 0
 				? this.searchResults
 				: this.searchResults.filter(x =>
-						this.activeFilters.every(f => x.tags.indexOf(f) >= 0)
+						this.activeFilters.every(f => x.tags?.indexOf(f) ?? -1 >= 0)
 				  )
 		).slice(0, this.maxResults)
 	}

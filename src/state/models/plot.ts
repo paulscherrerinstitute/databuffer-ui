@@ -30,14 +30,10 @@ import {
 } from '../../ui/daq-plot/types'
 import { DaqPlotConfig } from '../../ui/daq-plot/types'
 import { make_debug, make_error, make_info } from './applog'
-
-export interface Channel {
-	backend: string
-	name: string
-}
+import { DataUiChannel } from '../../shared/channel'
 
 export interface DataPoints {
-	channel: Channel
+	channel: DataUiChannel
 	values: number[]
 }
 
@@ -115,7 +111,7 @@ export interface PlotState {
 	plotTitle: string
 	startTime: number
 	endTime: number
-	channels: Channel[]
+	channels: DataUiChannel[]
 	dataRequests: DataRequestMeta[]
 	yAxes: YAxis[]
 	dataSeries: DataSeries[]
@@ -127,10 +123,10 @@ export interface PlotState {
 }
 
 // helper functions
-const findIndexOfChannel = (state: PlotState, ch: Channel): number =>
+const findIndexOfChannel = (state: PlotState, ch: DataUiChannel): number =>
 	state.channels.findIndex(e => e.backend === ch.backend && e.name === ch.name)
 
-const isChannelSelected = (state: PlotState, ch: Channel): boolean =>
+const isChannelSelected = (state: PlotState, ch: DataUiChannel): boolean =>
 	findIndexOfChannel(state, ch) >= 0
 
 export const plot = createModel({
@@ -150,7 +146,7 @@ export const plot = createModel({
 		dialogDownloadAggregation: 'as-is',
 	} as PlotState,
 	reducers: {
-		selectChannel(state, channel: Channel) {
+		selectChannel(state, channel: DataUiChannel) {
 			return isChannelSelected(state, channel)
 				? state
 				: {
@@ -210,7 +206,7 @@ export const plot = createModel({
 			}
 		},
 
-		setSelectedChannels(state, channels: Channel[]) {
+		setSelectedChannels(state, channels: DataUiChannel[]) {
 			return {
 				...state,
 				channels: channels,
@@ -453,7 +449,7 @@ export const plot = createModel({
 						`querying channels: ${channels.map(x => channelToId(x)).join(', ')}`
 					)
 				)
-				async function handleChannel(index: number, channel: Channel) {
+				async function handleChannel(index: number, channel: DataUiChannel) {
 					dispatch.plot.drawPlotRequest({
 						channelIndex: index,
 						sentAt: Date.now(),
@@ -515,7 +511,7 @@ export const plot = createModel({
 
 					case ROUTE.PLOT_SINGLE_CHANEL:
 						{
-							const channel: Channel = {
+							const channel: DataUiChannel = {
 								backend: payload.params.backend,
 								name: payload.params.name,
 							}
@@ -560,7 +556,7 @@ export const plot = createModel({
 								}
 							}
 
-							const channels: Channel[] = []
+							const channels: DataUiChannel[] = []
 							// we have to buffer the params into arrays, because we need to
 							// add the channels to the selection first; otherwise there are
 							// no dataseries and no axes are available

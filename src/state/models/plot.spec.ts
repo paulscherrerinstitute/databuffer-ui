@@ -7,7 +7,7 @@ import {
 	DataSeries,
 	PlotVariation,
 } from './plot'
-import { Channel, channelToId } from '../../shared/channel'
+import { DataUiChannel, channelToId } from '../../shared/channel'
 import { store, AppState, AppDispatch } from '../store'
 import { DataResponse, NR_OF_BINS } from '../../api/queryrest'
 import {
@@ -195,7 +195,7 @@ describe('plot model', () => {
 			describe('when calling selectChannel twice', () => {
 				let state1: PlotState
 				let state2: PlotState
-				const channel: Channel = { name: 'a', backend: 'b' }
+				const channel: DataUiChannel = { name: 'a', backend: 'b' }
 				beforeEach(() => {
 					state1 = plot.reducers.selectChannel(plot.state, channel)
 					state2 = plot.reducers.selectChannel(state1, channel)

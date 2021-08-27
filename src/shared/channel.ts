@@ -1,11 +1,35 @@
-import type { Channel } from '@paulscherrerinstitute/databuffer-query-js/api/v0/channel'
-export type { Channel }
-export {
-	idToChannel,
-	channelToId,
-} from '@paulscherrerinstitute/databuffer-query-js/api/v0/channel'
+export type DataUiChannelShape = 'scalar' | 'waveform' | 'image'
 
-export function compareNameThenBackend<T extends Channel>(a: T, b: T): number {
+export interface DataUiChannel {
+	name: string
+	backend: string
+	description?: string
+	dataType?: string
+	dataShape?: DataUiChannelShape
+	source?: string
+	tags?: string[]
+	unit?: string
+}
+
+export const BACKEND_SEPARATOR = '/'
+
+export function channelToId(ch: DataUiChannel): string {
+	return `${ch.backend}${BACKEND_SEPARATOR}${ch.name}`
+}
+
+export function idToChannel(id: string): DataUiChannel {
+	const parts = id.split(BACKEND_SEPARATOR)
+	if (parts.length !== 2) {
+		throw new Error(`channel id invalid: ${id}`)
+	}
+	const [name, backend] = parts
+	return { name, backend }
+}
+
+export function compareNameThenBackend<T extends DataUiChannel>(
+	a: T,
+	b: T
+): number {
 	if (a.name < b.name) return -1
 	if (a.name > b.name) return 1
 	if (a.backend < b.backend) return -1

@@ -2,16 +2,16 @@ import { LitElement, customElement, html, state, css } from 'lit-element'
 
 import { formatDate } from '../util'
 import { AppState, store } from '../state/store'
-import { Channel, DataRequestMeta, plotSelectors } from '../state/models/plot'
+import { DataRequestMeta, plotSelectors } from '../state/models/plot'
 
 import type { DataResponse } from '../api/queryrest'
 import { baseStyles } from './shared-styles'
 import { connect } from '@captaincodeman/rdx'
-import { channelToId } from '../shared/channel'
+import { channelToId, DataUiChannel } from '../shared/channel'
 
 @customElement('view-query-meta')
 export class QueryMetaElement extends connect(store, LitElement) {
-	@state() channels: Channel[] = []
+	@state() channels: DataUiChannel[] = []
 	@state() pendingRequests!: number
 	@state() dataRequests!: DataRequestMeta[]
 

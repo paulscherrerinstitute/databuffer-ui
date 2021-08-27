@@ -4,17 +4,17 @@ import type { Checkbox } from 'weightless/checkbox'
 import 'weightless/list-item'
 import '@paulscherrerinstitute/databuffer-web-components/daq-pill'
 import '@paulscherrerinstitute/databuffer-web-components/daq-pill-list'
-import { ChannelWithTags } from '../state/models/channelsearch'
+import { DataUiChannel } from '../shared/channel'
 
 @customElement('channel-search-result-item')
 export class ChannelSearchResultItemElement extends LitElement {
-	@state() item!: ChannelWithTags
+	@state() item!: DataUiChannel
 	@state() selectedIndex: number = -1
 	@state() activeFilters: string[] = []
 
 	public render() {
 		return html`
-			<wl-list-item ?disabled=${this.item.type === 'string'}>
+			<wl-list-item ?disabled=${this.item.dataType === 'string'}>
 				<wl-checkbox
 					slot="before"
 					?checked=${this.selectedIndex >= 0}
@@ -25,11 +25,7 @@ export class ChannelSearchResultItemElement extends LitElement {
 									composed: true,
 									bubbles: true,
 									detail: {
-										// reduce ChannelWithTags to Channel
-										channel: {
-											backend: this.item.backend,
-											name: this.item.name,
-										},
+										channel: this.item,
 									},
 								})
 							)
@@ -48,9 +44,9 @@ export class ChannelSearchResultItemElement extends LitElement {
 					slot="after"
 					selectable
 					.selected=${this.activeFilters.filter(x =>
-						this.item?.tags.includes(x)
+						this.item?.tags?.includes(x)
 					)}
-					.value=${this.item.tags}
+					.value=${this.item.tags ?? []}
 				></daq-pill-list>
 				<div class="channel-name">${this.item.name}</div>
 				<div class="channel-description">${this.item.description}</div>

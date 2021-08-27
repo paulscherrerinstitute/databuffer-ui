@@ -6,7 +6,7 @@ import type {
 	DataResponse,
 	ChannelNamesResponse,
 } from '@paulscherrerinstitute/databuffer-query-js/api/v0'
-import { Channel } from '../shared/channel'
+import { DataUiChannel } from '../shared/channel'
 import {
 	AggregationOperation,
 	EventField,
@@ -26,7 +26,7 @@ export class ApiV0QueryProvider {
 		return this.api.queryBackends()
 	}
 
-	public queryData(channel: Channel, start: string, end: string) {
+	public queryData(channel: DataUiChannel, start: string, end: string) {
 		return this.api.queryData({
 			channels: [channel],
 			range: {
