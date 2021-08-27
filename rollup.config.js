@@ -42,8 +42,10 @@ export default {
 	},
 	plugins: [
 		replace({
-			APP_VERSION_STRING: appVersion,
-			GIT_COMMIT_REF: gitRef,
+			values: {
+				APP_VERSION_STRING: JSON.stringify(appVersion),
+				GIT_COMMIT_REF: JSON.stringify(gitRef),
+			},
 			preventAssignment: true, // as per recommendation
 		}),
 		resolve({
