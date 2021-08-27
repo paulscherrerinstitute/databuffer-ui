@@ -1,11 +1,14 @@
 import { ChannelConfigsQuery } from '@paulscherrerinstitute/databuffer-query-js/api/v0/query-channel-configs'
 import { createModel, RoutingState } from '@captaincodeman/rdx'
-import { channelToId } from '@paulscherrerinstitute/databuffer-query-js/api/v0/channel'
 import { createSelector } from 'reselect'
 import { EffectsStore, AppState } from '../store'
 import { queryRestApi } from '../../api/queryrest'
 import { ROUTE } from '../routing'
-import { compareNameThenBackend, DataUiChannel } from '../../shared/channel'
+import {
+	channelToId,
+	compareNameThenBackend,
+	DataUiChannel,
+} from '../../shared/channel'
 
 export const dataShapeDisplay = {
 	scalar: 'scalar',
@@ -142,18 +145,12 @@ export const channelsearch = createModel({
 export async function _searchChannel(
 	query: ChannelConfigsQuery
 ): Promise<IdToChannelMap> {
-	const response = await queryRestApi.searchChannels(query.regex)
-
+	const channels = await queryRestApi.searchChannels(query.regex)
 	const result: IdToChannelMap = {}
-
-	for (const x of response) {
-		for (const chConfig of x.channels) {
-			const { backend, name } = chConfig
-			const id = channelToId({ backend, name })
-			result[id] = chConfig
-		}
+	for (const ch of channels) {
+		const id = channelToId(ch)
+		result[id] = ch
 	}
-
 	return result
 }
 
