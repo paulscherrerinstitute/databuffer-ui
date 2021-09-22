@@ -16,6 +16,7 @@ import {
 } from './highcharts'
 import { baseStyles } from '../shared-styles'
 import { DaqPlotYAxis, DaqPlotDataSeries, DaqPlotDataPoint } from './types'
+import { PlotDataSeries } from '../../state/models/plot'
 
 //#region Highcharts manipulations
 
@@ -136,7 +137,7 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 	xMin?: number
 
 	@state()
-	series: DaqPlotDataSeries[] = []
+	series: PlotDataSeries[] = []
 
 	@query('#chartgroup')
 	private chartgroupDiv!: HTMLDivElement

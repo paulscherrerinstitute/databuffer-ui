@@ -2,7 +2,7 @@ import { LitElement, customElement, html, state, css } from 'lit-element'
 
 import { formatDate } from '../util'
 import { AppState, store } from '../state/store'
-import { DataRequestMeta, plotSelectors } from '../state/models/plot'
+import { PlotDataSeries, plotSelectors } from '../state/models/plot'
 
 import type { DataResponse } from '../api/queryrest'
 import { baseStyles } from './shared-styles'
@@ -13,13 +13,13 @@ import { channelToId, DataUiChannel } from '../shared/channel'
 export class QueryMetaElement extends connect(store, LitElement) {
 	@state() channels: DataUiChannel[] = []
 	@state() pendingRequests!: number
-	@state() dataRequests!: DataRequestMeta[]
+	@state() dataSeries!: PlotDataSeries[]
 
 	mapState(state: AppState) {
 		return {
 			channels: plotSelectors.channels(state),
 			pendingRequests: plotSelectors.pendingRequests(state),
-			dataRequests: plotSelectors.dataRequests(state),
+			dataSeries: plotSelectors.plotDataSeries(state),
 		}
 	}
 
@@ -41,20 +41,20 @@ export class QueryMetaElement extends connect(store, LitElement) {
 					</tr>
 				</thead>
 				<tbody>
-					${this.dataRequests.map(
-						(r, idx) => html`<tr>
+					${this.dataSeries.map(
+						(x, idx) => html`<tr>
 							<td>${channelToId(this.channels[idx])}</td>
-							<td>${r.request.sentAt ? formatDate(r.request.sentAt) : ''}</td>
+							<td>${x.requestSentAt ? formatDate(x.requestSentAt) : ''}</td>
 							<td>
-								${r.request.finishedAt ? formatDate(r.request.finishedAt) : ''}
+								${x.requestFinishedAt ? formatDate(x.requestFinishedAt) : ''}
 							</td>
 							<td>
-								${r.request.finishedAt && r.request.sentAt
-									? (r.request.finishedAt - r.request.sentAt) / 1000 + ' sec'
+								${x.requestFinishedAt && x.requestSentAt
+									? (x.requestFinishedAt - x.requestSentAt) / 1000 + ' sec'
 									: ''}
 							</td>
-							<td>${r.error ? r.error.message : ''}</td>
-							<td>${r.response.length > 0 ? r.response[0].data.length : ''}</td>
+							<td>${x.error?.message ?? ''}</td>
+							<td>${x.datapoints?.length ?? ''}</td>
 						</tr>`
 					)}
 				</tbody>

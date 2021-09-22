@@ -17,6 +17,7 @@ import {
 import { baseStyles } from '../shared-styles'
 import { isEmptyObj } from '../../util'
 import { DaqPlotYAxis, DaqPlotDataSeries } from './types'
+import { PlotDataSeries } from '../../state/models/plot'
 
 declare global {
 	interface HTMLElementTagNameMap {
@@ -42,7 +43,7 @@ export class DaqPlotSeparateAxesElement extends LitElement {
 	xMin?: number
 
 	@state()
-	series: DaqPlotDataSeries[] = []
+	series: PlotDataSeries[] = []
 
 	@query('#chart')
 	private chartDiv!: HTMLDivElement

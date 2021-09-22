@@ -1,5 +1,6 @@
 export interface DaqPlotYAxis {
 	title?: string
+	categories?: string[]
 	type?: 'linear' | 'logarithmic'
 	side?: 'left' | 'right'
 	unit?: string

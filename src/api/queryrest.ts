@@ -6,13 +6,23 @@ import type {
 	DataResponse,
 	ChannelNamesResponse,
 } from '@paulscherrerinstitute/databuffer-query-js/api/v0'
-import { DataUiChannel, DataUiChannelShape } from '../shared/channel'
+import {
+	channelToId,
+	dataShapeDisplay,
+	DataUiChannel,
+	DataUiChannelShape,
+} from '../shared/channel'
 import {
 	AggregationOperation,
+	AggregationResult,
 	EventField,
 } from '@paulscherrerinstitute/databuffer-query-js/api/v0/query-data'
 import { ChannelConfig } from '@paulscherrerinstitute/databuffer-query-js/api/v0/query-channel-configs/response'
-import { dataShapeDisplay } from '../state/models/channelsearch'
+import {
+	DataUiAggregatedValue,
+	DataUiDataPoint,
+	DataUiDataSeries,
+} from '../shared/dataseries'
 
 export const NR_OF_BINS = 500
 export type { DataResponse, ChannelNamesResponse }
@@ -28,8 +38,50 @@ export class ApiV0QueryProvider {
 		return this.api.queryBackends()
 	}
 
-	public queryData(channel: DataUiChannel, start: string, end: string) {
-		return this.api.queryData({
+	public async queryStringData(
+		channel: DataUiChannel,
+		start: string,
+		end: string
+	): Promise<DataUiDataSeries<number, string>> {
+		const id = channelToId(channel)
+		if (channel.dataType !== 'string') {
+			throw new Error(`internal error: not a string channel: ${id}`)
+		}
+		const response = await this.api.queryData({
+			channels: [{ name: channel.name, backend: channel.backend }],
+			range: {
+				startDate: start,
+				endDate: end,
+			},
+			eventFields: [EventField.GLOBAL_MILLIS, EventField.VALUE],
+		})
+		let datapoints: DataUiDataPoint<number, string>[] = []
+		for (const respItem of response) {
+			if (respItem.channel.backend !== channel.backend) continue
+			if (respItem.channel.name !== channel.name) continue
+			datapoints = respItem.data.map(e => ({
+				x: e[EventField.GLOBAL_MILLIS] as number,
+				y: e[EventField.VALUE] as string,
+			}))
+			break
+		}
+		const result: DataUiDataSeries<number, string> = {
+			name: id,
+			datapoints,
+		}
+		return result
+	}
+
+	public async queryData(
+		channel: DataUiChannel,
+		start: string,
+		end: string
+	): Promise<DataUiDataSeries<number, DataUiAggregatedValue>> {
+		const id = channelToId(channel)
+		if (channel.dataType === 'string') {
+			throw new Error(`internal error: string channel: ${id}`)
+		}
+		const response = await this.api.queryData({
 			channels: [{ name: channel.name, backend: channel.backend }],
 			range: {
 				startDate: start,
@@ -49,6 +101,26 @@ export class ApiV0QueryProvider {
 				nrOfBins: NR_OF_BINS,
 			},
 		})
+		let datapoints: DataUiDataPoint<number, DataUiAggregatedValue>[] = []
+		for (const respItem of response) {
+			if (respItem.channel.backend !== channel.backend) continue
+			if (respItem.channel.name !== channel.name) continue
+			datapoints = respItem.data.map(e => ({
+				x: e[EventField.GLOBAL_MILLIS] as number,
+				y: {
+					count: e[EventField.EVENT_COUNT] as number,
+					min: (e[EventField.VALUE] as AggregationResult).min as number,
+					mean: (e[EventField.VALUE] as AggregationResult).mean as number,
+					max: (e[EventField.VALUE] as AggregationResult).max as number,
+				},
+			}))
+			break
+		}
+		const result = {
+			name: id,
+			datapoints,
+		}
+		return result
 	}
 
 	public async searchChannels(nameRegex?: string): Promise<DataUiChannel[]> {

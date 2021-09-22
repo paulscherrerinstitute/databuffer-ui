@@ -4,13 +4,13 @@
 import {
 	channelsearch,
 	channelsearchSelectors,
-	dataShapeDisplay,
 	IdToChannelMap,
 } from './channelsearch'
 import { store, AppDispatch, AppState } from '../store'
 import { createTestEnv, RdxTestEnv } from '../rdx-test-util'
 import { EffectFns, RoutingState } from '@captaincodeman/rdx'
 import { ROUTE } from '../routing'
+import { dataShapeDisplay } from '../../shared/channel'
 
 describe('channelsearch model', () => {
 	describe('initial state', () => {

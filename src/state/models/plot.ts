@@ -13,10 +13,6 @@ import {
 	AggregationSpecification,
 	MappingAlignment,
 } from '@paulscherrerinstitute/databuffer-query-js/api/v0/query-data'
-import {
-	channelToId,
-	idToChannel,
-} from '@paulscherrerinstitute/databuffer-query-js/api/v0/channel'
 import { DataResponse, NR_OF_BINS, queryRestApi } from '../../api/queryrest'
 import { EffectsStore, AppState } from '../store'
 import { formatDate } from '../../util'
@@ -30,12 +26,12 @@ import {
 } from '../../ui/daq-plot/types'
 import { DaqPlotConfig } from '../../ui/daq-plot/types'
 import { make_debug, make_error, make_info } from './applog'
-import { DataUiChannel } from '../../shared/channel'
-
-export interface DataPoints {
-	channel: DataUiChannel
-	values: number[]
-}
+import { channelToId, DataUiChannel, idToChannel } from '../../shared/channel'
+import {
+	DataUiAggregatedValue,
+	DataUiDataPoint,
+	DataUiDataSeries,
+} from '../../shared/dataseries'
 
 export enum PlotVariation {
 	/** 1 Y axis for all channels */
@@ -50,16 +46,6 @@ export enum PlotVariation {
 export function isPlotVariation(val: any): val is PlotVariation {
 	if (typeof val !== 'string') return false
 	return Object.values(PlotVariation as Record<string, string>).includes(val)
-}
-
-/** DataSeries defines a data set to be plotted in the chart */
-export interface DataSeries {
-	/** name allows the data series to use a non-technical label */
-	name: string
-	/** channelIndex is the index into the array of selected channels */
-	channelIndex: number
-	/** yAxisIndex is the index into the array of defined Y axes */
-	yAxisIndex: number
 }
 
 /** type of YAxis */
@@ -87,34 +73,24 @@ export interface YAxis {
 
 export type DownloadAggregation = 'as-is' | 'PT5S' | 'PT1M' | 'PT1H' | 'raw'
 
-export type DataRequestMeta = {
-	fetching: boolean
+export type PlotDataSeries = {
+	channel: DataUiChannel
+	label: string
+	yAxisIndex: number
+	fetching?: boolean
 	error?: Error
-	request: {
-		sentAt?: number
-		finishedAt?: number
-	}
-	response: DataResponse
+	requestSentAt?: number
+	requestFinishedAt?: number
+	datapoints?: DataUiDataPoint<number, unknown>[]
 }
-const _make_empty_datarequest = (): DataRequestMeta => ({
-	fetching: false,
-	error: undefined,
-	request: {
-		sentAt: undefined,
-		finishedAt: undefined,
-	},
-	response: [],
-})
 
 export interface PlotState {
 	plotVariation: PlotVariation
 	plotTitle: string
 	startTime: number
 	endTime: number
-	channels: DataUiChannel[]
-	dataRequests: DataRequestMeta[]
+	dataSeries: PlotDataSeries[]
 	yAxes: YAxis[]
-	dataSeries: DataSeries[]
 	queryRangeShowing: boolean
 	dialogShareLinkShowing: boolean
 	dialogShareLinkAbsoluteTimes: boolean
@@ -124,7 +100,9 @@ export interface PlotState {
 
 // helper functions
 const findIndexOfChannel = (state: PlotState, ch: DataUiChannel): number =>
-	state.channels.findIndex(e => e.backend === ch.backend && e.name === ch.name)
+	state.dataSeries.findIndex(
+		e => e.channel.backend === ch.backend && e.channel.name === ch.name
+	)
 
 const isChannelSelected = (state: PlotState, ch: DataUiChannel): boolean =>
 	findIndexOfChannel(state, ch) >= 0
@@ -151,12 +129,11 @@ export const plot = createModel({
 				? state
 				: {
 						...state,
-						channels: [...state.channels, channel],
 						yAxes: [
 							...state.yAxes,
 							{
 								title: channel.name,
-								unit: '',
+								unit: channel.unit || '',
 								side: state.yAxes.length % 2 === 0 ? 'left' : 'right',
 								min: null,
 								max: null,
@@ -166,64 +143,45 @@ export const plot = createModel({
 						dataSeries: [
 							...state.dataSeries,
 							{
-								channelIndex: state.channels.length,
+								channel,
+								label: channel.name,
 								yAxisIndex: state.yAxes.length,
-								name: channel.name,
 							},
 						],
-						dataRequests: [...state.dataRequests, _make_empty_datarequest()],
 				  }
 		},
 
 		unselectChannel(state, index: number) {
+			const dataSeries = [...state.dataSeries]
+			dataSeries.splice(index, 1)
+			const yAxes = [...state.yAxes]
+			yAxes.splice(index, 1)
+			for (let i = index; i < yAxes.length; i++) {
+				yAxes[i].side = i % 2 === 0 ? 'left' : 'right'
+			}
 			return {
 				...state,
-				channels: [
-					...state.channels.slice(0, index),
-					...state.channels.slice(index + 1),
-				],
-				yAxes: state.yAxes
-					.filter((x, idx) => idx !== index)
-					.map((x, idx) => ({
-						...x,
-						side: idx % 2 === 0 ? 'left' : 'right',
-					})),
-				dataSeries: state.dataSeries
-					.filter((x, idx) => idx !== index)
-					.map(
-						(
-							x // shift the indices for all items after the unselected item
-						) =>
-							x.channelIndex < index
-								? x
-								: {
-										...x,
-										channelIndex: x.channelIndex - 1,
-										yAxisIndex: x.yAxisIndex - 1,
-								  }
-					),
-				dataRequests: state.dataRequests.filter((x, idx) => idx !== index),
+				dataSeries,
+				yAxes,
 			}
 		},
 
 		setSelectedChannels(state, channels: DataUiChannel[]) {
 			return {
 				...state,
-				channels: channels,
+				dataSeries: channels.map((channel, idx) => ({
+					channel,
+					label: channel.name,
+					yAxisIndex: idx,
+				})),
 				yAxes: channels.map((ch, idx) => ({
 					title: ch.name,
 					side: idx % 2 === 0 ? 'left' : 'right',
-					unit: '',
+					unit: ch.unit || '',
 					min: null,
 					max: null,
 					type: 'linear',
 				})),
-				dataSeries: channels.map((ch, idx) => ({
-					name: ch.name,
-					channelIndex: idx,
-					yAxisIndex: idx,
-				})),
-				dataRequests: channels.map(_make_empty_datarequest),
 			}
 		},
 
@@ -267,70 +225,60 @@ export const plot = createModel({
 			}
 		},
 
-		drawPlotRequest(state, payload: { channelIndex: number; sentAt: number }) {
-			const { channelIndex, sentAt } = payload
+		drawPlotRequest(state, payload: { index: number; timestamp: number }) {
+			const { index, timestamp } = payload
+			const dataSeries = [...state.dataSeries]
+			dataSeries[index] = {
+				...dataSeries[index],
+				fetching: true,
+				error: undefined,
+				requestSentAt: timestamp,
+				requestFinishedAt: undefined,
+				datapoints: undefined,
+			}
 			return {
 				...state,
-				dataRequests: state.dataRequests.map((r, idx) =>
-					idx !== channelIndex
-						? r
-						: {
-								..._make_empty_datarequest(),
-								fetching: true,
-								request: {
-									sentAt,
-									finishedAt: undefined,
-								},
-						  }
-				),
+				dataSeries,
 			}
 		},
 
 		drawPlotSuccess(
 			state,
 			payload: {
-				channelIndex: number
+				index: number
 				timestamp: number
-				response: DataResponse
+				datapoints: DataUiDataPoint<number, unknown>[]
 			}
 		) {
+			const { index, timestamp, datapoints } = payload
+			const dataSeries = [...state.dataSeries]
+			dataSeries[index] = {
+				...dataSeries[index],
+				fetching: false,
+				requestFinishedAt: timestamp,
+				datapoints: datapoints,
+			}
 			return {
 				...state,
-				dataRequests: state.dataRequests.map((r, idx) =>
-					idx !== payload.channelIndex
-						? r
-						: {
-								...r,
-								fetching: false,
-								request: {
-									...r.request,
-									finishedAt: payload.timestamp,
-								},
-								response: payload.response,
-						  }
-				),
+				dataSeries,
 			}
 		},
 
 		drawPlotFailure(
 			state,
-			payload: { channelIndex: number; timestamp: number; error: Error }
+			payload: { index: number; timestamp: number; error: Error }
 		) {
+			const { index, timestamp, error } = payload
+			const dataSeries = [...state.dataSeries]
+			dataSeries[index] = {
+				...dataSeries[index],
+				fetching: false,
+				requestFinishedAt: timestamp,
+				error,
+			}
 			return {
 				...state,
-				dataRequests: state.dataRequests.map((r, idx) =>
-					idx !== payload.channelIndex
-						? r
-						: {
-								...r,
-								fetching: false,
-								request: {
-									...r.request,
-									finishedAt: payload.timestamp,
-								},
-								error: payload.error,
-						  }
-				),
+				dataSeries,
 			}
 		},
 
@@ -451,28 +399,32 @@ export const plot = createModel({
 				)
 				async function handleChannel(index: number, channel: DataUiChannel) {
 					dispatch.plot.drawPlotRequest({
-						channelIndex: index,
-						sentAt: Date.now(),
+						index,
+						timestamp: Date.now(),
 					})
 					const channelId = channelToId(channel)
 					try {
 						dispatch.applog.log(make_debug(`querying data for ${channelId}`))
-						const response = await queryRestApi.queryData(
-							channel,
-							startDate,
-							endDate
-						)
+						const response =
+							channel.dataType === 'string'
+								? await queryRestApi.queryStringData(
+										channel,
+										startDate,
+										endDate
+								  )
+								: await queryRestApi.queryData(channel, startDate, endDate)
 						dispatch.plot.drawPlotSuccess({
-							channelIndex: index,
+							index,
 							timestamp: Date.now(),
-							response,
+							datapoints: response.datapoints,
 						})
 						dispatch.applog.log(
 							make_debug(`received response for ${channelId}`)
 						)
-					} catch (error) {
+					} catch (err) {
+						const error = err as Error
 						dispatch.plot.drawPlotFailure({
-							channelIndex: index,
+							index,
 							timestamp: Date.now(),
 							error,
 						})
@@ -700,47 +652,44 @@ export namespace plotSelectors {
 	export const plotTitle = createSelector([getState], state => state.plotTitle)
 	export const startTime = createSelector([getState], state => state.startTime)
 	export const endTime = createSelector([getState], state => state.endTime)
-	export const channels = createSelector([getState], state => state.channels)
-	export const dataRequests = createSelector(
+	export const plotDataSeries = createSelector(
 		[getState],
-		state => state.dataRequests
+		state => state.dataSeries
+	)
+	export const channels = createSelector([plotDataSeries], series =>
+		series.map(x => x.channel)
 	)
 	export const pendingRequests = createSelector(
-		[dataRequests],
-		dataRequests => dataRequests.filter(r => r.fetching).length
+		[plotDataSeries],
+		series => series.filter(x => x.fetching).length
 	)
-	export const requestErrors = createSelector([dataRequests], dataRequests =>
-		dataRequests.map(r => r.error)
+	export const requestErrors = createSelector([plotDataSeries], series =>
+		series.map(x => x.error)
 	)
 	export const anyRequestErrors = createSelector(
 		[requestErrors],
 		errors => errors.filter(Boolean).length > 0
 	)
-	export const allRequestsFinished = createSelector(
-		[dataRequests],
-		dataRequests => dataRequests.every(r => !r.fetching)
+	export const allRequestsFinished = createSelector([plotDataSeries], series =>
+		series.every(x => !x.fetching)
 	)
-	export const shouldDisplayChart = createSelector(
-		[dataRequests],
-		dataRequests => dataRequests.some(r => !r.fetching && r.error === undefined)
+	export const shouldDisplayChart = createSelector([plotDataSeries], series =>
+		series.some(x => !x.fetching && x.error === undefined)
 	)
 	/** timestamp of first started request */
-	export const firstRequestSentAt = createSelector(
-		[dataRequests],
-		dataRequests => {
-			const times = dataRequests
-				.map(r => r.request.sentAt)
-				.filter(x => x !== undefined) as number[]
-			if (times.length === 0) return undefined
-			return Math.max(...times)
-		}
-	)
+	export const firstRequestSentAt = createSelector([plotDataSeries], series => {
+		const times = series
+			.map(x => x.requestSentAt)
+			.filter(x => x !== undefined) as number[]
+		if (times.length === 0) return undefined
+		return Math.max(...times)
+	})
 	/** timestamp of last finished request */
 	export const lastRequestFinishedAt = createSelector(
-		[dataRequests],
-		dataRequests => {
-			const times = dataRequests
-				.map(r => r.request.finishedAt)
+		[plotDataSeries],
+		series => {
+			const times = series
+				.map(x => x.requestFinishedAt)
 				.filter(x => x !== undefined) as number[]
 			if (times.length === 0) return undefined
 			return Math.max(...times)
@@ -759,78 +708,62 @@ export namespace plotSelectors {
 			requestFinishedAt ? `Data retrieved ${formatDate(requestFinishedAt)}` : ''
 	)
 
-	export const channelsWithoutData = createSelector(
-		[dataRequests, channels],
-		(dataRequests, channels) =>
-			dataRequests
-				.filter(r => r.response.length === 0 || r.response[0].data.length === 0)
-				.map((_, idx) => channels[idx])
+	export const channelsWithoutData = createSelector([plotDataSeries], series =>
+		series
+			.filter(x => x.datapoints && x.datapoints.length === 0)
+			.map(x => x.channel)
 	)
 
 	export const yAxes = createSelector([getState], state => state.yAxes)
 
-	export const dataSeriesConfigs = createSelector(
-		[getState],
-		state => state.dataSeries
-	)
-
-	export const dataPoints = createSelector(
-		[channels, dataRequests],
-		(channels, dataRequests) =>
-			channels.map((x, idx) => {
-				const response = dataRequests[idx].response
-				const responseItem = response[0] // only 1 channel per request
-				const binning = needsBinning(responseItem)
-				const data = binning
-					? responseItem.data.map(mapDataPointWithBinning)
-					: responseItem.data.map(mapDataPointWithoutBinning)
-				return {
-					needsBinning: binning,
-					data,
-				}
-			})
-	)
-
-	export const daqPlotYAxes = createSelector([yAxes], yAxes =>
-		yAxes.map(
-			y =>
-				({
+	export const daqPlotYAxes = createSelector(
+		[yAxes, plotDataSeries],
+		(yAxes, series) =>
+			yAxes.map((y, idx) => {
+				const ch = series[idx].channel
+				const result: DaqPlotYAxis = {
 					title: y.title,
 					type: y.type,
 					side: y.side,
-					min: y.min,
-					max: y.max,
+					min: y.min ?? undefined,
+					max: y.max ?? undefined,
 					unit: y.unit,
-				} as DaqPlotYAxis)
-		)
-	)
-
-	export const daqPlotDataSeries = createSelector(
-		[channels, dataRequests, dataSeriesConfigs],
-		(channels, dataRequests, dataSeriesConfigs) =>
-			channels.map((_, i) => ({
-				name: dataSeriesConfigs[i].name,
-				yAxis: dataSeriesConfigs[i].yAxisIndex,
-				data:
-					dataRequests[i].response.length === 0
-						? []
-						: dataRequests[i].response[0].data.map(item => ({
-								x: item.globalMillis as number,
-								min: (item.value as AggregationResult).min as number,
-								max: (item.value as AggregationResult).max as number,
-								mean: (item.value as AggregationResult).mean as number,
-								binSize: item.eventCount as number,
-						  })),
-			}))
+				}
+				if (ch.dataType === 'string') {
+					// TODO: what now?!
+					result.categories = Array.from(
+						new Set(series[idx].datapoints?.map(pt => pt.y))
+					)
+				}
+				return result
+			})
 	)
 
 	export const daqPlotConfig = createSelector(
-		[plotTitle, plotSubTitle, daqPlotYAxes, daqPlotDataSeries],
+		[plotTitle, plotSubTitle, daqPlotYAxes, plotDataSeries],
 		(title, subtitle, yAxes, series) => ({
 			title,
 			subtitle,
 			yAxes,
-			series,
+			series: series.map((x, idx) => {
+				return {
+					name: x.label,
+					yAxis: x.yAxisIndex,
+					data:
+						(
+							x.datapoints as DataUiDataPoint<number, DataUiAggregatedValue>[]
+						)?.map(
+							p =>
+								({
+									x: p.x,
+									binSize: p.y.count,
+									max: p.y.max,
+									mean: p.y.mean,
+									min: p.y.min,
+								} as DaqPlotDataPoint)
+						) ?? [],
+				} as DaqPlotDataSeries
+			}),
 		})
 	)
 
@@ -851,7 +784,7 @@ export namespace plotSelectors {
 
 	export const dialogShareLinkUrl = createSelector(
 		[
-			dataSeriesConfigs,
+			plotDataSeries,
 			yAxes,
 			dialogShareLinkAbsoluteTimes,
 			channels,
@@ -861,7 +794,7 @@ export namespace plotSelectors {
 			plotVariation,
 		],
 		(
-			dataSeriesConfig,
+			series,
 			yAxes,
 			absTimes,
 			channels,
@@ -873,34 +806,26 @@ export namespace plotSelectors {
 			const params = channels
 				.slice(0, 16)
 				.map((ch, i) => `c${i + 1}=${encodeURIComponent(channelToId(ch))}`)
-			dataSeriesConfig.slice(0, 16).forEach((cfg, i) => {
-				if (cfg.name !== channels[cfg.channelIndex].name) {
-					params.push(`l${i + 1}=${encodeURIComponent(cfg.name)}`)
+			series.slice(0, 16).forEach((x, i) => {
+				if (x.label !== x.channel.name) {
+					params.push(`l${i + 1}=${encodeURIComponent(x.label)}`)
 				}
-				if (yAxes[cfg.yAxisIndex].type !== 'linear') {
-					params.push(
-						`y${i + 1}=${encodeURIComponent(yAxes[cfg.yAxisIndex].type)}`
-					)
+			})
+			yAxes.slice(0, 16).forEach((x, i) => {
+				if (x.type !== 'linear') {
+					params.push(`y${i + 1}=${encodeURIComponent(x.type)}`)
 				}
-				if (yAxes[cfg.yAxisIndex].min !== null) {
-					params.push(
-						`min${i + 1}=${encodeURIComponent(
-							yAxes[cfg.yAxisIndex].min!.toString(10)
-						)}`
-					)
+				if (x.min !== null) {
+					params.push(`min${i + 1}=${encodeURIComponent(x.min.toString(10))}`)
 				}
-				if (yAxes[cfg.yAxisIndex].max !== null) {
-					params.push(
-						`max${i + 1}=${encodeURIComponent(
-							yAxes[cfg.yAxisIndex].max!.toString(10)
-						)}`
-					)
+				if (x.max !== null) {
+					params.push(`max${i + 1}=${encodeURIComponent(x.max.toString(10))}`)
 				}
 			})
 
 			if (absTimes) {
-				params.push(`startTime=${startTime}`)
-				params.push(`endTime=${endTime}`)
+				params.push(`startTime=${new Date(startTime).toISOString()}`)
+				params.push(`endTime=${new Date(endTime).toISOString()}`)
 			} else {
 				params.push(`duration=${endTime - startTime}`)
 			}

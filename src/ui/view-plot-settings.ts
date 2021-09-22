@@ -7,6 +7,7 @@ import {
 	YAxisType,
 	plotSelectors,
 	PlotVariation,
+	PlotDataSeries,
 } from '../state/models/plot'
 
 import { baseStyles } from './shared-styles'
@@ -21,7 +22,7 @@ import { DataUiChannel } from '../shared/channel'
 @customElement('view-plot-settings')
 export class PlotSettingsElement extends connect(store, LitElement) {
 	@state() channels: DataUiChannel[] = []
-	@state() dataSeriesConfig: DataSeries[] = []
+	@state() dataSeries: PlotDataSeries[] = []
 	@state() plotVariation: PlotVariation = PlotVariation.SeparateAxes
 	@state() plotTitle: string = ''
 	@state() yAxes: YAxis[] = []
@@ -29,7 +30,7 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 	mapState(state: AppState) {
 		return {
 			channels: plotSelectors.channels(state),
-			dataSeriesConfig: plotSelectors.dataSeriesConfigs(state),
+			dataSeries: plotSelectors.plotDataSeries(state),
 			plotVariation: plotSelectors.plotVariation(state),
 			plotTitle: plotSelectors.plotTitle(state),
 			yAxes: plotSelectors.yAxes(state),
@@ -81,16 +82,15 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 					<th>Axis type</th>
 					<th>Scaling</th>
 				</tr>
-				${this.dataSeriesConfig.map((series, idx) => {
-					const ch = this.channels[series.channelIndex]
-					const yAxis = this.yAxes[series.yAxisIndex]
+				${this.dataSeries.map((x, idx) => {
+					const yAxis = this.yAxes[x.yAxisIndex]
 					return html`
 						<tr>
-							<td>${ch.backend}</td>
-							<td>${ch.name}</td>
+							<td>${x.channel.backend}</td>
+							<td>${x.channel.name}</td>
 							<td>
 								<mwc-textfield
-									.value=${series.name}
+									.value=${x.label}
 									@change=${(e: Event) => {
 										if (e.target === null) return
 										const v = (e.target as TextField).value
@@ -109,7 +109,7 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 										if (e.target === null) return
 										const v = (e.target as Select).value
 										store.dispatch.plot.setAxisType({
-											index: series.yAxisIndex,
+											index: x.yAxisIndex,
 											type: v as YAxisType,
 										})
 									}}
@@ -137,7 +137,7 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 										if (e.target === null) return
 										const v = (e.target as TextField).value
 										store.dispatch.plot.setAxisMin({
-											index: series.yAxisIndex,
+											index: x.yAxisIndex,
 											min: v === '' ? null : Number.parseFloat(v),
 										})
 									}}
@@ -152,7 +152,7 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 										if (e.target === null) return
 										const v = (e.target as TextField).value
 										store.dispatch.plot.setAxisMax({
-											index: series.yAxisIndex,
+											index: x.yAxisIndex,
 											max: v === '' ? null : Number.parseFloat(v),
 										})
 									}}

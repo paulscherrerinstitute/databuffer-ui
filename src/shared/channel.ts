@@ -22,7 +22,7 @@ export function idToChannel(id: string): DataUiChannel {
 	if (parts.length !== 2) {
 		throw new Error(`channel id invalid: ${id}`)
 	}
-	const [name, backend] = parts
+	const [backend, name] = parts
 	return { name, backend }
 }
 
@@ -35,4 +35,10 @@ export function compareNameThenBackend<T extends DataUiChannel>(
 	if (a.backend < b.backend) return -1
 	if (a.backend > b.backend) return 1
 	return 0
+}
+
+export const dataShapeDisplay = {
+	scalar: 'scalar',
+	waveform: '1d',
+	image: '2d',
 }

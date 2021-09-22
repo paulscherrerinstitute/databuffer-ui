@@ -10,12 +10,6 @@ import {
 	DataUiChannel,
 } from '../../shared/channel'
 
-export const dataShapeDisplay = {
-	scalar: 'scalar',
-	waveform: '1d',
-	image: '2d',
-}
-
 export type IdToChannelMap = { [id: string]: DataUiChannel }
 
 export interface ChannelSearchState {

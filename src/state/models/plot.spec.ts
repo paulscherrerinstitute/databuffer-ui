@@ -6,6 +6,7 @@ import {
 	YAxis,
 	DataSeries,
 	PlotVariation,
+	PlotDataSeries,
 } from './plot'
 import { DataUiChannel, channelToId } from '../../shared/channel'
 import { store, AppState, AppDispatch } from '../store'
@@ -91,16 +92,6 @@ describe('plot model', () => {
 			expect(plot.state.endTime - plot.state.startTime).toBe(expectedDuration)
 		})
 
-		it('channels', () => {
-			expect(Array.isArray(plot.state.channels)).toBe(true)
-			expect(plot.state.channels.length).toBe(0)
-		})
-
-		it('dataRequests', () => {
-			expect(Array.isArray(plot.state.dataRequests)).toBe(true)
-			expect(plot.state.dataRequests.length).toBe(0)
-		})
-
 		it('yAxes', () => {
 			expect(Array.isArray(plot.state.yAxes)).toBe(true)
 			expect(plot.state.yAxes.length).toBe(0)
@@ -134,14 +125,6 @@ describe('plot model', () => {
 
 	describe('reducers', () => {
 		describe('selectChannel', () => {
-			it('adds to channels', () => {
-				const newState = plot.reducers.selectChannel(plot.state, {
-					name: 'a',
-					backend: 'b',
-				})
-				expect(newState.channels).toEqual([{ name: 'a', backend: 'b' }])
-			})
-
 			it('adds to yAxes', () => {
 				const newState = plot.reducers.selectChannel(plot.state, {
 					name: 'a',
@@ -199,10 +182,6 @@ describe('plot model', () => {
 				beforeEach(() => {
 					state1 = plot.reducers.selectChannel(plot.state, channel)
 					state2 = plot.reducers.selectChannel(state1, channel)
-				})
-
-				it('should not add twice to channels', () => {
-					expect(state2.channels).toEqual(state1.channels)
 				})
 
 				it('should not add twice to yAxes', () => {
@@ -851,11 +830,14 @@ describe('plot model', () => {
 				...state,
 				plot: {
 					...state.plot,
-					dataRequests: [
+					dataSeries: [
 						{
+							channel: { name: 'a', backend: 'b' },
+							label: 'a',
+							yAxisIndex: 0,
 							fetching: false,
-							request: { finishedAt: undefined },
-							response: [],
+							requestFinishedAt: undefined,
+							datapoints: undefined,
 						},
 					],
 				},
@@ -865,21 +847,30 @@ describe('plot model', () => {
 				...state,
 				plot: {
 					...state.plot,
-					dataRequests: [
+					dataSeries: [
 						{
+							channel: { name: 'a1', backend: 'b' },
+							label: 'a1',
+							yAxisIndex: 0,
 							fetching: false,
-							request: { finishedAt: ts - 10000 },
-							response: [],
+							requestFinishedAt: ts - 10000,
+							datapoints: undefined,
 						},
 						{
+							channel: { name: 'a2', backend: 'b' },
+							label: 'a2',
+							yAxisIndex: 1,
 							fetching: false,
-							request: { finishedAt: ts },
-							response: [],
+							requestFinishedAt: ts,
+							datapoints: undefined,
 						},
 						{
+							channel: { name: 'a3', backend: 'b' },
+							label: 'a3',
+							yAxisIndex: 2,
 							fetching: false,
-							request: { finishedAt: ts - 20000 },
-							response: [],
+							requestFinishedAt: ts - 20000,
+							datapoints: undefined,
 						},
 					],
 				},
@@ -961,7 +952,7 @@ describe('plot model', () => {
 							error: undefined,
 							fetching: false,
 							request: {},
-							response: [],
+							datapoints: undefined,
 						},
 					],
 				},
@@ -975,7 +966,7 @@ describe('plot model', () => {
 							error: new Error('test'),
 							fetching: false,
 							request: {},
-							response: [],
+							datapoints: undefined,
 						},
 					],
 				},
@@ -1026,12 +1017,12 @@ describe('plot model', () => {
 						{
 							fetching: false,
 							request: { sentAt: 200, finishedAt: 400 },
-							response: [],
+							response: undefined,
 						},
 						{
 							fetching: false,
 							request: { sentAt: 100, finishedAt: 300 },
-							response: [],
+							response: undefined,
 						},
 					],
 				},
@@ -1044,12 +1035,12 @@ describe('plot model', () => {
 						{
 							fetching: false,
 							request: { sentAt: 200, finishedAt: 400 },
-							response: [],
+							response: undefined,
 						},
 						{
 							fetching: false,
 							request: { sentAt: 300, finishedAt: 500 },
-							response: [],
+							response: undefined,
 						},
 					],
 				},
@@ -1067,12 +1058,12 @@ describe('plot model', () => {
 						{
 							fetching: false,
 							request: { sentAt: 200, finishedAt: 400 },
-							response: [],
+							response: undefined,
 						},
 						{
 							fetching: false,
 							request: { sentAt: 100, finishedAt: 300 },
-							response: [],
+							response: undefined,
 						},
 					],
 				},
@@ -1085,12 +1076,12 @@ describe('plot model', () => {
 						{
 							fetching: false,
 							request: { sentAt: 200, finishedAt: 400 },
-							response: [],
+							response: undefined,
 						},
 						{
 							fetching: false,
 							request: { sentAt: 300, finishedAt: 500 },
-							response: [],
+							response: undefined,
 						},
 					],
 				},
@@ -1108,12 +1099,12 @@ describe('plot model', () => {
 						{
 							fetching: false,
 							request: { sentAt: 200, finishedAt: 400 },
-							response: [],
+							response: undefined,
 						},
 						{
 							fetching: false,
 							request: { sentAt: 100, finishedAt: 300 },
-							response: [],
+							response: undefined,
 						},
 					],
 				},
@@ -1126,12 +1117,12 @@ describe('plot model', () => {
 						{
 							fetching: false,
 							request: { sentAt: 200, finishedAt: 400 },
-							response: [],
+							response: undefined,
 						},
 						{
 							fetching: false,
 							request: { sentAt: 300, finishedAt: 500 },
-							response: [],
+							response: undefined,
 						},
 					],
 				},
@@ -1144,12 +1135,12 @@ describe('plot model', () => {
 						{
 							fetching: true,
 							request: { sentAt: 200, finishedAt: undefined },
-							response: [],
+							response: undefined,
 						},
 						{
 							fetching: true,
 							request: { sentAt: 300, finishedAt: undefined },
-							response: [],
+							response: undefined,
 						},
 					],
 				},
@@ -1196,7 +1187,7 @@ describe('plot model', () => {
 				...state,
 				plot: {
 					...state.plot,
-					response: [],
+					response: undefined,
 				},
 			}
 			const state2 = {
@@ -1260,7 +1251,7 @@ describe('plot model', () => {
 			])
 		})
 
-		it('retrieves dataSeriesConfig', () => {
+		it('retrieves plotDataSeries', () => {
 			const state1 = {
 				...state,
 				plot: { ...state.plot, dataSeries: [] },
@@ -1271,81 +1262,19 @@ describe('plot model', () => {
 					...state.plot,
 					dataSeries: [
 						{
-							name: 'a',
-							channelIndex: 0,
+							channel: { name: 'a', backend: 'b' },
+							label: 'a',
 							yAxisIndex: 0,
-						} as DataSeries,
+						} as PlotDataSeries,
 					],
 				},
 			}
-			expect(plotSelectors.dataSeriesConfigs(state1)).toEqual([])
-			expect(plotSelectors.dataSeriesConfigs(state2)).toEqual([
+			expect(plotSelectors.plotDataSeries(state1)).toEqual([])
+			expect(plotSelectors.plotDataSeries(state2)).toEqual([
 				{
-					name: 'a',
-					channelIndex: 0,
+					channel: { name: 'a', backend: 'b' },
+					label: 'a',
 					yAxisIndex: 0,
-				},
-			])
-		})
-
-		it('retrieves dataPoints', () => {
-			const state1 = {
-				...state,
-				plot: { ...state.plot, channels: [], response: [] },
-			}
-			const ch1 = { name: 'ch1', backend: 'b1' }
-			const ch2 = { name: 'ch2', backend: 'b2' }
-			const response = [
-				{
-					channel: ch1,
-					data: [{ eventCount: 1, globalMillis: 100, value: 42 }],
-				},
-				{
-					channel: ch2,
-					data: [
-						{
-							eventCount: 10,
-							globalMillis: 110,
-							value: { min: 10, mean: 20, max: 30 },
-						},
-					],
-				},
-			]
-
-			const state2 = {
-				...state,
-				plot: {
-					...state.plot,
-					channels: [ch1, ch2],
-					response,
-				},
-			}
-			expect(plotSelectors.dataPoints(state1)).toEqual([])
-			expect(plotSelectors.dataPoints(state2)).toEqual([
-				{
-					data: [
-						{
-							eventCount: response[0].data[0].eventCount,
-							x: response[0].data[0].globalMillis,
-							y: (response[0].data[0].value as AggregationResult).mean,
-						},
-					],
-					needsBinning: false,
-					responseIndex: 0,
-				},
-				{
-					data: [
-						{
-							eventCount: response[1].data[0].eventCount,
-							x: response[1].data[0].globalMillis,
-							y: (response[1].data[0].value as AggregationResult).mean,
-							max: (response[1].data[0].value as AggregationResult).max,
-							mean: (response[1].data[0].value as AggregationResult).mean,
-							min: (response[1].data[0].value as AggregationResult).min,
-						},
-					],
-					needsBinning: true,
-					responseIndex: 1,
 				},
 			])
 		})
@@ -1848,7 +1777,7 @@ describe('plot model', () => {
 				...state,
 				plot: {
 					...state.plot,
-					channels: [],
+					dataSeries: [],
 				},
 			}
 			for (let i = 1; i <= 16; i++) {
@@ -1857,9 +1786,13 @@ describe('plot model', () => {
 					...state1,
 					plot: {
 						...state1.plot,
-						channels: [
-							...state1.plot.channels,
-							{ backend: 'bbb', name: `chan-${i}` },
+						dataSeries: [
+							...state1.plot.dataSeries,
+							{
+								channel: { backend: 'bbb', name: `chan-${i}` },
+								label: `chan-${i}`,
+								yAxisIndex: i - 1,
+							},
 						],
 					},
 				}
@@ -1872,13 +1805,17 @@ describe('plot model', () => {
 				...state1,
 				plot: {
 					...state1.plot,
-					channels: [
-						...state1.plot.channels,
-						{ backend: 'bbb', name: `chan-17` },
+					dataSeries: [
+						...state1.plot.dataSeries,
+						{
+							channel: { backend: 'bbb', name: `chan-17` },
+							label: 'chan-17',
+							yAxisIndex: 16,
+						},
 					],
 				},
 			}
-			expect(state1.plot.channels.length).toBe(17)
+			expect(state1.plot.dataSeries.length).toBe(17)
 			expect(plotSelectors.dialogShareLinkChannelsTruncated(state1)).toBe(true)
 		})
 
@@ -1890,8 +1827,8 @@ describe('plot model', () => {
 					plot: {
 						...store.state.plot,
 						dataSeries: EXAMPLE_CHANNELS.map((ch, idx) => ({
-							name: ch.name,
-							channelIndex: idx,
+							channel: ch,
+							label: ch.name,
 							yAxisIndex: idx,
 						})),
 						yAxes: EXAMPLE_CHANNELS.map((ch, idx) => ({
@@ -1902,7 +1839,6 @@ describe('plot model', () => {
 							max: null,
 							type: 'linear',
 						})),
-						channels: EXAMPLE_CHANNELS,
 						startTime: 100000,
 						endTime: 300000,
 						dialogShareLinkAbsoluteTimes: true,
@@ -1959,7 +1895,9 @@ describe('plot model', () => {
 			it('sets parameters c1...c6 correctly', () => {
 				const url = plotSelectors.dialogShareLinkUrl(state)
 				const params = new URLSearchParams(url.split('?', 2)[1])
-				const expectedValues = state.plot.channels.map(c => channelToId(c))
+				const expectedValues = state.plot.dataSeries.map(x =>
+					channelToId(x.channel)
+				)
 				for (let i = 0; i < expectedValues.length; i++) {
 					expect(params.has(`c${i + 1}`)).toBe(true)
 					expect(params.get(`c${i + 1}`)).toBe(expectedValues[i])
@@ -1969,27 +1907,107 @@ describe('plot model', () => {
 			it('supports only up to 16 channels', () => {
 				// populate state with 20 channels
 				// that would be c1...c20, if it didn't cut off
-				state.plot.channels = [
-					{ backend: 'my-backend', name: 'chan01' },
-					{ backend: 'my-backend', name: 'chan02' },
-					{ backend: 'my-backend', name: 'chan03' },
-					{ backend: 'my-backend', name: 'chan04' },
-					{ backend: 'my-backend', name: 'chan05' },
-					{ backend: 'my-backend', name: 'chan06' },
-					{ backend: 'my-backend', name: 'chan07' },
-					{ backend: 'my-backend', name: 'chan08' },
-					{ backend: 'my-backend', name: 'chan09' },
-					{ backend: 'my-backend', name: 'chan10' },
-					{ backend: 'my-backend', name: 'chan11' },
-					{ backend: 'my-backend', name: 'chan12' },
-					{ backend: 'my-backend', name: 'chan13' },
-					{ backend: 'my-backend', name: 'chan14' },
-					{ backend: 'my-backend', name: 'chan15' },
-					{ backend: 'my-backend', name: 'chan16' },
-					{ backend: 'my-backend', name: 'chan17' },
-					{ backend: 'my-backend', name: 'chan18' },
-					{ backend: 'my-backend', name: 'chan19' },
-					{ backend: 'my-backend', name: 'chan20' },
+				state.plot.dataSeries = [
+					{
+						channel: { backend: 'my-backend', name: 'chan01' },
+						label: 'chan01',
+						yAxisIndex: 0,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan02' },
+						label: 'chan02',
+						yAxisIndex: 1,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan03' },
+						label: 'chan03',
+						yAxisIndex: 2,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan04' },
+						label: 'chan04',
+						yAxisIndex: 3,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan05' },
+						label: 'chan05',
+						yAxisIndex: 4,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan06' },
+						label: 'chan06',
+						yAxisIndex: 5,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan07' },
+						label: 'chan07',
+						yAxisIndex: 6,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan08' },
+						label: 'chan08',
+						yAxisIndex: 7,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan09' },
+						label: 'chan09',
+						yAxisIndex: 8,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan10' },
+						label: 'chan10',
+						yAxisIndex: 9,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan11' },
+						label: 'chan11',
+						yAxisIndex: 10,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan12' },
+						label: 'chan12',
+						yAxisIndex: 11,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan13' },
+						label: 'chan13',
+						yAxisIndex: 12,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan14' },
+						label: 'chan14',
+						yAxisIndex: 13,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan15' },
+						label: 'chan15',
+						yAxisIndex: 14,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan16' },
+						label: 'chan16',
+						yAxisIndex: 15,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan17' },
+						label: 'chan17',
+						yAxisIndex: 16,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan18' },
+						label: 'chan18',
+						yAxisIndex: 17,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan19' },
+						label: 'chan19',
+						yAxisIndex: 18,
+					},
+					{
+						channel: { backend: 'my-backend', name: 'chan20' },
+						label: 'chan20',
+						yAxisIndex: 19,
+					},
 				]
 				const url = plotSelectors.dialogShareLinkUrl(state)
 				const params = new URLSearchParams(url.split('?', 2)[1])
@@ -2010,8 +2028,8 @@ describe('plot model', () => {
 			})
 
 			it('does include l1...l16 if the dataSeries.name != channel.name', () => {
-				state.plot.dataSeries[2].name = 'custom-label-1'
-				state.plot.dataSeries[4].name = 'custom-label-2'
+				state.plot.dataSeries[2].label = 'custom-label-1'
+				state.plot.dataSeries[4].label = 'custom-label-2'
 				const url = plotSelectors.dialogShareLinkUrl(state)
 				const params = new URLSearchParams(url.split('?', 2)[1])
 				expect(params.has(`l3`)).toBe(true)
@@ -2159,7 +2177,13 @@ describe('plot model', () => {
 				...state,
 				plot: {
 					...state.plot,
-					channels: [...EXAMPLE_CHANNELS],
+					dataSeries: [
+						...EXAMPLE_CHANNELS.map((x, idx) => ({
+							channel: x,
+							label: x.name,
+							yAxisIndex: idx,
+						})),
+					],
 					startTime: 100_000,
 					endTime: 200_000,
 				},
@@ -2195,7 +2219,13 @@ describe('plot model', () => {
 					...store.state,
 					plot: {
 						...store.state.plot,
-						channels: [...EXAMPLE_CHANNELS],
+						dataSeries: [
+							...EXAMPLE_CHANNELS.map((x, idx) => ({
+								channel: x,
+								label: x.name,
+								yAxisIndex: idx,
+							})),
+						],
 						startTime: 100_000,
 						endTime: 200_000,
 						dialogDownloadAggregation: 'PT1M',
@@ -2292,7 +2322,13 @@ describe('plot model', () => {
 					...store.state,
 					plot: {
 						...store.state.plot,
-						channels: [...EXAMPLE_CHANNELS],
+						dataSeries: [
+							...EXAMPLE_CHANNELS.map((x, idx) => ({
+								channel: x,
+								label: x.name,
+								yAxisIndex: idx,
+							})),
+						],
 						startTime: 100_000,
 						endTime: 200_000,
 						dialogDownloadAggregation: 'PT1M',

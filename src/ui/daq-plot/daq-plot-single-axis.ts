@@ -17,6 +17,7 @@ import {
 	yAxis2HighchartsYAxisOptions,
 } from './highcharts'
 import { baseStyles } from '../shared-styles'
+import { PlotDataSeries } from '../../state/models/plot'
 
 declare global {
 	interface HTMLElementTagNameMap {
@@ -42,7 +43,7 @@ export class DaqPlotSingleAxisElement extends LitElement {
 	xMin?: number
 
 	@state()
-	series: DaqPlotDataSeries[] = []
+	series: PlotDataSeries[] = []
 
 	// @state()
 	// reloadOnZoom: boolean = false

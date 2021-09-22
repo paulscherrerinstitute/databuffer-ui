@@ -34,7 +34,7 @@ import './daq-plot/daq-plot-single-axis'
 import type { TimeRange } from '../util'
 import { AppState, store } from '../state/store'
 import {
-	DataRequestMeta,
+	PlotDataSeries,
 	DataSeries,
 	DownloadAggregation,
 	plotSelectors,
@@ -69,7 +69,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@state() endTime: number = 2
 	@state() channels: DataUiChannel[] = []
 	@state() anyRequestErrors: boolean = false
-	@state() dataRequests: DataRequestMeta[] = []
 	@state() pendingRequests: number = 0
 	@state() allRequestsFinished: boolean = true
 	@state() requestDuration!: number
@@ -87,6 +86,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@state() dialogDownloadAggregation!: string
 	@state() plotVariation!: PlotVariation
 	@state() daqPlotConfig!: DaqPlotConfig
+	@state() plotDataSeries: PlotDataSeries[] = []
 
 	private reloadOnZoom = false
 
@@ -131,7 +131,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			startTime: plotSelectors.startTime(state),
 			endTime: plotSelectors.endTime(state),
 			anyRequestErrors: plotSelectors.anyRequestErrors(state),
-			dataRequests: plotSelectors.dataRequests(state),
 			requestDuration: plotSelectors.totalRequestDuration(state),
 			shouldDisplayChart: plotSelectors.shouldDisplayChart(state),
 			channelsWithoutData: plotSelectors.channelsWithoutData(state),
@@ -149,6 +148,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			dialogDownloadCurlCommand: plotSelectors.dialogDownloadCurlCommand(state),
 			plotVariation: plotSelectors.plotVariation(state),
 			daqPlotConfig: plotSelectors.daqPlotConfig(state),
+			plotDataSeries: plotSelectors.plotDataSeries(state),
 		}
 	}
 
@@ -230,7 +230,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					.yAxes=${this.daqPlotConfig.yAxes}
 					.xMin=${this.startTime}
 					.xMax=${this.endTime}
-					.series=${this.daqPlotConfig.series}
+					.series=${this.plotDataSeries}
 				></daq-plot-separate-axes>`
 
 			case PlotVariation.SingleAxis:

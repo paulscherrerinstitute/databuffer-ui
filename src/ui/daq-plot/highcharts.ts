@@ -1,8 +1,13 @@
 import Highcharts from 'highcharts'
 import highchartsMore from 'highcharts/highcharts-more'
+import {
+	DataUiDataPoint,
+	DataUiAggregatedValue,
+	DataUiDataSeries,
+} from '../../shared/dataseries'
+import { PlotDataSeries } from '../../state/models/plot'
 import { formatDate, TimeRange } from '../../util'
 import type { DaqPlotDataSeries, DaqPlotYAxis } from './types'
-import { needsBinning } from './util'
 
 // extend Highcharts with the "Highcharts More" module
 // see https://www.highcharts.com/forum/viewtopic.php?t=35113
@@ -73,11 +78,12 @@ export function yAxis2HighchartsYAxisOptions(yAxes: DaqPlotYAxis[]) {
 	return yAxes.map((y, idx) => {
 		const color = getColor(idx)
 		const opts: Highcharts.YAxisOptions = {
-			type: y.type,
+			type: y.categories ? 'category' : y.type,
+			categories: y.categories,
 			min: y.min,
 			max: y.max,
 			opposite: y.side !== 'left',
-			lineColor: getColor(idx),
+			lineColor: color,
 			labels: {
 				format: `{value}${y.unit ? ' ' + y.unit : ''}`,
 				style: { color },
@@ -100,35 +106,59 @@ const TOOLTIP_FORMAT_WITHOUT_BINNING =
 	'<tr><td style="color:{point.color}"><b>{series.name}</b></td><td></td><td></td><td><b>{point.mean}</b></td><td></td></tr>'
 
 export function dataSeries2HighchartsSeriesOptions(
-	dataSeries: DaqPlotDataSeries[]
+	dataSeries: PlotDataSeries[]
 ) {
 	const result: Highcharts.SeriesOptionsType[] = []
 	for (const ds of dataSeries) {
-		const isBinned = needsBinning(ds.data)
-		const color = getColor(ds.yAxis)
-		result.push({
-			name: ds.name,
+		const isBinned = ds.channel.dataType !== 'string'
+		const color = getColor(ds.yAxisIndex)
+		const opts: Highcharts.SeriesOptionsType = {
+			name: ds.label,
 			type: 'line',
 			step: 'left',
-			yAxis: ds.yAxis,
+			yAxis: ds.yAxisIndex,
 			tooltip: {
 				pointFormat: isBinned
 					? TOOLTIP_FORMAT_WITH_BINNING
 					: TOOLTIP_FORMAT_WITHOUT_BINNING,
 			},
-			data: ds.data.map(pt => ({ ...pt, y: pt.mean })),
 			color,
 			zIndex: 1,
-		})
+		}
+		if (ds.datapoints) {
+			if (ds.channel.dataType === 'string') {
+				const categories = Array.from(new Set(ds.datapoints.map(pt => pt.y)))
+				opts.data = (ds.datapoints as DataUiDataPoint<number, string>[]).map(
+					pt => ({
+						x: pt.x,
+						y: categories.indexOf(pt.y),
+					})
+				)
+			} else {
+				opts.data = (
+					ds.datapoints as DataUiDataPoint<number, DataUiAggregatedValue>[]
+				).map(pt => ({
+					x: pt.x,
+					y: pt.y.mean,
+					binSize: pt.y.count,
+					min: pt.y.min,
+					max: pt.y.max,
+					mean: pt.y.mean,
+				}))
+			}
+		}
+		result.push(opts)
 		if (!isBinned) continue
 		result.push({
-			name: `${ds.name} - min/max`,
+			name: `${ds.label} - min/max`,
 			enableMouseTracking: false,
 			type: 'arearange',
 			step: 'left',
-			yAxis: ds.yAxis,
+			yAxis: ds.yAxisIndex,
 			linkedTo: ':previous',
-			data: ds.data.map(item => [item.x, item.min, item.max]),
+			data: (
+				ds.datapoints as DataUiDataPoint<number, DataUiAggregatedValue>[]
+			).map(item => [item.x, item.y.min, item.y.max]),
 			color,
 			fillOpacity: 0.3,
 			marker: { enabled: false },
