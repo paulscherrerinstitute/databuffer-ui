@@ -424,55 +424,6 @@ export const plot = createModel({
 //#region selectors
 const getState = (state: AppState) => state.plot
 
-interface HighChartsDataPointWithBinning {
-	x?: number
-	y?: number
-	eventCount?: number
-	min?: number
-	mean?: number
-	max?: number
-}
-
-interface HighChartsDataPointWithoutBinning {
-	x?: number
-	y?: number
-	eventCount?: number
-}
-
-function getColor(idx: number): string {
-	const colors = Highcharts.getOptions().colors
-	if (colors) return colors[idx]
-	return '#000000'
-}
-
-const needsBinning = (item: DataResponseItem): boolean => {
-	if (item.data.length === 0) return false
-	return item.data.some(x => x.eventCount && x.eventCount > 1)
-}
-
-const mapDataPointWithBinning = (
-	dataPoint: Event
-): HighChartsDataPointWithBinning => ({
-	x: dataPoint.globalMillis,
-	y: (dataPoint.value as AggregationResult).mean,
-	eventCount: dataPoint.eventCount,
-	min: (dataPoint.value as AggregationResult).min,
-	mean: (dataPoint.value as AggregationResult).mean,
-	max: (dataPoint.value as AggregationResult).max,
-})
-const mapDataPointWithoutBinning = (
-	dataPoint: Event
-): HighChartsDataPointWithoutBinning => ({
-	x: dataPoint.globalMillis,
-	y: (dataPoint.value as AggregationResult).mean,
-	eventCount: dataPoint.eventCount,
-})
-
-const TOOLTIP_FORMAT_WITH_BINNING =
-	'<tr><td style="color:{point.color}"><b>{series.name}</b></td><td>{point.eventCount}</td><td>{point.min}</td><td><b>{point.mean}</b></td><td>{point.max}</td></tr>'
-const TOOLTIP_FORMAT_WITHOUT_BINNING =
-	'<tr><td style="color:{point.color}"><b>{series.name}</b></td><td></td><td></td><td><b>{point.y}</b></td><td></td></tr>'
-
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace plotSelectors {
 	export const plotVariation = createSelector(
@@ -575,7 +526,7 @@ export namespace plotSelectors {
 			title,
 			subtitle,
 			yAxes,
-			series: series.map((x, idx) => {
+			series: series.map(x => {
 				return {
 					name: x.label,
 					yAxis: x.yAxisIndex,
