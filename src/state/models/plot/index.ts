@@ -13,25 +13,29 @@ import {
 	AggregationSpecification,
 	MappingAlignment,
 } from '@paulscherrerinstitute/databuffer-query-js/api/v0/query-data'
-import { DataResponse, NR_OF_BINS, queryRestApi } from '../../api/queryrest'
-import { EffectsStore, AppState, AppDispatch } from '../store'
-import { formatDate } from '../../util'
+import { DataResponse, NR_OF_BINS, queryRestApi } from '../../../api/queryrest'
+import { EffectsStore, AppState, AppDispatch } from '../../store'
+import { formatDate } from '../../../util'
 import { parseISO } from 'date-fns'
 import FileSaver from 'file-saver'
-import { ROUTE } from '../routing'
+import { ROUTE } from '../../routing'
 import {
 	DaqPlotDataPoint,
 	DaqPlotDataSeries,
 	DaqPlotYAxis,
-} from '../../ui/daq-plot/types'
-import { DaqPlotConfig } from '../../ui/daq-plot/types'
-import { make_debug, make_error, make_info } from './applog'
-import { channelToId, DataUiChannel, idToChannel } from '../../shared/channel'
+} from '../../../ui/daq-plot/types'
+import { DaqPlotConfig } from '../../../ui/daq-plot/types'
+import { make_debug, make_error, make_info } from '../applog'
+import {
+	channelToId,
+	DataUiChannel,
+	idToChannel,
+} from '../../../shared/channel'
 import {
 	DataUiAggregatedValue,
 	DataUiDataPoint,
 	DataUiDataSeries,
-} from '../../shared/dataseries'
+} from '../../../shared/dataseries'
 
 export enum PlotVariation {
 	/** 1 Y axis for all channels */
