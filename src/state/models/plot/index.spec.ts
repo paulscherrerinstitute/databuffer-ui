@@ -2,10 +2,9 @@
 import { plot, plotSelectors } from './index'
 import { PlotState, YAxis, PlotVariation, PlotDataSeries } from './types'
 import { DataUiChannel, channelToId } from '../../../shared/channel'
-import { store, AppState, AppDispatch } from '../../store'
+import { store, AppState } from '../../store'
 import { DataResponse, NR_OF_BINS } from '../../../api/queryrest'
 import {
-	AggregationResult,
 	EventField,
 	AggregationOperation,
 	AggregationType,
@@ -14,10 +13,6 @@ import {
 	MappingAlignment,
 } from '@paulscherrerinstitute/databuffer-query-js/api/v0/query-data'
 import { formatDate } from '../../../util'
-import { EffectFns, RoutingState } from '@captaincodeman/rdx'
-import { createTestEnv, RdxTestEnv } from '../../rdx-test-util'
-import { parseISO } from 'date-fns'
-import { ROUTE } from '../../routing'
 
 const EXAMPLE_CHANNELS = [
 	{ name: 'channel2', backend: 'backend2' },

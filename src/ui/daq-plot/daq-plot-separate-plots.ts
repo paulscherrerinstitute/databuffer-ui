@@ -15,7 +15,7 @@ import {
 	yAxis2HighchartsYAxisOptions,
 } from './highcharts'
 import { baseStyles } from '../shared-styles'
-import { DaqPlotYAxis, DaqPlotDataSeries, DaqPlotDataPoint } from './types'
+import { DaqPlotYAxis } from './types'
 import { PlotDataSeries } from '../../state/models/plot'
 
 //#region Highcharts manipulations

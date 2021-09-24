@@ -1,5 +1,5 @@
-import { getColor, yAxis2HighchartsYAxisOptions } from './highcharts'
-import { DaqPlotDataPoint, DaqPlotYAxis } from './types'
+import { yAxis2HighchartsYAxisOptions } from './highcharts'
+import { DaqPlotYAxis } from './types'
 
 describe('module daq-plot/highcharts', () => {
 	describe('yAxis2HighchartsYAxisOptions', () => {

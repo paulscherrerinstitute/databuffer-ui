@@ -4,7 +4,6 @@ import { formatDate } from '../util'
 import { AppState, store } from '../state/store'
 import { PlotDataSeries, plotSelectors } from '../state/models/plot'
 
-import type { DataResponse } from '../api/queryrest'
 import { baseStyles } from './shared-styles'
 import { connect } from '@captaincodeman/rdx'
 import { channelToId, DataUiChannel } from '../shared/channel'

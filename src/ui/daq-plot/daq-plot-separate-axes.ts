@@ -16,7 +16,7 @@ import {
 } from './highcharts'
 import { baseStyles } from '../shared-styles'
 import { isEmptyObj } from '../../util'
-import { DaqPlotYAxis, DaqPlotDataSeries } from './types'
+import { DaqPlotYAxis } from './types'
 import { PlotDataSeries } from '../../state/models/plot'
 
 declare global {

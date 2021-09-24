@@ -5,7 +5,6 @@ import {
 	state,
 	css,
 	query,
-	TemplateResult,
 	PropertyValues,
 } from 'lit-element'
 
@@ -24,7 +23,6 @@ import '@material/mwc-icon-button'
 import '@material/mwc-radio'
 import { Radio } from '@material/mwc-radio'
 import '@material/mwc-textfield'
-import { TextField } from '@material/mwc-textfield'
 import '@material/mwc-snackbar'
 import { Snackbar } from '@material/mwc-snackbar'
 import './daq-plot/daq-plot-separate-axes'
@@ -35,21 +33,15 @@ import type { TimeRange } from '../util'
 import { AppState, store } from '../state/store'
 import {
 	PlotDataSeries,
-	DataSeries,
 	DownloadAggregation,
 	plotSelectors,
 	PlotVariation,
 } from '../state/models/plot'
 
-import * as datefns from 'date-fns'
 import type { DataResponse } from '../api/queryrest'
 import { baseStyles } from './shared-styles'
 import { connect } from '@captaincodeman/rdx'
-import type {
-	DaqPlotConfig,
-	DaqPlotDataSeries,
-	DaqPlotYAxis,
-} from './daq-plot/types'
+import type { DaqPlotConfig } from './daq-plot/types'
 import type { DaqPlotSingleAxisElement } from './daq-plot/daq-plot-single-axis'
 import type { DaqPlotSeparateAxesElement } from './daq-plot/daq-plot-separate-axes'
 import type { DaqPlotSeparatePlotsElement } from './daq-plot/daq-plot-separate-plots'

@@ -7,8 +7,8 @@ import {
 	state,
 	query,
 } from 'lit-element'
-import { isEmptyObj, TimeRange } from '../../util'
-import { DaqPlotDataSeries, DaqPlotYAxis } from './types'
+import { isEmptyObj } from '../../util'
+import { DaqPlotYAxis } from './types'
 
 import {
 	dataSeries2HighchartsSeriesOptions,

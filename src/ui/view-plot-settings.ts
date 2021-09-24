@@ -2,7 +2,6 @@ import { LitElement, customElement, html, state, css } from 'lit-element'
 
 import { AppState, store } from '../state/store'
 import {
-	DataSeries,
 	YAxis,
 	YAxisType,
 	plotSelectors,
