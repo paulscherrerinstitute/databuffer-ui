@@ -1,13 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import {
-	plot,
-	PlotState,
-	plotSelectors,
-	YAxis,
-	DataSeries,
-	PlotVariation,
-	PlotDataSeries,
-} from './index'
+import { plot, plotSelectors } from './index'
+import { PlotState, YAxis, PlotVariation, PlotDataSeries } from './types'
 import { DataUiChannel, channelToId } from '../../../shared/channel'
 import { store, AppState, AppDispatch } from '../../store'
 import { DataResponse, NR_OF_BINS } from '../../../api/queryrest'
