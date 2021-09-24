@@ -511,9 +511,12 @@ export namespace plotSelectors {
 					unit: y.unit,
 				}
 				if (ch.dataType === 'string') {
-					// TODO: what now?!
 					result.categories = Array.from(
-						new Set(series[idx].datapoints?.map(pt => pt.y))
+						new Set(
+							(
+								series[idx].datapoints as Array<DataUiDataPoint<number, string>>
+							)?.map(pt => pt.y)
+						)
 					)
 				}
 				return result
