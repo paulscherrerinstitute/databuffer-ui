@@ -11,14 +11,14 @@ export enum PlotVariation {
 	/** 1 plot (with 1 Y axis) for each channel */
 	SeparatePlots = 'separate-plots',
 }
-export function isPlotVariation(val: any): val is PlotVariation {
+export function isPlotVariation(val: unknown): val is PlotVariation {
 	if (typeof val !== 'string') return false
 	return Object.values(PlotVariation as Record<string, string>).includes(val)
 }
 
 /** type of YAxis */
 export type YAxisType = 'linear' | 'logarithmic'
-export function isYAxisType(val: any): val is YAxisType {
+export function isYAxisType(val: unknown): val is YAxisType {
 	if (typeof val !== 'string') return false
 	return val === 'linear' || val === 'logarithmic'
 }
