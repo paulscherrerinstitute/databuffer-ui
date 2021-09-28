@@ -211,7 +211,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					.yAxes=${this.daqPlotConfig.yAxes}
 					.xMin=${this.startTime}
 					.xMax=${this.endTime}
-					.series=${this.daqPlotConfig.series}
+					.series=${this.plotDataSeries}
 				></daq-plot-separate-plots>`
 
 			case PlotVariation.SeparateAxes:
@@ -233,7 +233,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					.yAxes=${this.daqPlotConfig.yAxes}
 					.xMin=${this.startTime}
 					.xMax=${this.endTime}
-					.series=${this.daqPlotConfig.series}
+					.series=${this.plotDataSeries}
 				></daq-plot-single-axis>`
 
 			default:
