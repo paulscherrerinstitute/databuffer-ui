@@ -15,8 +15,7 @@ import {
 	yAxis2HighchartsYAxisOptions,
 } from './highcharts'
 import { baseStyles } from '../shared-styles'
-import { DaqPlotYAxis } from './types'
-import { PlotDataSeries } from '../../state/models/plot'
+import { PlotDataSeries, YAxis } from '../../state/models/plot'
 
 //#region Highcharts manipulations
 
@@ -128,7 +127,7 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 	subtitle: string = ''
 
 	@state()
-	yAxes: DaqPlotYAxis[] = []
+	yAxes: YAxis[] = []
 
 	@state()
 	xMax?: number

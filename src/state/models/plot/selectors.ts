@@ -13,11 +13,6 @@ import {
 	DataUiAggregatedValue,
 	DataUiDataPoint,
 } from '../../../shared/dataseries'
-import {
-	DaqPlotDataPoint,
-	DaqPlotDataSeries,
-	DaqPlotYAxis,
-} from '../../../ui/daq-plot/types'
 import { formatDate } from '../../../util'
 import { AppState } from '../../store'
 import { NR_OF_BINS } from '../../../api/queryrest'
@@ -94,60 +89,6 @@ export const channelsWithoutData = createSelector([plotDataSeries], series =>
 )
 
 export const yAxes = createSelector([getState], state => state.yAxes)
-
-export const daqPlotYAxes = createSelector(
-	[yAxes, plotDataSeries],
-	(yAxes, series) =>
-		yAxes.map((y, idx) => {
-			const ch = series[idx].channel
-			const result: DaqPlotYAxis = {
-				title: y.title,
-				type: y.type,
-				side: y.side,
-				min: y.min ?? undefined,
-				max: y.max ?? undefined,
-				unit: y.unit,
-			}
-			if (ch.dataType === 'string') {
-				result.categories = Array.from(
-					new Set(
-						(
-							series[idx].datapoints as Array<DataUiDataPoint<number, string>>
-						)?.map(pt => pt.y)
-					)
-				)
-			}
-			return result
-		})
-)
-
-export const daqPlotConfig = createSelector(
-	[plotTitle, plotSubTitle, daqPlotYAxes, plotDataSeries],
-	(title, subtitle, yAxes, series) => ({
-		title,
-		subtitle,
-		yAxes,
-		series: series.map(x => {
-			return {
-				name: x.label,
-				yAxis: x.yAxisIndex,
-				data:
-					(
-						x.datapoints as DataUiDataPoint<number, DataUiAggregatedValue>[]
-					)?.map(
-						p =>
-							({
-								x: p.x,
-								binSize: p.y.count,
-								max: p.y.max,
-								mean: p.y.mean,
-								min: p.y.min,
-							} as DaqPlotDataPoint)
-					) ?? [],
-			} as DaqPlotDataSeries
-		}),
-	})
-)
 
 export const queryRangeShowing = createSelector(
 	[getState],

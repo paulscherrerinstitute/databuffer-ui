@@ -74,8 +74,13 @@ export const plot = createModel({
 			dataSeries.splice(index, 1)
 			const yAxes = [...state.yAxes]
 			yAxes.splice(index, 1)
+			// re-distribute all following axes
 			for (let i = index; i < yAxes.length; i++) {
 				yAxes[i].side = i % 2 === 0 ? 'left' : 'right'
+			}
+			// shift yAxisIndex after deleting the yAxis
+			for (let i = index; i < dataSeries.length; i++) {
+				dataSeries[i].yAxisIndex -= 1
 			}
 			return {
 				...state,
@@ -176,10 +181,25 @@ export const plot = createModel({
 				requestFinishedAt: timestamp,
 				datapoints: datapoints,
 			}
-			return {
+			const result = {
 				...state,
 				dataSeries,
 			}
+			if (dataSeries[index].channel.dataType === 'string') {
+				const yAxes = [...state.yAxes]
+				const yAxisIndex = dataSeries[index].yAxisIndex
+				yAxes[yAxisIndex].categories = Array.from(
+					new Set(
+						(
+							dataSeries[index].datapoints as Array<
+								DataUiDataPoint<number, string>
+							>
+						)?.map(pt => pt.y)
+					)
+				)
+				result.yAxes = yAxes
+			}
+			return result
 		},
 
 		drawPlotFailure(

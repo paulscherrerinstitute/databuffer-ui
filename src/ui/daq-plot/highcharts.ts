@@ -5,9 +5,8 @@ import {
 	DataUiAggregatedValue,
 	DataUiDataSeries,
 } from '../../shared/dataseries'
-import { PlotDataSeries } from '../../state/models/plot'
+import { PlotDataSeries, YAxis } from '../../state/models/plot'
 import { formatDate, TimeRange } from '../../util'
-import type { DaqPlotDataSeries, DaqPlotYAxis } from './types'
 
 // extend Highcharts with the "Highcharts More" module
 // see https://www.highcharts.com/forum/viewtopic.php?t=35113
@@ -74,7 +73,7 @@ export function initChart(container: HTMLElement) {
 }
 
 /** Map a YAxis object a Highcharts configuration */
-export function yAxis2HighchartsYAxisOptions(yAxes: DaqPlotYAxis[]) {
+export function yAxis2HighchartsYAxisOptions(yAxes: YAxis[]) {
 	return yAxes.map((y, idx) => {
 		const color = getColor(idx)
 		const opts: Highcharts.YAxisOptions = {
@@ -149,21 +148,27 @@ export function dataSeries2HighchartsSeriesOptions(
 		}
 		result.push(opts)
 		if (!isBinned) continue
-		result.push({
+		// for binned data series, add a background band with min/max
+		const minMaxSeries: Highcharts.SeriesOptionsType = {
 			name: `${ds.label} - min/max`,
 			enableMouseTracking: false,
 			type: 'arearange',
 			step: 'left',
 			yAxis: ds.yAxisIndex,
 			linkedTo: ':previous',
-			data: (
-				ds.datapoints as DataUiDataPoint<number, DataUiAggregatedValue>[]
-			).map(item => [item.x, item.y.min, item.y.max]),
 			color,
 			fillOpacity: 0.3,
 			marker: { enabled: false },
 			zIndex: 0,
-		})
+		}
+		if (ds.datapoints) {
+			const pts = ds.datapoints as DataUiDataPoint<
+				number,
+				DataUiAggregatedValue
+			>[]
+			minMaxSeries.data = pts.map(item => [item.x, item.y.min, item.y.max])
+		}
+		result.push(minMaxSeries)
 	}
 	return result
 }

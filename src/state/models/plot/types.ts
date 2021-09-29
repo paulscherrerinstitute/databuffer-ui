@@ -37,6 +37,8 @@ export interface YAxis {
 	max: number | null
 	/** type of axis */
 	type: YAxisType
+	/** categories, for string data series */
+	categories?: string[]
 }
 
 export type DownloadAggregation = 'as-is' | 'PT5S' | 'PT1M' | 'PT1H' | 'raw'

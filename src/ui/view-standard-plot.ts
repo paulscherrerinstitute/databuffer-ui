@@ -36,12 +36,12 @@ import {
 	DownloadAggregation,
 	plotSelectors,
 	PlotVariation,
+	YAxis,
 } from '../state/models/plot'
 
 import type { DataResponse } from '../api/queryrest'
 import { baseStyles } from './shared-styles'
 import { connect } from '@captaincodeman/rdx'
-import type { DaqPlotConfig } from './daq-plot/types'
 import type { DaqPlotSingleAxisElement } from './daq-plot/daq-plot-single-axis'
 import type { DaqPlotSeparateAxesElement } from './daq-plot/daq-plot-separate-axes'
 import type { DaqPlotSeparatePlotsElement } from './daq-plot/daq-plot-separate-plots'
@@ -77,7 +77,9 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	dialogDownloadShowing: boolean = false
 	@state() dialogDownloadAggregation!: string
 	@state() plotVariation!: PlotVariation
-	@state() daqPlotConfig!: DaqPlotConfig
+	@state() plotTitle: string = ''
+	@state() plotSubTitle: string = ''
+	@state() plotYAxes: YAxis[] = []
 	@state() plotDataSeries: PlotDataSeries[] = []
 
 	private reloadOnZoom = false
@@ -139,7 +141,9 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			dialogDownloadAggregation: plotSelectors.dialogDownloadAggregation(state),
 			dialogDownloadCurlCommand: plotSelectors.dialogDownloadCurlCommand(state),
 			plotVariation: plotSelectors.plotVariation(state),
-			daqPlotConfig: plotSelectors.daqPlotConfig(state),
+			plotTitle: plotSelectors.plotTitle(state),
+			plotSubTitle: plotSelectors.plotSubTitle(state),
+			plotYAxes: plotSelectors.yAxes(state),
 			plotDataSeries: plotSelectors.plotDataSeries(state),
 		}
 	}
@@ -206,9 +210,9 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			case PlotVariation.SeparatePlots:
 				return html`<daq-plot-separate-plots
 					id="daqplot"
-					.title=${this.daqPlotConfig.title}
-					.subtitle=${this.daqPlotConfig.subtitle}
-					.yAxes=${this.daqPlotConfig.yAxes}
+					.title=${this.plotTitle}
+					.subtitle=${this.plotSubTitle}
+					.yAxes=${this.plotYAxes}
 					.xMin=${this.startTime}
 					.xMax=${this.endTime}
 					.series=${this.plotDataSeries}
@@ -217,9 +221,9 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			case PlotVariation.SeparateAxes:
 				return html`<daq-plot-separate-axes
 					id="daqplot"
-					.title=${this.daqPlotConfig.title}
-					.subtitle=${this.daqPlotConfig.subtitle}
-					.yAxes=${this.daqPlotConfig.yAxes}
+					.title=${this.plotTitle}
+					.subtitle=${this.plotSubTitle}
+					.yAxes=${this.plotYAxes}
 					.xMin=${this.startTime}
 					.xMax=${this.endTime}
 					.series=${this.plotDataSeries}
@@ -228,9 +232,9 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			case PlotVariation.SingleAxis:
 				return html`<daq-plot-single-axis
 					id="daqplot"
-					.title=${this.daqPlotConfig.title}
-					.subtitle=${this.daqPlotConfig.subtitle}
-					.yAxes=${this.daqPlotConfig.yAxes}
+					.title=${this.plotTitle}
+					.subtitle=${this.plotSubTitle}
+					.yAxes=${this.plotYAxes}
 					.xMin=${this.startTime}
 					.xMax=${this.endTime}
 					.series=${this.plotDataSeries}
