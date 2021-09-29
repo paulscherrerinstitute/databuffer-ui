@@ -3,7 +3,7 @@ import { plot, plotSelectors } from './index'
 import { PlotState, YAxis, PlotVariation, PlotDataSeries } from './types'
 import { DataUiChannel, channelToId } from '../../../shared/channel'
 import { store, AppState } from '../../store'
-import { DataResponse, NR_OF_BINS } from '../../../api/queryrest'
+import { NR_OF_BINS } from '../../../api/queryrest'
 import {
 	EventField,
 	AggregationOperation,
@@ -23,38 +23,43 @@ const EXAMPLE_CHANNELS = [
 	{ name: 'channel1', backend: 'backend1' },
 ]
 
-const EXAMPLE_RESPONSE: DataResponse = [
-	{
-		channel: EXAMPLE_CHANNELS[0],
-		data: [
-			{
-				eventCount: 1,
-				globalMillis: 333,
-				shape: [1],
-				value: {
-					min: 1,
-					mean: 2,
-					max: 3,
-				},
-			},
-		],
-	},
-	{
-		channel: EXAMPLE_CHANNELS[1],
-		data: [
-			{
-				eventCount: 100,
-				globalMillis: 335,
-				shape: [1],
-				value: {
-					min: 2,
-					mean: 3,
-					max: 4,
-				},
-			},
-		],
-	},
-]
+// EXAMPLE_RESPONSE is still used in some of the commented/disabled
+// tests. While those are still around, don't delete it, just so we
+// can be sure, how these fit together without having to dig through
+// version control history.
+//
+// const EXAMPLE_RESPONSE: DataResponse = [
+// 	{
+// 		channel: EXAMPLE_CHANNELS[0],
+// 		data: [
+// 			{
+// 				eventCount: 1,
+// 				globalMillis: 333,
+// 				shape: [1],
+// 				value: {
+// 					min: 1,
+// 					mean: 2,
+// 					max: 3,
+// 				},
+// 			},
+// 		],
+// 	},
+// 	{
+// 		channel: EXAMPLE_CHANNELS[1],
+// 		data: [
+// 			{
+// 				eventCount: 100,
+// 				globalMillis: 335,
+// 				shape: [1],
+// 				value: {
+// 					min: 2,
+// 					mean: 3,
+// 					max: 4,
+// 				},
+// 			},
+// 		],
+// 	},
+// ]
 
 describe('plot model', () => {
 	describe('initial state', () => {
