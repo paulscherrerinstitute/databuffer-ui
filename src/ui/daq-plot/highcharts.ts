@@ -1,12 +1,8 @@
 import Highcharts from 'highcharts'
 import highchartsMore from 'highcharts/highcharts-more'
-import {
-	DataUiDataPoint,
-	DataUiAggregatedValue,
-	DataUiDataSeries,
-} from '../../shared/dataseries'
+import { DataUiDataPoint, DataUiAggregatedValue } from '../../shared/dataseries'
 import { PlotDataSeries, YAxis } from '../../state/models/plot'
-import { formatDate, TimeRange } from '../../util'
+import { TimeRange } from '../../util'
 
 // extend Highcharts with the "Highcharts More" module
 // see https://www.highcharts.com/forum/viewtopic.php?t=35113

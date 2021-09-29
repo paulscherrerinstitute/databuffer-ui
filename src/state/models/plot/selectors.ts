@@ -9,10 +9,6 @@ import {
 	MappingAlignment,
 } from '@paulscherrerinstitute/databuffer-query-js/api/v0/query-data'
 import { channelToId } from '../../../shared/channel'
-import {
-	DataUiAggregatedValue,
-	DataUiDataPoint,
-} from '../../../shared/dataseries'
 import { formatDate } from '../../../util'
 import { AppState } from '../../store'
 import { NR_OF_BINS } from '../../../api/queryrest'
