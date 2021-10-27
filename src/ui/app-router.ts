@@ -32,6 +32,7 @@ export class AppRouterElement extends connect(store, LitElement) {
 		[ROUTE.CHANNEL_SEARCH]: `<view-channel-search></view-channel-search>`,
 		[ROUTE.PLOT]: `<view-standard-plot></view-standard-plot>`,
 		[ROUTE.PLOT_SETTINGS]: `<view-plot-settings></view-plot-settings>`,
+		[ROUTE.PRESELECT]: `<view-preselect></view-preselect>`,
 		[ROUTE.QUERY_META]: `<view-query-meta></view-query-meta>`,
 	}
 
