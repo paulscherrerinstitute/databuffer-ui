@@ -54,7 +54,7 @@ const KEY_RELOAD_ZOOM = IS_MAC ? 'Meta' : 'Control'
 // see https://www.highcharts.com/forum/viewtopic.php?t=35113
 highchartsMore(Highcharts)
 
-@customElement('view-standard-plot')
+@customElement('view-plot')
 export class StandardPlotElement extends connect(store, LitElement) {
 	@state() response: DataResponse = []
 	@state() startTime: number = 1
