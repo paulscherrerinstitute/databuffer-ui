@@ -4,13 +4,10 @@
 import {
 	channelsearch,
 	channelsearchSelectors,
-	ShapeName,
 	IdToChannelMap,
 } from './channelsearch'
-import { store, AppDispatch, AppState } from '../store'
-import { createTestEnv, RdxTestEnv } from '../rdx-test-util'
-import { EffectFns, RoutingState } from '@captaincodeman/rdx'
-import { ROUTE } from '../routing'
+import { store, AppState } from '../store'
+import { dataShapeDisplay } from '../../shared/channel'
 
 describe('channelsearch model', () => {
 	describe('initial state', () => {
@@ -161,29 +158,29 @@ describe('channelsearch model', () => {
 						backend: 'b1',
 						name: 'c1',
 						source: 's1',
-						type: 't1',
-						shape: [1],
+						dataType: 't1',
+						dataShape: 'scalar',
 					},
 					'b2/c2': {
 						backend: 'b2',
 						name: 'c2',
 						source: 's2',
-						type: 't2',
-						shape: [1],
+						dataType: 't2',
+						dataShape: 'scalar',
 					},
 					'b3/c3': {
 						backend: 'b3',
 						name: 'c3',
 						source: 's3',
-						type: 't3',
-						shape: [1],
+						dataType: 't3',
+						dataShape: 'scalar',
 					},
 					'b4/c4': {
 						backend: 'b4',
 						name: 'c4',
 						source: 's4',
-						type: 't4',
-						shape: [1],
+						dataType: 't4',
+						dataShape: 'scalar',
 					},
 				}
 			})
@@ -416,8 +413,8 @@ describe('channelsearch model', () => {
 							description: 'a',
 							source: 'tcp://localhost:1001',
 							unit: 'A',
-							shape: [1],
-							type: 'uint16',
+							dataShape: 'scalar',
+							dataType: 'uint16',
 						},
 						'backend2/channel3': {
 							name: 'channel3',
@@ -425,8 +422,8 @@ describe('channelsearch model', () => {
 							description: 'b',
 							source: 'tcp://localhost:1002',
 							unit: 'B',
-							shape: [1],
-							type: 'float32',
+							dataShape: 'scalar',
+							dataType: 'float32',
 						},
 						'backend2/channel1': {
 							name: 'channel1',
@@ -434,8 +431,8 @@ describe('channelsearch model', () => {
 							description: 'c',
 							source: 'tcp://localhost:1003',
 							unit: 'C',
-							shape: [10],
-							type: 'uint16',
+							dataShape: 'waveform',
+							dataType: 'uint16',
 						},
 						'backend1/channel2': {
 							name: 'channel2',
@@ -443,8 +440,8 @@ describe('channelsearch model', () => {
 							description: 'd',
 							source: 'tcp://localhost:1004',
 							unit: 'D',
-							shape: [20],
-							type: 'float32',
+							dataShape: 'waveform',
+							dataType: 'float32',
 						},
 						'backend3/channel1': {
 							name: 'channel1',
@@ -452,8 +449,8 @@ describe('channelsearch model', () => {
 							description: 'e',
 							source: 'tcp://localhost:1005',
 							unit: 'E',
-							shape: [10, 20],
-							type: 'uint16',
+							dataShape: 'image',
+							dataType: 'uint16',
 						},
 						'backend1/channel1': {
 							name: 'channel1',
@@ -461,10 +458,10 @@ describe('channelsearch model', () => {
 							description: 'f',
 							source: 'tcp://localhost:1006',
 							unit: 'F',
-							shape: [20, 10],
-							type: 'uint16',
+							dataShape: 'image',
+							dataType: 'uint16',
 						},
-					},
+					} as IdToChannelMap,
 				},
 			}
 			expect(
@@ -493,8 +490,8 @@ describe('channelsearch model', () => {
 							description: 'a',
 							source: 'tcp://localhost:1001',
 							unit: 'A',
-							shape: [1],
-							type: 'uint16',
+							dataShape: 'scalar',
+							dataType: 'uint16',
 						},
 						'backend2/channel2': {
 							name: 'channel2',
@@ -502,14 +499,14 @@ describe('channelsearch model', () => {
 							description: 'b',
 							source: 'tcp://localhost:1002',
 							unit: 'B',
-							shape: [1],
-							type: 'float32',
+							dataShape: 'scalar',
+							dataType: 'float32',
 						},
-					},
+					} as IdToChannelMap,
 				},
 			}
 			const val = channelsearchSelectors
-				.resultsWithTags(state1)
+				.results(state1)
 				.map(x => ({ name: x.name, backend: x.backend, tags: x.tags }))
 			expect(Array.isArray(val)).toBe(true)
 			expect(val.length).toBe(2)
@@ -529,8 +526,8 @@ describe('channelsearch model', () => {
 							description: 'a',
 							source: 'tcp://localhost:1001',
 							unit: 'A',
-							shape: [1],
-							type: 'uint16',
+							dataShape: 'scalar',
+							dataType: 'uint16',
 						},
 						'backend1/channel2': {
 							name: 'channel2',
@@ -538,8 +535,8 @@ describe('channelsearch model', () => {
 							description: 'b',
 							source: 'tcp://localhost:1002',
 							unit: 'B',
-							shape: [10],
-							type: 'float32',
+							dataShape: 'waveform',
+							dataType: 'float32',
 						},
 						'backend1/channel3': {
 							name: 'channel3',
@@ -547,14 +544,14 @@ describe('channelsearch model', () => {
 							description: 'c',
 							source: 'tcp://localhost:1003',
 							unit: 'C',
-							shape: [10, 20],
-							type: 'uint16',
+							dataShape: 'image',
+							dataType: 'uint16',
 						},
-					},
+					} as IdToChannelMap,
 				},
 			}
 			const val = channelsearchSelectors
-				.resultsWithTags(state1)
+				.results(state1)
 				.map(x => ({ name: x.name, backend: x.backend, tags: x.tags }))
 			expect(Array.isArray(val)).toBe(true)
 			expect(val.length).toBe(3)
@@ -575,8 +572,8 @@ describe('channelsearch model', () => {
 							description: 'a',
 							source: 'tcp://localhost:1001',
 							unit: 'A',
-							shape: [1],
-							type: 'uint16',
+							dataShape: 'scalar',
+							dataType: 'uint16',
 						},
 						'backend1/channel2': {
 							name: 'channel2',
@@ -584,8 +581,8 @@ describe('channelsearch model', () => {
 							description: 'b',
 							source: 'tcp://localhost:1002',
 							unit: 'B',
-							shape: [10],
-							type: 'float32',
+							dataShape: 'waveform',
+							dataType: 'float32',
 						},
 						'backend1/channel3': {
 							name: 'channel3',
@@ -593,20 +590,26 @@ describe('channelsearch model', () => {
 							description: 'c',
 							source: 'tcp://localhost:1003',
 							unit: 'C',
-							shape: [10, 20],
-							type: 'uint16',
+							dataShape: 'image',
+							dataType: 'uint16',
 						},
-					},
+					} as IdToChannelMap,
 				},
 			}
 			const val = channelsearchSelectors
-				.resultsWithTags(state1)
+				.results(state1)
 				.map(x => ({ name: x.name, backend: x.backend, tags: x.tags }))
 			expect(Array.isArray(val)).toBe(true)
 			expect(val.length).toBe(3)
-			expect(val[0].tags).toEqual(expect.arrayContaining([ShapeName.SCALAR]))
-			expect(val[1].tags).toEqual(expect.arrayContaining([ShapeName.WAVEFORM]))
-			expect(val[2].tags).toEqual(expect.arrayContaining([ShapeName.IMAGE]))
+			expect(val[0].tags).toEqual(
+				expect.arrayContaining([dataShapeDisplay.scalar])
+			)
+			expect(val[1].tags).toEqual(
+				expect.arrayContaining([dataShapeDisplay.waveform])
+			)
+			expect(val[2].tags).toEqual(
+				expect.arrayContaining([dataShapeDisplay.image])
+			)
 		})
 
 		it('combines all tags into availableTags', () => {
@@ -621,8 +624,8 @@ describe('channelsearch model', () => {
 							description: 'a',
 							source: 'tcp://localhost:1001',
 							unit: 'A',
-							shape: [1],
-							type: 'uint16',
+							dataShape: 'scalar',
+							dataType: 'uint16',
 						},
 						'backend2/channel2': {
 							name: 'channel2',
@@ -630,8 +633,8 @@ describe('channelsearch model', () => {
 							description: 'b',
 							source: 'tcp://localhost:1002',
 							unit: 'B',
-							shape: [10],
-							type: 'float32',
+							dataShape: 'waveform',
+							dataType: 'float32',
 						},
 						'backend3/channel3': {
 							name: 'channel3',
@@ -639,10 +642,10 @@ describe('channelsearch model', () => {
 							description: 'c',
 							source: 'tcp://localhost:1003',
 							unit: 'C',
-							shape: [10, 20],
-							type: 'uint16',
+							dataShape: 'image',
+							dataType: 'uint16',
 						},
-					},
+					} as IdToChannelMap,
 				},
 			}
 			const val = channelsearchSelectors.availableTags(state1)
@@ -654,9 +657,9 @@ describe('channelsearch model', () => {
 					'backend3',
 					'float32',
 					'uint16',
-					ShapeName.SCALAR,
-					ShapeName.WAVEFORM,
-					ShapeName.IMAGE,
+					dataShapeDisplay.scalar,
+					dataShapeDisplay.waveform,
+					dataShapeDisplay.image,
 				])
 			)
 		})
@@ -673,8 +676,8 @@ describe('channelsearch model', () => {
 							description: 'a',
 							source: 'tcp://localhost:1001',
 							unit: 'A',
-							shape: [1],
-							type: 'uint16',
+							dataShape: 'scalar',
+							dataType: 'uint16',
 						},
 						'backend2/channel2': {
 							name: 'channel2',
@@ -682,8 +685,8 @@ describe('channelsearch model', () => {
 							description: 'b',
 							source: 'tcp://localhost:1002',
 							unit: 'B',
-							shape: [10],
-							type: 'float32',
+							dataShape: 'waveform',
+							dataType: 'float32',
 						},
 						'backend3/channel3': {
 							name: 'channel3',
@@ -691,18 +694,18 @@ describe('channelsearch model', () => {
 							description: 'c',
 							source: 'tcp://localhost:1003',
 							unit: 'C',
-							shape: [10, 20],
-							type: 'uint16',
+							dataShape: 'image',
+							dataType: 'uint16',
 						},
-					},
+					} as IdToChannelMap,
 				},
 			}
 			const val = channelsearchSelectors.availableTags(state1)
 			expect(val).toEqual(
 				[
-					ShapeName.SCALAR,
-					ShapeName.WAVEFORM,
-					ShapeName.IMAGE,
+					dataShapeDisplay.scalar,
+					dataShapeDisplay.waveform,
+					dataShapeDisplay.image,
 					'backend1',
 					'backend2',
 					'backend3',

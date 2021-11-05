@@ -30,8 +30,9 @@ export class AppRouterElement extends connect(store, LitElement) {
 	private viewByPage: { [key: string]: string } = {
 		[ROUTE.HOME]: `<view-home></view-home>`,
 		[ROUTE.CHANNEL_SEARCH]: `<view-channel-search></view-channel-search>`,
-		[ROUTE.PLOT]: `<view-standard-plot></view-standard-plot>`,
+		[ROUTE.PLOT]: `<view-plot></view-plot>`,
 		[ROUTE.PLOT_SETTINGS]: `<view-plot-settings></view-plot-settings>`,
+		[ROUTE.PRESELECT]: `<view-preselect></view-preselect>`,
 		[ROUTE.QUERY_META]: `<view-query-meta></view-query-meta>`,
 	}
 

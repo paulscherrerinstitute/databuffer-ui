@@ -1,8 +1,8 @@
 import Highcharts from 'highcharts'
 import highchartsMore from 'highcharts/highcharts-more'
-import { formatDate, TimeRange } from '../../util'
-import type { DaqPlotDataSeries, DaqPlotYAxis } from './types'
-import { needsBinning } from './util'
+import { DataUiDataPoint, DataUiAggregatedValue } from '../../shared/dataseries'
+import { PlotDataSeries, YAxis } from '../../state/models/plot'
+import { TimeRange } from '../../util'
 
 // extend Highcharts with the "Highcharts More" module
 // see https://www.highcharts.com/forum/viewtopic.php?t=35113
@@ -58,26 +58,22 @@ export function initChart(container: HTMLElement) {
 			useUTC: false,
 		},
 		tooltip: {
-			useHTML: true,
-			valueDecimals: 4,
-			headerFormat:
-				'<span style="font-size: 10px">{point.key}</span><table><tr><td>Series</td><td>Bin size</td><td>min</td><td>mean</td><td>max</td></tr>',
-			footerFormat: '</table>',
-			shared: true,
+			enabled: false,
 		},
 	})
 }
 
 /** Map a YAxis object a Highcharts configuration */
-export function yAxis2HighchartsYAxisOptions(yAxes: DaqPlotYAxis[]) {
+export function yAxis2HighchartsYAxisOptions(yAxes: YAxis[]) {
 	return yAxes.map((y, idx) => {
 		const color = getColor(idx)
 		const opts: Highcharts.YAxisOptions = {
-			type: y.type,
+			type: y.categories ? 'category' : y.type,
+			categories: y.categories,
 			min: y.min,
 			max: y.max,
 			opposite: y.side !== 'left',
-			lineColor: getColor(idx),
+			lineColor: color,
 			labels: {
 				format: `{value}${y.unit ? ' ' + y.unit : ''}`,
 				style: { color },
@@ -94,46 +90,56 @@ export function yAxis2HighchartsYAxisOptions(yAxes: DaqPlotYAxis[]) {
 	})
 }
 
-const TOOLTIP_FORMAT_WITH_BINNING =
-	'<tr><td style="color:{point.color}"><b>{series.name}</b></td><td>{point.binSize}</td><td>{point.min}</td><td><b>{point.mean}</b></td><td>{point.max}</td></tr>'
-const TOOLTIP_FORMAT_WITHOUT_BINNING =
-	'<tr><td style="color:{point.color}"><b>{series.name}</b></td><td></td><td></td><td><b>{point.mean}</b></td><td></td></tr>'
-
 export function dataSeries2HighchartsSeriesOptions(
-	dataSeries: DaqPlotDataSeries[]
+	dataSeries: PlotDataSeries[]
 ) {
 	const result: Highcharts.SeriesOptionsType[] = []
 	for (const ds of dataSeries) {
-		const isBinned = needsBinning(ds.data)
-		const color = getColor(ds.yAxis)
-		result.push({
-			name: ds.name,
+		const isBinned = ds.channel.dataType !== 'string'
+		const color = getColor(ds.yAxisIndex)
+		const opts: Highcharts.SeriesOptionsType = {
+			name: ds.label,
 			type: 'line',
 			step: 'left',
-			yAxis: ds.yAxis,
-			tooltip: {
-				pointFormat: isBinned
-					? TOOLTIP_FORMAT_WITH_BINNING
-					: TOOLTIP_FORMAT_WITHOUT_BINNING,
-			},
-			data: ds.data.map(pt => ({ ...pt, y: pt.mean })),
+			yAxis: ds.yAxisIndex,
 			color,
 			zIndex: 1,
-		})
+		}
+		if (ds.datapoints) {
+			if (ds.channel.dataType === 'string') {
+				const categories = Array.from(new Set(ds.datapoints.map(pt => pt.y)))
+				opts.data = (ds.datapoints as DataUiDataPoint<number, string>[]).map(
+					pt => [pt.x, categories.indexOf(pt.y)]
+				)
+			} else {
+				opts.data = (
+					ds.datapoints as DataUiDataPoint<number, DataUiAggregatedValue>[]
+				).map(pt => [pt.x, pt.y.mean])
+			}
+		}
+		result.push(opts)
 		if (!isBinned) continue
-		result.push({
-			name: `${ds.name} - min/max`,
+		// for binned data series, add a background band with min/max
+		const minMaxSeries: Highcharts.SeriesOptionsType = {
+			name: `${ds.label} - min/max`,
 			enableMouseTracking: false,
 			type: 'arearange',
 			step: 'left',
-			yAxis: ds.yAxis,
+			yAxis: ds.yAxisIndex,
 			linkedTo: ':previous',
-			data: ds.data.map(item => [item.x, item.min, item.max]),
 			color,
 			fillOpacity: 0.3,
 			marker: { enabled: false },
 			zIndex: 0,
-		})
+		}
+		if (ds.datapoints) {
+			const pts = ds.datapoints as DataUiDataPoint<
+				number,
+				DataUiAggregatedValue
+			>[]
+			minMaxSeries.data = pts.map(item => [item.x, item.y.min, item.y.max])
+		}
+		result.push(minMaxSeries)
 	}
 	return result
 }

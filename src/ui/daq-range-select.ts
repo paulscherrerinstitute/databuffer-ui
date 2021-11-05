@@ -47,23 +47,6 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 		return {
 			startTime: plotSelectors.startTime(state),
 			endTime: plotSelectors.endTime(state),
-			requestDuration: plotSelectors.totalRequestDuration(state),
-			shouldDisplayChart: plotSelectors.shouldDisplayChart(state),
-			channelsWithoutData: plotSelectors.channelsWithoutData(state),
-			allRequestsFinished: plotSelectors.allRequestsFinished(state),
-			pendingRequests: plotSelectors.pendingRequests(state),
-			queryRangeShowing: plotSelectors.queryRangeShowing(state),
-			dialogShareLinkShowing: plotSelectors.dialogShareLinkShowing(state),
-			dialogShareLinkAbsoluteTimes:
-				plotSelectors.dialogShareLinkAbsoluteTimes(state),
-			dialogShareLinkUrl: plotSelectors.dialogShareLinkUrl(state),
-			dialogShareLinkChannelsTruncated:
-				plotSelectors.dialogShareLinkChannelsTruncated(state),
-			dialogDownloadShowing: plotSelectors.dialogDownloadShowing(state),
-			dialogDownloadAggregation: plotSelectors.dialogDownloadAggregation(state),
-			dialogDownloadCurlCommand: plotSelectors.dialogDownloadCurlCommand(state),
-			plotVariation: plotSelectors.plotVariation(state),
-			daqPlotConfig: plotSelectors.daqPlotConfig(state),
 		}
 	}
 

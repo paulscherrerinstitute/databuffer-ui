@@ -5,7 +5,6 @@ import {
 	state,
 	css,
 	query,
-	TemplateResult,
 	PropertyValues,
 } from 'lit-element'
 
@@ -24,7 +23,6 @@ import '@material/mwc-icon-button'
 import '@material/mwc-radio'
 import { Radio } from '@material/mwc-radio'
 import '@material/mwc-textfield'
-import { TextField } from '@material/mwc-textfield'
 import '@material/mwc-snackbar'
 import { Snackbar } from '@material/mwc-snackbar'
 import './daq-plot/daq-plot-separate-axes'
@@ -34,27 +32,21 @@ import './daq-plot/daq-plot-single-axis'
 import type { TimeRange } from '../util'
 import { AppState, store } from '../state/store'
 import {
-	Channel,
-	DataRequestMeta,
-	DataSeries,
+	PlotDataSeries,
 	DownloadAggregation,
 	plotSelectors,
 	PlotVariation,
+	YAxis,
 } from '../state/models/plot'
 
-import * as datefns from 'date-fns'
 import type { DataResponse } from '../api/queryrest'
 import { baseStyles } from './shared-styles'
 import { connect } from '@captaincodeman/rdx'
-import type {
-	DaqPlotConfig,
-	DaqPlotDataSeries,
-	DaqPlotYAxis,
-} from './daq-plot/types'
 import type { DaqPlotSingleAxisElement } from './daq-plot/daq-plot-single-axis'
 import type { DaqPlotSeparateAxesElement } from './daq-plot/daq-plot-separate-axes'
 import type { DaqPlotSeparatePlotsElement } from './daq-plot/daq-plot-separate-plots'
 import './daq-range-select'
+import type { DataUiChannel } from '../shared/channel'
 
 const IS_MAC = window.navigator.appVersion.toLowerCase().indexOf('mac') >= 0
 const KEY_RELOAD_ZOOM = IS_MAC ? 'Meta' : 'Control'
@@ -62,20 +54,19 @@ const KEY_RELOAD_ZOOM = IS_MAC ? 'Meta' : 'Control'
 // see https://www.highcharts.com/forum/viewtopic.php?t=35113
 highchartsMore(Highcharts)
 
-@customElement('view-standard-plot')
+@customElement('view-plot')
 export class StandardPlotElement extends connect(store, LitElement) {
 	@state() response: DataResponse = []
 	@state() startTime: number = 1
 	@state() endTime: number = 2
-	@state() channels: Channel[] = []
+	@state() channels: DataUiChannel[] = []
 	@state() anyRequestErrors: boolean = false
-	@state() dataRequests: DataRequestMeta[] = []
 	@state() pendingRequests: number = 0
 	@state() allRequestsFinished: boolean = true
 	@state() requestDuration!: number
 	@state() requestFinishedAt!: number
 	@state() shouldDisplayChart!: boolean
-	@state() channelsWithoutData: Channel[] = []
+	@state() channelsWithoutData: DataUiChannel[] = []
 	@state() queryRangeShowing: boolean = false
 	@state() dialogShareLinkShowing: boolean = false
 	@state() dialogShareLinkAbsoluteTimes: boolean = false
@@ -86,7 +77,10 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	dialogDownloadShowing: boolean = false
 	@state() dialogDownloadAggregation!: string
 	@state() plotVariation!: PlotVariation
-	@state() daqPlotConfig!: DaqPlotConfig
+	@state() plotTitle: string = ''
+	@state() plotSubTitle: string = ''
+	@state() plotYAxes: YAxis[] = []
+	@state() plotDataSeries: PlotDataSeries[] = []
 
 	private reloadOnZoom = false
 
@@ -131,7 +125,6 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			startTime: plotSelectors.startTime(state),
 			endTime: plotSelectors.endTime(state),
 			anyRequestErrors: plotSelectors.anyRequestErrors(state),
-			dataRequests: plotSelectors.dataRequests(state),
 			requestDuration: plotSelectors.totalRequestDuration(state),
 			shouldDisplayChart: plotSelectors.shouldDisplayChart(state),
 			channelsWithoutData: plotSelectors.channelsWithoutData(state),
@@ -148,7 +141,10 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			dialogDownloadAggregation: plotSelectors.dialogDownloadAggregation(state),
 			dialogDownloadCurlCommand: plotSelectors.dialogDownloadCurlCommand(state),
 			plotVariation: plotSelectors.plotVariation(state),
-			daqPlotConfig: plotSelectors.daqPlotConfig(state),
+			plotTitle: plotSelectors.plotTitle(state),
+			plotSubTitle: plotSelectors.plotSubTitle(state),
+			plotYAxes: plotSelectors.yAxes(state),
+			plotDataSeries: plotSelectors.plotDataSeries(state),
 		}
 	}
 
@@ -214,34 +210,34 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			case PlotVariation.SeparatePlots:
 				return html`<daq-plot-separate-plots
 					id="daqplot"
-					.title=${this.daqPlotConfig.title}
-					.subtitle=${this.daqPlotConfig.subtitle}
-					.yAxes=${this.daqPlotConfig.yAxes}
+					.title=${this.plotTitle}
+					.subtitle=${this.plotSubTitle}
+					.yAxes=${this.plotYAxes}
 					.xMin=${this.startTime}
 					.xMax=${this.endTime}
-					.series=${this.daqPlotConfig.series}
+					.series=${this.plotDataSeries}
 				></daq-plot-separate-plots>`
 
 			case PlotVariation.SeparateAxes:
 				return html`<daq-plot-separate-axes
 					id="daqplot"
-					.title=${this.daqPlotConfig.title}
-					.subtitle=${this.daqPlotConfig.subtitle}
-					.yAxes=${this.daqPlotConfig.yAxes}
+					.title=${this.plotTitle}
+					.subtitle=${this.plotSubTitle}
+					.yAxes=${this.plotYAxes}
 					.xMin=${this.startTime}
 					.xMax=${this.endTime}
-					.series=${this.daqPlotConfig.series}
+					.series=${this.plotDataSeries}
 				></daq-plot-separate-axes>`
 
 			case PlotVariation.SingleAxis:
 				return html`<daq-plot-single-axis
 					id="daqplot"
-					.title=${this.daqPlotConfig.title}
-					.subtitle=${this.daqPlotConfig.subtitle}
-					.yAxes=${this.daqPlotConfig.yAxes}
+					.title=${this.plotTitle}
+					.subtitle=${this.plotSubTitle}
+					.yAxes=${this.plotYAxes}
 					.xMin=${this.startTime}
 					.xMax=${this.endTime}
-					.series=${this.daqPlotConfig.series}
+					.series=${this.plotDataSeries}
 				></daq-plot-single-axis>`
 
 			default:

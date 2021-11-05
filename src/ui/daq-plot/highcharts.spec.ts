@@ -1,9 +1,9 @@
-import { getColor, yAxis2HighchartsYAxisOptions } from './highcharts'
-import { DaqPlotDataPoint, DaqPlotYAxis } from './types'
+import { YAxis } from '../../state/models/plot/types'
+import { yAxis2HighchartsYAxisOptions } from './highcharts'
 
 describe('module daq-plot/highcharts', () => {
 	describe('yAxis2HighchartsYAxisOptions', () => {
-		let yAxes: DaqPlotYAxis[]
+		let yAxes: YAxis[]
 
 		beforeEach(() => {
 			yAxes = [
@@ -11,8 +11,8 @@ describe('module daq-plot/highcharts', () => {
 					title: 'a',
 					unit: 'mA',
 					side: 'left',
-					min: undefined,
-					max: undefined,
+					min: null,
+					max: null,
 					type: 'linear',
 				},
 				{

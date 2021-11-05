@@ -16,7 +16,7 @@ import {
 } from './highcharts'
 import { baseStyles } from '../shared-styles'
 import { isEmptyObj } from '../../util'
-import { DaqPlotYAxis, DaqPlotDataSeries } from './types'
+import { PlotDataSeries, YAxis } from '../../state/models/plot'
 
 declare global {
 	interface HTMLElementTagNameMap {
@@ -33,7 +33,7 @@ export class DaqPlotSeparateAxesElement extends LitElement {
 	subtitle: string = ''
 
 	@state()
-	yAxes: DaqPlotYAxis[] = []
+	yAxes: YAxis[] = []
 
 	@state()
 	xMax?: number
@@ -42,7 +42,7 @@ export class DaqPlotSeparateAxesElement extends LitElement {
 	xMin?: number
 
 	@state()
-	series: DaqPlotDataSeries[] = []
+	series: PlotDataSeries[] = []
 
 	@query('#chart')
 	private chartDiv!: HTMLDivElement

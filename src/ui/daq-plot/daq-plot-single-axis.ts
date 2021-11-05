@@ -7,8 +7,7 @@ import {
 	state,
 	query,
 } from 'lit-element'
-import { isEmptyObj, TimeRange } from '../../util'
-import { DaqPlotDataSeries, DaqPlotYAxis } from './types'
+import { isEmptyObj } from '../../util'
 
 import {
 	dataSeries2HighchartsSeriesOptions,
@@ -17,6 +16,7 @@ import {
 	yAxis2HighchartsYAxisOptions,
 } from './highcharts'
 import { baseStyles } from '../shared-styles'
+import { PlotDataSeries, YAxis } from '../../state/models/plot'
 
 declare global {
 	interface HTMLElementTagNameMap {
@@ -33,7 +33,7 @@ export class DaqPlotSingleAxisElement extends LitElement {
 	subtitle: string = ''
 
 	@state()
-	yAxes: DaqPlotYAxis[] = []
+	yAxes: YAxis[] = []
 
 	@state()
 	xMax?: number
@@ -42,7 +42,7 @@ export class DaqPlotSingleAxisElement extends LitElement {
 	xMin?: number
 
 	@state()
-	series: DaqPlotDataSeries[] = []
+	series: PlotDataSeries[] = []
 
 	// @state()
 	// reloadOnZoom: boolean = false

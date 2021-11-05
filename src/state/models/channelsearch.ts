@@ -1,38 +1,16 @@
-import {
-	ChannelConfig,
-	ChannelConfigsQuery,
-} from '@paulscherrerinstitute/databuffer-query-js/api/v0/query-channel-configs'
+import { ChannelConfigsQuery } from '@paulscherrerinstitute/databuffer-query-js/api/v0/query-channel-configs'
 import { createModel, RoutingState } from '@captaincodeman/rdx'
-import { channelToId } from '@paulscherrerinstitute/databuffer-query-js/api/v0/channel'
 import { createSelector } from 'reselect'
 import { EffectsStore, AppState } from '../store'
 import { queryRestApi } from '../../api/queryrest'
 import { ROUTE } from '../routing'
-import { compareNameThenBackend } from '../../shared/channel'
+import {
+	channelToId,
+	compareNameThenBackend,
+	DataUiChannel,
+} from '../../shared/channel'
 
-export type { ChannelConfig }
-
-export interface ChannelWithTags extends ChannelConfig {
-	tags: string[]
-}
-
-export enum ShapeName {
-	SCALAR = 'scalar',
-	WAVEFORM = '1d',
-	IMAGE = '2d',
-}
-
-export const getShapeName = (c: ChannelConfig): ShapeName => {
-	if (c.shape.length > 2)
-		throw new Error(`shape has too many dimensions: ${JSON.stringify(c.shape)}`)
-	if (c.shape.length === 0)
-		throw new Error(`channel has no shape: ${c.backend}/${c.name}`)
-	if (c.shape.length === 2) return ShapeName.IMAGE
-	if (c.shape[0] === 1) return ShapeName.SCALAR
-	return ShapeName.WAVEFORM
-}
-
-export type IdToChannelMap = { [id: string]: ChannelConfig }
+export type IdToChannelMap = { [id: string]: DataUiChannel }
 
 export interface ChannelSearchState {
 	pattern: string
@@ -161,18 +139,12 @@ export const channelsearch = createModel({
 export async function _searchChannel(
 	query: ChannelConfigsQuery
 ): Promise<IdToChannelMap> {
-	const response = await queryRestApi.searchChannels(query.regex)
-
+	const channels = await queryRestApi.searchChannels(query.regex)
 	const result: IdToChannelMap = {}
-
-	for (const x of response) {
-		for (const chConfig of x.channels) {
-			const { backend, name } = chConfig
-			const id = channelToId({ backend, name })
-			result[id] = chConfig
-		}
+	for (const ch of channels) {
+		const id = channelToId(ch)
+		result[id] = ch
 	}
-
 	return result
 }
 
@@ -205,14 +177,8 @@ export namespace channelsearchSelectors {
 		Object.values(entities).sort(compareNameThenBackend)
 	)
 
-	export const resultsWithTags = createSelector([results], results =>
-		results.map(x => ({ ...x, tags: [x.backend, getShapeName(x), x.type] }))
-	)
-
-	export const availableTags = createSelector(
-		[resultsWithTags],
-		resultsWithTags =>
-			Array.from(new Set(resultsWithTags.flatMap(x => x.tags))).sort()
+	export const availableTags = createSelector([results], results =>
+		Array.from(new Set(results.flatMap(x => x.tags))).sort()
 	)
 
 	export const fetching = createSelector([getState], state => state.fetching)

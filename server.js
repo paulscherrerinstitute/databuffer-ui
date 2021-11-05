@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 // development server for the app project
 // run with: npm start
 
@@ -13,11 +14,14 @@ browserSync.init({
 	server: {
 		baseDir: 'public',
 		index: 'index.html',
+		routes: {
+			'/src': './src/',
+		},
 	},
 	files: ['scripts/**', 'index.html'],
 	middleware: [
 		logger(),
-		compression({ level: zlib.Z_BEST_COMPRESSION }),
+		compression({ level: zlib.constants.Z_BEST_COMPRESSION }),
 		historyApiFallback(),
 	],
 	rewriteRules: [
