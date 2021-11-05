@@ -109,22 +109,12 @@ export function dataSeries2HighchartsSeriesOptions(
 			if (ds.channel.dataType === 'string') {
 				const categories = Array.from(new Set(ds.datapoints.map(pt => pt.y)))
 				opts.data = (ds.datapoints as DataUiDataPoint<number, string>[]).map(
-					pt => ({
-						x: pt.x,
-						y: categories.indexOf(pt.y),
-					})
+					pt => [pt.x, categories.indexOf(pt.y)]
 				)
 			} else {
 				opts.data = (
 					ds.datapoints as DataUiDataPoint<number, DataUiAggregatedValue>[]
-				).map(pt => ({
-					x: pt.x,
-					y: pt.y.mean,
-					binSize: pt.y.count,
-					min: pt.y.min,
-					max: pt.y.max,
-					mean: pt.y.mean,
-				}))
+				).map(pt => [pt.x, pt.y.mean])
 			}
 		}
 		result.push(opts)
