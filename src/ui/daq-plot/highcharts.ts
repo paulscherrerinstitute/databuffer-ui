@@ -58,12 +58,7 @@ export function initChart(container: HTMLElement) {
 			useUTC: false,
 		},
 		tooltip: {
-			useHTML: true,
-			valueDecimals: 4,
-			headerFormat:
-				'<span style="font-size: 10px">{point.key}</span><table><tr><td>Series</td><td>Bin size</td><td>min</td><td>mean</td><td>max</td></tr>',
-			footerFormat: '</table>',
-			shared: true,
+			enabled: false,
 		},
 	})
 }
@@ -95,11 +90,6 @@ export function yAxis2HighchartsYAxisOptions(yAxes: YAxis[]) {
 	})
 }
 
-const TOOLTIP_FORMAT_WITH_BINNING =
-	'<tr><td style="color:{point.color}"><b>{series.name}</b></td><td>{point.binSize}</td><td>{point.min}</td><td><b>{point.mean}</b></td><td>{point.max}</td></tr>'
-const TOOLTIP_FORMAT_WITHOUT_BINNING =
-	'<tr><td style="color:{point.color}"><b>{series.name}</b></td><td></td><td></td><td><b>{point.mean}</b></td><td></td></tr>'
-
 export function dataSeries2HighchartsSeriesOptions(
 	dataSeries: PlotDataSeries[]
 ) {
@@ -112,11 +102,6 @@ export function dataSeries2HighchartsSeriesOptions(
 			type: 'line',
 			step: 'left',
 			yAxis: ds.yAxisIndex,
-			tooltip: {
-				pointFormat: isBinned
-					? TOOLTIP_FORMAT_WITH_BINNING
-					: TOOLTIP_FORMAT_WITHOUT_BINNING,
-			},
 			color,
 			zIndex: 1,
 		}
