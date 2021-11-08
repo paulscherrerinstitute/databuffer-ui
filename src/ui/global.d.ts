@@ -1,4 +1,4 @@
-interface DatabufferUi {
+interface DataUiStartupConfig {
 	TITLE: string
 	QUERY_API: string
 	DISPATCHER_API: string
@@ -6,5 +6,5 @@ interface DatabufferUi {
 }
 
 interface Window {
-	DatabufferUi: DatabufferUi
+	DatabufferUi: DataUiStartupConfig
 }
