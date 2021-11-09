@@ -8,6 +8,7 @@ import '@paulscherrerinstitute/databuffer-web-components/daq-pill-list'
 import { store, AppState } from '../state/store'
 
 import { channelsearchSelectors } from '../state/models/channelsearch'
+import { appcfgSelectors } from '../state/models/appcfg'
 
 @customElement('view-home')
 export class HomeElement extends connect(store, LitElement) {
@@ -17,20 +18,15 @@ export class HomeElement extends connect(store, LitElement) {
 	@state()
 	availableBackends: string[] = []
 	@state()
-	availableBackendsFetching: boolean = false
-	@state()
-	availableBackendsError?: Error = undefined
+	initialized: boolean = false
 
 	@query('#query')
 	private __query!: TextField
 
 	mapState(state: AppState) {
 		return {
-			availableBackends: channelsearchSelectors.availableBackends(state),
-			availableBackendsFetching:
-				channelsearchSelectors.availableBackendsFetching(state),
-			availableBackendsError:
-				channelsearchSelectors.availableBackendsError(state),
+			availableBackends: appcfgSelectors.availableBackends(state),
+			initialized: appcfgSelectors.initialized(state),
 			pattern: channelsearchSelectors.pattern(state),
 		}
 	}
@@ -67,14 +63,11 @@ export class HomeElement extends connect(store, LitElement) {
 
 					<div style="margin-top:3rem">
 						<p>Available backends:</p>
-						<p ?hidden=${!this.availableBackendsFetching}>Loading...</p>
+						<p ?hidden=${this.initialized}>Loading backend data...</p>
 						<daq-pill-list
-							?hidden=${this.availableBackendsFetching}
+							?hidden=${!this.initialized}
 							.value=${this.availableBackends}
 						></daq-pill-list>
-						<p ?hidden=${this.availableBackendsError === undefined}>
-							There was an error fetching the backends from the API
-						</p>
 					</div>
 				</div>
 			</div>

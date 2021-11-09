@@ -27,9 +27,6 @@ export interface ChannelSearchState {
 export const channelsearch = createModel({
 	state: {
 		pattern: '',
-		availableBackends: [],
-		availableBackendsFetching: false,
-		availableBackendsError: undefined,
 		selectedBackends: [],
 		entities: {},
 		ids: [],
@@ -38,24 +35,6 @@ export const channelsearch = createModel({
 	} as ChannelSearchState,
 
 	reducers: {
-		availableBackendsRequest(state) {
-			return {
-				...state,
-				availableBackends: [],
-				availableBackendsFetching: true,
-				availableBackendsError: undefined,
-			}
-		},
-		availableBackendsSuccess(state, availableBackends: string[]) {
-			return { ...state, availableBackends, availableBackendsFetching: false }
-		},
-		availableBackendsError(state, error) {
-			return {
-				...state,
-				availableBackendsFetching: false,
-				availableBackendsError: error,
-			}
-		},
 		patternChange(state, newPattern: string) {
 			return {
 				...state,
@@ -87,16 +66,6 @@ export const channelsearch = createModel({
 	effects(store: EffectsStore) {
 		const dispatch = store.getDispatch() // save for later
 		return {
-			async init() {
-				dispatch.channelsearch.availableBackendsRequest()
-				try {
-					const backends = await queryRestApi.listBackends()
-					dispatch.channelsearch.availableBackendsSuccess(backends)
-				} catch (err) {
-					dispatch.channelsearch.availableBackendsError(err)
-				}
-			},
-
 			async runSearch() {
 				const pattern = store.getState().channelsearch.pattern
 				// TODO: do we really want to select / disable backends?
@@ -153,18 +122,6 @@ const getState = (state: AppState) => state.channelsearch
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace channelsearchSelectors {
 	export const pattern = createSelector([getState], state => state.pattern)
-
-	export const availableBackends = createSelector([getState], state =>
-		[...state.availableBackends].sort()
-	)
-	export const availableBackendsFetching = createSelector(
-		[getState],
-		state => state.availableBackendsFetching
-	)
-	export const availableBackendsError = createSelector(
-		[getState],
-		state => state.availableBackendsError
-	)
 
 	export const selectedBackends = createSelector(
 		[getState],
