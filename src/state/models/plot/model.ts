@@ -1,6 +1,5 @@
 import { createModel, RoutingState } from '@captaincodeman/rdx'
 
-import { queryRestApi } from '../../../api/queryrest'
 import { EffectsStore } from '../../store'
 import { ROUTE } from '../../routing'
 import { make_debug, make_error, make_info } from '../applog'
@@ -15,6 +14,7 @@ import {
 } from './types'
 import { handleRoutePreselect } from './preselect'
 import * as plotSelectors from './selectors'
+import { appcfgSelectors } from '../appcfg'
 
 // helper functions
 const findIndexOfChannel = (state: PlotState, ch: DataUiChannel): number =>
@@ -335,6 +335,7 @@ export const plot = createModel({
 						`querying channels: ${channels.map(x => channelToId(x)).join(', ')}`
 					)
 				)
+				const queryApis = appcfgSelectors.backendToQueryApi(store.getState())
 				async function handleChannel(index: number, channel: DataUiChannel) {
 					dispatch.plot.drawPlotRequest({
 						index,
@@ -342,15 +343,18 @@ export const plot = createModel({
 					})
 					const channelId = channelToId(channel)
 					try {
+						const api = queryApis[channel.backend]
+						if (!api) {
+							dispatch.applog.log(
+								make_error(`no api provider for ${channelId}`)
+							)
+							return
+						}
 						dispatch.applog.log(make_debug(`querying data for ${channelId}`))
 						const response =
 							channel.dataType === 'string'
-								? await queryRestApi.queryStringData(
-										channel,
-										startDate,
-										endDate
-								  )
-								: await queryRestApi.queryData(channel, startDate, endDate)
+								? await api.queryStringData(channel, startDate, endDate)
+								: await api.queryData(channel, startDate, endDate)
 						dispatch.plot.drawPlotSuccess({
 							index,
 							timestamp: Date.now(),
