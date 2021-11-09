@@ -5,42 +5,49 @@ import type { EffectsStore } from '../store'
 import { createDataApiProvider } from '../../api/queryrest'
 import type { DataApiProvider } from '../../api/queryrest'
 
+type QueryApiProviderInfo = {
+	url: string
+	api: DataApiProvider
+	backends: string[]
+}
+
 export interface AppcfgState {
-	queryUrls: string[]
-	backendToQueryApi: Record<string, DataApiProvider>
-	initialized: boolean
+	queryApiProviders: QueryApiProviderInfo[]
+	queryApiProvidersFetching: boolean
+	queryApiProvidersError?: Error
 }
 
 export const appcfg = createModel({
 	state: {
-		queryUrls: [],
-		backendToQueryApi: {},
-		initialized: false,
+		queryApiProviders: [],
+		queryApiProvidersFetching: false,
+		queryApiProvidersError: undefined,
 	} as AppcfgState,
 	reducers: {
-		setQueryUrls(state: AppcfgState, queryUrls: string[]) {
-			return { ...state, queryUrls }
+		queryApiProvidersRequest(state: AppcfgState) {
+			return {
+				...state,
+				queryApiProviders: [],
+				queryApiProvidersFetching: true,
+				queryApiProvidersError: undefined,
+			}
 		},
-
-		clearBackendToQueryApiProviders(state: AppcfgState) {
-			return { ...state, backendToQueryApi: {} }
-		},
-
-		addBackendToQueryApiProvider(
+		queryApiProvidersSuccess(
 			state: AppcfgState,
-			payload: { backend: string; api: DataApiProvider }
+			queryApiProviders: QueryApiProviderInfo[]
 		) {
 			return {
 				...state,
-				backendToQueryApi: {
-					...state.backendToQueryApi,
-					[payload.backend]: payload.api,
-				},
+				queryApiProviders,
+				queryApiProvidersFetching: false,
 			}
 		},
-
-		setInitialized(state: AppcfgState, initialized: boolean) {
-			return { ...state, initialized }
+		queryApiProvidersFailure(state: AppcfgState, error: Error) {
+			return {
+				...state,
+				queryApiProvidersFetching: false,
+				queryApiProvidersError: error,
+			}
 		},
 	},
 
@@ -49,46 +56,21 @@ export const appcfg = createModel({
 		return {
 			async init() {
 				const urls = window.DatabufferUi.QUERY_API.split(/\s+/)
-				dispatch.appcfg.setQueryUrls(urls)
-			},
 
-			async setQueryUrls() {
-				dispatch.appcfg.setInitialized(false)
-				dispatch.appcfg.clearBackendToQueryApiProviders()
-				const state = store.getState()
-				const urls = appcfgSelectors.queryUrls(state)
+				dispatch.appcfg.queryApiProvidersRequest()
 
-				type ResultItem = {
-					api?: DataApiProvider
-					backends?: string[]
-				}
-				const results: ResultItem[] = new Array(urls.length)
-				async function processApiUrl(url: string, index: number) {
+				async function _processApiUrl(url: string) {
 					const api = await createDataApiProvider(url)
-					const backends = await api.listBackends()
-					results[index] = { api, backends }
+					const backends = await api?.listBackends()
+					return { url, api, backends }
 				}
 
-				await Promise.all(urls.map((url, index) => processApiUrl(url, index)))
-
-				// Now, that all API providers have been created and queried for
-				// their backends, setup the mappinig from backends to API providers.
-				// Process them in the order of the original config setting of the
-				// URLs, i.e. the first one that provides a backend wins (for that backend).
-				const seenBackends = new Set<string>()
-				for (const x of results) {
-					if (!x.api) continue // skip if no API provider could be created
-					if (!x.backends) continue // skip if backends could not be queried
-					for (const backend of x.backends) {
-						if (seenBackends.has(backend)) continue // skip if we alread added this backend
-						seenBackends.add(backend)
-						dispatch.appcfg.addBackendToQueryApiProvider({
-							backend,
-							api: x.api,
-						})
-					}
+				try {
+					const apis = await Promise.all(urls.map(url => _processApiUrl(url)))
+					dispatch.appcfg.queryApiProvidersSuccess(apis)
+				} catch (e) {
+					dispatch.appcfg.queryApiProvidersFailure(e as Error)
 				}
-				dispatch.appcfg.setInitialized(true)
 			},
 		}
 	},
@@ -98,17 +80,37 @@ const getState = (state: AppState) => state.appcfg
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace appcfgSelectors {
-	export const initialized = createSelector(
+	export const queryApiProviders = createSelector(
 		[getState],
-		state => state.initialized
+		state => state.queryApiProviders
 	)
-	export const queryUrls = createSelector([getState], state => state.queryUrls)
+
+	export const queryApiProvidersFetching = createSelector(
+		[getState],
+		state => state.queryApiProvidersFetching
+	)
+
+	export const queryApiProvidersError = createSelector(
+		[getState],
+		state => state.queryApiProvidersError
+	)
+
 	export const backendToQueryApi = createSelector(
-		[getState],
-		state => state.backendToQueryApi
+		[queryApiProviders],
+		queryApiProviders => {
+			const result = new Map<string, DataApiProvider>()
+			queryApiProviders.forEach(item => {
+				for (const backend of item.backends) {
+					if (result.has(backend)) continue
+					result.set(backend, item.api)
+				}
+			})
+			return result
+		}
 	)
+
 	export const availableBackends = createSelector(
 		[backendToQueryApi],
-		backendToQueryApi => Object.keys(backendToQueryApi)
+		backendToQueryApi => [...backendToQueryApi.keys()].sort()
 	)
 }

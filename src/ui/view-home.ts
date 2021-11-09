@@ -18,7 +18,9 @@ export class HomeElement extends connect(store, LitElement) {
 	@state()
 	availableBackends: string[] = []
 	@state()
-	initialized: boolean = false
+	queryApiProvidersFetching: boolean = false
+	@state()
+	queryApiProvidersError?: Error
 
 	@query('#query')
 	private __query!: TextField
@@ -26,7 +28,9 @@ export class HomeElement extends connect(store, LitElement) {
 	mapState(state: AppState) {
 		return {
 			availableBackends: appcfgSelectors.availableBackends(state),
-			initialized: appcfgSelectors.initialized(state),
+			queryApiProvidersFetching:
+				appcfgSelectors.queryApiProvidersFetching(state),
+			queryApiProvidersError: appcfgSelectors.queryApiProvidersError(state),
 			pattern: channelsearchSelectors.pattern(state),
 		}
 	}
@@ -63,9 +67,14 @@ export class HomeElement extends connect(store, LitElement) {
 
 					<div style="margin-top:3rem">
 						<p>Available backends:</p>
-						<p ?hidden=${this.initialized}>Loading backend data...</p>
+						<p ?hidden=${!this.queryApiProvidersFetching}>
+							Loading backend data...
+						</p>
+						<p ?hidden=${this.queryApiProvidersError === undefined}>
+							Could not connect to query API providers
+						</p>
 						<daq-pill-list
-							?hidden=${!this.initialized}
+							?hidden=${this.queryApiProvidersFetching}
 							.value=${this.availableBackends}
 						></daq-pill-list>
 					</div>

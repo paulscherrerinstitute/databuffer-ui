@@ -343,7 +343,7 @@ export const plot = createModel({
 					})
 					const channelId = channelToId(channel)
 					try {
-						const api = queryApis[channel.backend]
+						const api = queryApis.get(channel.backend)
 						if (!api) {
 							dispatch.applog.log(
 								make_error(`no api provider for ${channelId}`)

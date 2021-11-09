@@ -2,21 +2,19 @@ import { ChannelConfigsQuery } from '@paulscherrerinstitute/databuffer-query-js/
 import { createModel, RoutingState } from '@captaincodeman/rdx'
 import { createSelector } from 'reselect'
 import { EffectsStore, AppState } from '../store'
-import { queryRestApi } from '../../api/queryrest'
+import type { DataApiProvider } from '../../api/queryrest'
 import { ROUTE } from '../routing'
 import {
 	channelToId,
 	compareNameThenBackend,
 	DataUiChannel,
 } from '../../shared/channel'
+import { appcfgSelectors } from './appcfg'
 
 export type IdToChannelMap = { [id: string]: DataUiChannel }
 
 export interface ChannelSearchState {
 	pattern: string
-	availableBackends: string[]
-	availableBackendsFetching: boolean
-	availableBackendsError?: Error
 	selectedBackends: string[]
 	entities: IdToChannelMap
 	ids: string[]
@@ -83,8 +81,18 @@ export const channelsearch = createModel({
 					dispatch.routing.push('/search')
 				}
 				try {
-					// eslint-disable-next-line @typescript-eslint/no-use-before-define
-					const entities = await _searchChannel(query)
+					const apis = appcfgSelectors
+						.queryApiProviders(store.getState())
+						.map(x => x.api)
+					// first query all api providers
+					const allEntities = await Promise.all(
+						apis.map(api => _searchChannel(query, api))
+					)
+					// then remove duplicates
+					const entities = allEntities.reduce(
+						(prev, curr) => ({ ...curr, ...prev }),
+						{}
+					)
 					dispatch.channelsearch.searchSuccess(entities)
 				} catch (err) {
 					dispatch.channelsearch.searchFailure(err)
@@ -106,9 +114,10 @@ export const channelsearch = createModel({
 })
 
 export async function _searchChannel(
-	query: ChannelConfigsQuery
+	query: ChannelConfigsQuery,
+	api: DataApiProvider
 ): Promise<IdToChannelMap> {
-	const channels = await queryRestApi.searchChannels(query.regex)
+	const channels = await api.searchChannels(query.regex)
 	const result: IdToChannelMap = {}
 	for (const ch of channels) {
 		const id = channelToId(ch)
