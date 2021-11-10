@@ -53,6 +53,23 @@ export function initChart(container: HTMLElement) {
 			crosshair: true,
 			startOnTick: false,
 			endOnTick: false,
+			dateTimeLabelFormats: {
+				day: '%Y-%m-%d',
+				week: '%Y-%m-%d',
+				month: '%Y-%m-%d',
+				year: '%Y-%m-%d',
+			},
+			labels: {
+				formatter: function () {
+					let fmt = this.dateTimeLabelFormat as string
+					if (this.isFirst) {
+						if (!fmt.startsWith('%Y-%m-%d')) {
+							fmt = '%Y-%m-%d ' + fmt
+						}
+					}
+					return Highcharts.dateFormat(fmt, this.value as number)
+				},
+			},
 		},
 		time: {
 			useUTC: false,
