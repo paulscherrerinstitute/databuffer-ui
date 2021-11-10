@@ -8,11 +8,20 @@ import { TimeRange } from '../../util'
 // see https://www.highcharts.com/forum/viewtopic.php?t=35113
 highchartsMore(Highcharts)
 
+// specify colors as hex string
+// if it is set as "hsl(...)" the opacity of the min/max area plot won't work anymore
+const DATA_UI_COLORS = [
+	'#990000', // dark red
+	'#009900', // dark green
+	'#000099', // dark blue
+	'#996600', // brown
+	'#009999', // teal
+	'#990099', // purple
+]
+
 export function getColor(idx: number | undefined): string | undefined {
 	if (idx === undefined) return undefined
-	const colors = Highcharts.getOptions().colors
-	if (colors) return colors[idx]
-	return '#000000'
+	return DATA_UI_COLORS[idx % DATA_UI_COLORS.length]
 }
 
 export function initChart(container: HTMLElement) {
@@ -91,6 +100,7 @@ export function yAxis2HighchartsYAxisOptions(yAxes: YAxis[]) {
 			max: y.max,
 			opposite: y.side !== 'left',
 			lineColor: color,
+			lineWidth: 1,
 			labels: {
 				format: `{value}${y.unit ? ' ' + y.unit : ''}`,
 				style: { color },
