@@ -3,7 +3,7 @@
 import { RoutingState } from '@captaincodeman/rdx'
 import { parseISO } from 'date-fns'
 
-import { queryRestApi } from '../../../api/queryrest'
+import type { DataApiProvider } from '../../../api/queryrest'
 import {
 	channelToId,
 	DataUiChannel,
@@ -120,10 +120,11 @@ export const extractPreselectParams = (
 
 async function getChannelConfig(
 	backend: string,
-	name: string
+	name: string,
+	api: DataApiProvider
 ): Promise<DataUiChannel | undefined> {
 	const re = `^${name}$`
-	const temp = await queryRestApi.searchChannels(re)
+	const temp = await api.searchChannels(re)
 	for (const it of temp) {
 		if (it.backend !== backend) continue
 		if (it.name !== name) continue
@@ -167,7 +168,8 @@ async function configureDataSeries(
  */
 export async function handleRoutePreselect(
 	dispatch: AppDispatch,
-	routingState: RoutingState<ROUTE>
+	routingState: RoutingState<ROUTE>,
+	queryApiMap: Map<string, DataApiProvider>
 ) {
 	// if there are no query params, start over at home view
 	const params = extractPreselectParams(routingState.queries)
@@ -186,7 +188,18 @@ export async function handleRoutePreselect(
 	}
 
 	const configPromises = params.items.map(async item => {
-		const c = await getChannelConfig(item.channel.backend, item.channel.name)
+		const api = queryApiMap.get(item.channel.backend)
+		if (!api) {
+			dispatch.applog.log(
+				make_info(`no api configured for: ${channelToId(item.channel)}`)
+			)
+			return undefined
+		}
+		const c = await getChannelConfig(
+			item.channel.backend,
+			item.channel.name,
+			api
+		)
 		if (!c) {
 			dispatch.applog.log(
 				make_info(`channel not found: ${channelToId(item.channel)}`)

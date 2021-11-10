@@ -91,3 +91,32 @@ export function timeRangeWeek(baseDate: number): TimeRange {
 		.setHours(23, 59, 59, 999)
 	return { start, end }
 }
+
+/**
+ * Promise that will wait until a callback function returns `true`
+ *
+ * The time between iterations will increase between `options.sleepStart` up to `options.sleepMax`
+ *
+ * @param checkCallback callback function that will be called to determine, if we're done or not
+ * @param options
+ */
+export async function waitUntil(
+	checkCallback: () => boolean,
+	options = { sleepStart: 100, sleepFactor: 2, sleepMax: 5000 }
+): Promise<void> {
+	let done = checkCallback()
+	if (done) return
+
+	// sanitize options
+	let { sleepStart, sleepFactor, sleepMax } = options
+	if (sleepStart < 50) sleepStart = 50
+	if (sleepFactor < 1.0) sleepFactor = 1.0
+	if (sleepMax < sleepStart) sleepMax = sleepStart
+
+	let sleep = sleepStart
+	while (!done) {
+		await new Promise<void>(resolve => setTimeout(resolve, sleep))
+		done = checkCallback()
+		sleep = Math.min(sleep * 2, sleepMax)
+	}
+}

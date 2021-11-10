@@ -8,6 +8,7 @@ import '@paulscherrerinstitute/databuffer-web-components/daq-pill-list'
 import { store, AppState } from '../state/store'
 
 import { channelsearchSelectors } from '../state/models/channelsearch'
+import { appcfgSelectors } from '../state/models/appcfg'
 
 @customElement('view-home')
 export class HomeElement extends connect(store, LitElement) {
@@ -17,20 +18,19 @@ export class HomeElement extends connect(store, LitElement) {
 	@state()
 	availableBackends: string[] = []
 	@state()
-	availableBackendsFetching: boolean = false
+	queryApiProvidersFetching: boolean = false
 	@state()
-	availableBackendsError?: Error = undefined
+	queryApiProvidersError?: Error
 
 	@query('#query')
 	private __query!: TextField
 
 	mapState(state: AppState) {
 		return {
-			availableBackends: channelsearchSelectors.availableBackends(state),
-			availableBackendsFetching:
-				channelsearchSelectors.availableBackendsFetching(state),
-			availableBackendsError:
-				channelsearchSelectors.availableBackendsError(state),
+			availableBackends: appcfgSelectors.availableBackends(state),
+			queryApiProvidersFetching:
+				appcfgSelectors.queryApiProvidersFetching(state),
+			queryApiProvidersError: appcfgSelectors.queryApiProvidersError(state),
 			pattern: channelsearchSelectors.pattern(state),
 		}
 	}
@@ -67,14 +67,16 @@ export class HomeElement extends connect(store, LitElement) {
 
 					<div style="margin-top:3rem">
 						<p>Available backends:</p>
-						<p ?hidden=${!this.availableBackendsFetching}>Loading...</p>
+						<p ?hidden=${!this.queryApiProvidersFetching}>
+							Loading backend data...
+						</p>
+						<p ?hidden=${this.queryApiProvidersError === undefined}>
+							Could not connect to query API providers
+						</p>
 						<daq-pill-list
-							?hidden=${this.availableBackendsFetching}
+							?hidden=${this.queryApiProvidersFetching}
 							.value=${this.availableBackends}
 						></daq-pill-list>
-						<p ?hidden=${this.availableBackendsError === undefined}>
-							There was an error fetching the backends from the API
-						</p>
 					</div>
 				</div>
 			</div>
