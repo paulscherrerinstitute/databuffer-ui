@@ -69,7 +69,7 @@
 		"@material/mwc-snackbar": "^0.22.1",
 		"@material/mwc-textfield": "^0.22.1",
 		"@material/mwc-top-app-bar-fixed": "^0.22.1",
-		"@paulscherrerinstitute/databuffer-query-js": "^0.7.1",
+		"@paulscherrerinstitute/databuffer-query-js": "^0.7.2",
 		"@paulscherrerinstitute/databuffer-web-components": "^1.0.2",
 		"@types/jest": "^27.0.1",
 		"date-fns": "^2.23.0",
