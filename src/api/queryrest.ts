@@ -195,7 +195,3 @@ export class ApiV0QueryProvider implements DataApiProvider {
 		return result
 	}
 }
-
-export const queryRestApi = new ApiV0QueryProvider(
-	window.DatabufferUi.QUERY_API
-)
