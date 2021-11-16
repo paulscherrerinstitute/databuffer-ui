@@ -26,3 +26,7 @@ The reference material provides **detailed information** where appropriate. Thes
 
 - [URL parameters for `/preselect`](./reference/url_params_preselect.md)
 - [View: Plot Settings](./reference/view_plot_settings.md)
+
+## Maintainer documentation
+
+- [Reverse engineering the index plot](./maintainers/indexplot-reverseengineering.md)
