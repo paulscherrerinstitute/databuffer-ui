@@ -1,7 +1,39 @@
-# Reverse Engineering for the index plot
+# Reverse Engineering for the index plot  <!-- omit in toc -->
 
 This documentation is the protocol of reverse engineering the details of how the index plot feature works in Data UI v2.7.
 You can [check out the related issue on GitHub](https://github.com/paulscherrerinstitute/databuffer-ui/issues/19).
+
+- [Step 1: Overview plot](#step-1-overview-plot)
+	- [Query 1](#query-1)
+		- [Request](#request)
+		- [Response](#response)
+	- [Query 2](#query-2)
+		- [Request](#request-1)
+		- [Response](#response-1)
+- [Step 2: Index plot](#step-2-index-plot)
+	- [Query 1](#query-1-1)
+		- [Request](#request-2)
+		- [Response](#response-2)
+	- [Query 2](#query-2-1)
+		- [Request](#request-3)
+		- [Response](#response-3)
+	- [Query 3](#query-3)
+		- [Request](#request-4)
+		- [Response](#response-4)
+- [Step 3: Move inside bin](#step-3-move-inside-bin)
+	- [Query 1](#query-1-2)
+		- [Request](#request-5)
+		- [Response](#response-5)
+- [Step 4: Move to next bin](#step-4-move-to-next-bin)
+	- [Query 1](#query-1-3)
+		- [Request](#request-6)
+		- [Response](#response-6)
+	- [Query 2](#query-2-2)
+		- [Request](#request-7)
+		- [Response](#response-7)
+	- [Query 3](#query-3-1)
+		- [Request](#request-8)
+		- [Response](#response-8)
 
 ## Step 1: Overview plot
 
