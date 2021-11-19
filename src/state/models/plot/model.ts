@@ -355,7 +355,7 @@ export const plot = createModel({
 						const response =
 							channel.dataType === 'string'
 								? await api.queryStringData(channel, startDate, endDate)
-								: await api.queryData(channel, startDate, endDate)
+								: await api.queryBinnedData(channel, startDate, endDate)
 						dispatch.plot.drawPlotSuccess({
 							index,
 							timestamp: Date.now(),

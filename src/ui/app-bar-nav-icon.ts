@@ -38,6 +38,7 @@ export class AppBarNavIconElement extends connect(store, LitElement) {
 		[ROUTE.CHANNEL_SEARCH]: `/`,
 		[ROUTE.PLOT]: `/search`,
 		[ROUTE.PLOT_SETTINGS]: `/plot`,
+		[ROUTE.INDEX_PLOT]: `/plot`,
 		[ROUTE.QUERY_META]: `/plot`,
 	}
 

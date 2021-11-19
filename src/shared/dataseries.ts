@@ -14,3 +14,5 @@ export interface DataUiDataSeries<X, Y> {
 	name: string
 	datapoints: DataUiDataPoint<X, Y>[]
 }
+
+export type MinMax = { min: number; max: number }

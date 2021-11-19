@@ -1,5 +1,6 @@
 import Highcharts from 'highcharts'
 import highchartsMore from 'highcharts/highcharts-more'
+import { DataUiChannel } from '../../shared/channel'
 import { DataUiDataPoint, DataUiAggregatedValue } from '../../shared/dataseries'
 import { PlotDataSeries, YAxis } from '../../state/models/plot'
 import { TimeRange } from '../../util'
@@ -139,6 +140,35 @@ export function dataSeries2HighchartsSeriesOptions(
 					pt => [pt.x, categories.indexOf(pt.y)]
 				)
 			} else {
+				if (ds.channel.dataShape === 'waveform') {
+					opts.events = {
+						click: (e: Highcharts.SeriesClickEventObject) => {
+							const dataPoints = e.point.series.data
+							const n = e.point.index
+							const binStart = e.point.x
+							const binEnd =
+								n === dataPoints.length - 1
+									? e.point.series.chart.xAxis[0].max ?? binStart + 1
+									: dataPoints[n + 1].x
+							const event = new CustomEvent<{
+								channel: DataUiChannel
+								binStart: number
+								binEnd: number
+							}>('highchartspointclick', {
+								composed: true,
+								bubbles: true,
+								cancelable: true,
+								detail: {
+									channel: ds.channel,
+									binStart,
+									binEnd,
+								},
+							})
+							const ret = e.point.series.chart.container.dispatchEvent(event)
+							return ret
+						},
+					}
+				}
 				opts.data = (
 					ds.datapoints as DataUiDataPoint<number, DataUiAggregatedValue>[]
 				).map(pt => [pt.x, pt.y.mean])
