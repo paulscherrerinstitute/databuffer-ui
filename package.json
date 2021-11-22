@@ -67,6 +67,7 @@
 		"@material/mwc-radio": "^0.22.1",
 		"@material/mwc-select": "^0.22.1",
 		"@material/mwc-snackbar": "^0.22.1",
+		"@material/mwc-switch": "^0.22.1",
 		"@material/mwc-textfield": "^0.22.1",
 		"@material/mwc-top-app-bar-fixed": "^0.22.1",
 		"@paulscherrerinstitute/databuffer-query-js": "^0.7.2",
