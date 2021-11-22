@@ -41,6 +41,18 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 			'plot:download'() {
 				store.dispatch.plot.showDownload()
 			},
+			'indexplot:first'() {
+				store.dispatch.indexplot.gotoFirstEvent()
+			},
+			'indexplot:prev'() {
+				store.dispatch.indexplot.gotoPrevEvent()
+			},
+			'indexplot:next'() {
+				store.dispatch.indexplot.gotoNextEvent()
+			},
+			'indexplot:last'() {
+				store.dispatch.indexplot.gotoLastEvent()
+			},
 		}
 	}
 
@@ -73,6 +85,26 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 				title="view query information"
 				icon="info_outline"
 				@click=${() => this.dispatchEvent(new CustomEvent('plot:info'))}
+			></mwc-icon-button>`,
+		[ROUTE.INDEX_PLOT]: html`<mwc-icon-button
+				title="first event"
+				icon="first_page"
+				@click=${() => this.dispatchEvent(new CustomEvent('indexplot:first'))}
+			></mwc-icon-button>
+			<mwc-icon-button
+				title="previous event"
+				icon="chevron_left"
+				@click=${() => this.dispatchEvent(new CustomEvent('indexplot:prev'))}
+			></mwc-icon-button>
+			<mwc-icon-button
+				title="next event"
+				icon="chevron_right"
+				@click=${() => this.dispatchEvent(new CustomEvent('indexplot:next'))}
+			></mwc-icon-button>
+			<mwc-icon-button
+				title="last event"
+				icon="last_page"
+				@click=${() => this.dispatchEvent(new CustomEvent('indexplot:last'))}
 			></mwc-icon-button>`,
 	}
 

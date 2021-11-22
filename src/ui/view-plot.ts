@@ -29,7 +29,7 @@ import './daq-plot/daq-plot-separate-axes'
 import './daq-plot/daq-plot-separate-plots'
 import './daq-plot/daq-plot-single-axis'
 
-import type { TimeRange } from '../util'
+import { formatDate, TimeRange } from '../util'
 import { AppState, store } from '../state/store'
 import {
 	PlotDataSeries,
@@ -254,6 +254,18 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		}
 	}
 
+	private __onHighchartsPointClick(
+		e: CustomEvent<{
+			channel: DataUiChannel
+			binStart: number
+			binEnd: number
+		}>
+	) {
+		store.dispatch.routing.push('/index-plot')
+		const { channel, binStart, binEnd } = e.detail
+		store.dispatch.indexplot.selectChannelAndBin({ channel, binStart, binEnd })
+	}
+
 	render() {
 		return html`
 			${this.__renderShare()} ${this.__renderDownload()}
@@ -267,6 +279,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			></wl-progress-spinner>
 			<div
 				@highchartszoom=${this.__onHighchartsZoom}
+				@highchartspointclick=${this.__onHighchartsPointClick}
 				id="chart"
 				?hidden="${!this.shouldDisplayChart}"
 			>
