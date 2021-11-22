@@ -59,6 +59,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@state() response: DataResponse = []
 	@state() startTime: number = 1
 	@state() endTime: number = 2
+	@state() queryExpansion: boolean = false
 	@state() channels: DataUiChannel[] = []
 	@state() anyRequestErrors: boolean = false
 	@state() pendingRequests: number = 0
@@ -124,6 +125,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			channels: plotSelectors.channels(state),
 			startTime: plotSelectors.startTime(state),
 			endTime: plotSelectors.endTime(state),
+			queryExpansion: plotSelectors.queryExpansion(state),
 			anyRequestErrors: plotSelectors.anyRequestErrors(state),
 			requestDuration: plotSelectors.totalRequestDuration(state),
 			shouldDisplayChart: plotSelectors.shouldDisplayChart(state),

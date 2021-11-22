@@ -59,6 +59,7 @@ export interface PlotState {
 	plotTitle: string
 	startTime: number
 	endTime: number
+	queryExpansion: boolean
 	dataSeries: PlotDataSeries[]
 	yAxes: YAxis[]
 	queryRangeShowing: boolean

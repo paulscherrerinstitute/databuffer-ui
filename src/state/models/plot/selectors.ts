@@ -22,6 +22,10 @@ export const plotVariation = createSelector(
 export const plotTitle = createSelector([getState], state => state.plotTitle)
 export const startTime = createSelector([getState], state => state.startTime)
 export const endTime = createSelector([getState], state => state.endTime)
+export const queryExpansion = createSelector(
+	[getState],
+	state => state.queryExpansion
+)
 export const plotDataSeries = createSelector(
 	[getState],
 	state => state.dataSeries
@@ -109,6 +113,7 @@ export const dialogShareLinkUrl = createSelector(
 		channels,
 		startTime,
 		endTime,
+		queryExpansion,
 		plotTitle,
 		plotVariation,
 	],
@@ -119,6 +124,7 @@ export const dialogShareLinkUrl = createSelector(
 		channels,
 		startTime,
 		endTime,
+		queryExpansion,
 		plotTitle,
 		plotVariation
 	) => {
@@ -147,6 +153,9 @@ export const dialogShareLinkUrl = createSelector(
 			params.push(`endTime=${new Date(endTime).toISOString()}`)
 		} else {
 			params.push(`duration=${endTime - startTime}`)
+		}
+		if (queryExpansion) {
+			params.push('queryExpansion=1')
 		}
 		if (plotTitle) {
 			params.push(`title=${encodeURIComponent(plotTitle)}`)

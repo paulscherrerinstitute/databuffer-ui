@@ -89,6 +89,7 @@ export const extractPreselectDataSeriesConfig = (
 export type PreselectParams = {
 	startTime: number
 	endTime: number
+	queryExpansion: boolean
 	title?: string
 	plotVariation: PlotVariation
 	items: PreselectDataSeriesConfig[]
@@ -98,10 +99,12 @@ export const extractPreselectParams = (
 	q: QueryParams
 ): PreselectParams | undefined => {
 	if (q === undefined) return undefined
+	const queryExpansion = q.queryExpansion === '1'
 	const { startTime, endTime } = extractStartEndTime(q)
 	const p: PreselectParams = {
 		endTime,
 		startTime,
+		queryExpansion,
 		plotVariation: PlotVariation.SeparateAxes,
 		items: [],
 	}
@@ -186,6 +189,7 @@ export async function handleRoutePreselect(
 	if (params.title) {
 		dispatch.plot.changePlotTitle(params.title)
 	}
+	dispatch.plot.setQueryExpansion(params.queryExpansion)
 
 	const configPromises = params.items.map(async item => {
 		const api = queryApiMap.get(item.channel.backend)

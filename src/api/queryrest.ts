@@ -37,7 +37,8 @@ export interface DataApiProvider {
 	queryStringData: (
 		channel: DataUiChannel,
 		start: string,
-		end: string
+		end: string,
+		queryExpansion: boolean
 	) => Promise<DataUiDataSeries<number, string>>
 
 	/**
@@ -70,7 +71,8 @@ export interface DataApiProvider {
 	queryBinnedData: (
 		channel: DataUiChannel,
 		start: string,
-		end: string
+		end: string,
+		queryExpansion: boolean
 	) => Promise<DataUiDataSeries<number, DataUiAggregatedValue>>
 
 	/** search for channels available in the backend */
@@ -192,7 +194,8 @@ export class ApiV0QueryProvider implements DataApiProvider {
 	public async queryStringData(
 		channel: DataUiChannel,
 		start: string,
-		end: string
+		end: string,
+		queryExpansion: boolean = false
 	): Promise<DataUiDataSeries<number, string>> {
 		const id = channelToId(channel)
 		if (channel.dataType !== 'string') {
@@ -203,6 +206,8 @@ export class ApiV0QueryProvider implements DataApiProvider {
 			range: {
 				startDate: start,
 				endDate: end,
+				startExpansion: queryExpansion,
+				endExpansion: queryExpansion,
 			},
 			eventFields: [EventField.GLOBAL_MILLIS, EventField.VALUE],
 		})
@@ -226,7 +231,8 @@ export class ApiV0QueryProvider implements DataApiProvider {
 	public async queryBinnedData(
 		channel: DataUiChannel,
 		start: string,
-		end: string
+		end: string,
+		queryExpansion: boolean = false
 	): Promise<DataUiDataSeries<number, DataUiAggregatedValue>> {
 		const id = channelToId(channel)
 		if (channel.dataType === 'string') {
@@ -237,6 +243,8 @@ export class ApiV0QueryProvider implements DataApiProvider {
 			range: {
 				startDate: start,
 				endDate: end,
+				startExpansion: queryExpansion,
+				endExpansion: queryExpansion,
 			},
 			eventFields: [
 				EventField.GLOBAL_MILLIS,

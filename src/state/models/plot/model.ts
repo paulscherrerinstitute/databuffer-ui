@@ -32,6 +32,7 @@ export const plot = createModel({
 		plotTitle: '',
 		startTime: Date.now() - 60_000,
 		endTime: Date.now(),
+		queryExpansion: false,
 		channels: [],
 		dataRequests: [],
 		yAxes: [],
@@ -221,6 +222,10 @@ export const plot = createModel({
 			}
 		},
 
+		setQueryExpansion(state, queryExpansion: boolean) {
+			return { ...state, queryExpansion }
+		},
+
 		toggleQueryRange(state) {
 			return {
 				...state,
@@ -352,10 +357,23 @@ export const plot = createModel({
 							return
 						}
 						dispatch.applog.log(make_debug(`querying data for ${channelId}`))
+						const queryExpansion = plotSelectors.queryExpansion(
+							store.getState()
+						)
 						const response =
 							channel.dataType === 'string'
-								? await api.queryStringData(channel, startDate, endDate)
-								: await api.queryBinnedData(channel, startDate, endDate)
+								? await api.queryStringData(
+										channel,
+										startDate,
+										endDate,
+										queryExpansion
+								  )
+								: await api.queryBinnedData(
+										channel,
+										startDate,
+										endDate,
+										queryExpansion
+								  )
 						dispatch.plot.drawPlotSuccess({
 							index,
 							timestamp: Date.now(),
