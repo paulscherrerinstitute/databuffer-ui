@@ -77,7 +77,7 @@ export function initChart(container: HTMLElement) {
 							fmt = '%Y-%m-%d ' + fmt
 						}
 					}
-					return Highcharts.dateFormat(fmt, this.value as number)
+					return this.chart.time.dateFormat(fmt, this.value as number)
 				},
 			},
 		},
