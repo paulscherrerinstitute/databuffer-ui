@@ -11,14 +11,11 @@ import {
 
 import { baseStyles } from './shared-styles'
 import { connect } from '@captaincodeman/rdx'
-import '@material/mwc-formfield'
 import '@material/mwc-list/mwc-list-item'
 import '@material/mwc-select'
-import '@material/mwc-switch'
 import '@material/mwc-textfield'
 import { TextField } from '@material/mwc-textfield'
 import { Select } from '@material/mwc-select'
-import type { Switch } from '@material/mwc-switch'
 import { DataUiChannel } from '../shared/channel'
 
 @customElement('view-plot-settings')
@@ -28,7 +25,6 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 	@state() plotVariation: PlotVariation = PlotVariation.SeparateAxes
 	@state() plotTitle: string = ''
 	@state() yAxes: YAxis[] = []
-	@state() queryExpansion: boolean = false
 
 	mapState(state: AppState) {
 		return {
@@ -37,7 +33,6 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 			plotVariation: plotSelectors.plotVariation(state),
 			plotTitle: plotSelectors.plotTitle(state),
 			yAxes: plotSelectors.yAxes(state),
-			queryExpansion: plotSelectors.queryExpansion(state),
 		}
 	}
 
@@ -75,18 +70,8 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 					?selected=${this.plotVariation === PlotVariation.SeparatePlots}
 					.value=${PlotVariation.SeparatePlots}
 					>Separate plots</mwc-list-item
-				> </mwc-select
-			><br />
-			<mwc-formfield label="query expansion">
-				<mwc-switch
-					?checked=${this.queryExpansion}
-					@change=${(e: Event) => {
-						if (e.target === null) return
-						const val = (e.target as Switch).checked
-						store.dispatch.plot.setQueryExpansion(val)
-					}}
-				></mwc-switch>
-			</mwc-formfield>
+				>
+			</mwc-select>
 			<h2>Data series and axes</h2>
 			<table>
 				<tr>

@@ -1,6 +1,9 @@
 import { connect } from '@captaincodeman/rdx'
 import '@material/mwc-textfield'
 import type { TextField } from '@material/mwc-textfield'
+import '@material/mwc-formfield'
+import '@material/mwc-switch'
+import type { Switch } from '@material/mwc-switch'
 import * as datefns from 'date-fns'
 import {
 	LitElement,
@@ -33,6 +36,7 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 	@state() canPlot: boolean = false
 	@state() startTime: number = 1
 	@state() endTime: number = 2
+	@state() queryExpansion: boolean = false
 
 	@query('#quickdial')
 	private __quickDial!: Popover
@@ -47,6 +51,7 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 		return {
 			startTime: plotSelectors.startTime(state),
 			endTime: plotSelectors.endTime(state),
+			queryExpansion: plotSelectors.queryExpansion(state),
 		}
 	}
 
@@ -162,6 +167,16 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 						icon="more_horiz"
 						label="quick-dial"
 					></mwc-icon-button>
+					<mwc-formfield label="query expansion">
+						<mwc-switch
+							?checked=${this.queryExpansion}
+							@change=${(e: Event) => {
+								if (e.target === null) return
+								const val = (e.target as Switch).checked
+								store.dispatch.plot.setQueryExpansion(val)
+							}}
+						></mwc-switch>
+					</mwc-formfield>
 					<mwc-button
 						@click=${() => dispatch.plot.drawPlot()}
 						?disabled=${!this.canPlot}
@@ -256,7 +271,9 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 				}
 				#buttons {
 					margin: 8px 0;
-					display: inline;
+					display: inline-flex;
+					flex-direction: row;
+					align-items: center;
 				}
 				#quickdial {
 					max-height: 80vh;
