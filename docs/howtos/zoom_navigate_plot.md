@@ -24,4 +24,6 @@ While zoomed in, you can move the zoomed in area around by holding the <kbd>shif
 
 If you hold down the <kbd>Ctrl</kbd> key (<kbd>Cmd</kbd> on Mac computers) while dragging the rectangle to zoom in, _databuffer UI_ will **fetch new data**. The left and right edges will become the new _Start_ and _End_ of the plot range, and a new query is sent for data. That means, that for aggregated data, your number of data points per bin will go down, and hence actually your **plot's accuracy increases**. In the animation you can see, that the inital data is aggregated: A band is showing the min and max values, and the tooltip on the data points shows a bin size of 8. After zooming in with fetching data, the displayed data are raw single data points, without aggregation.
 
+**Please note**, that this operation is not available for the index plot of a wave form, as that already displays raw data.
+
 ![zoom with fetch](../images/zoom_with_fetch.gif)
