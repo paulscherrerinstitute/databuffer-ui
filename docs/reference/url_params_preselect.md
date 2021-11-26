@@ -78,6 +78,17 @@ The variation of plot to be used. Only specific constant values are supported:
 
 Any other value is being ignored and results in using the default.
 
+## queryExpansion
+
+Enable query expansion by setting to `1`. With query expansion enabled, the query range will be extended to include 1 data point before the start time, and 1 data point after the end time if these data points exist. This effectively connects the line plot to the left and right edges of the chart in case of sparse data points.
+
+Examples:
+
+| Example                         | meaning                     |
+| ------------------------------- | --------------------------- |
+| `1`                             | query expansion is enabled  |
+| any other value, or not present | query expansion is disabled |
+
 ## startTime
 
 Start time of the plot as an absolute timestamp in one of those formats:
