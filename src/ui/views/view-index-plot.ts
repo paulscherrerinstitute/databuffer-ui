@@ -1,13 +1,13 @@
 import { css, customElement, html, LitElement, state } from 'lit-element'
 import { connect } from '@captaincodeman/rdx'
 
-import { AppState, store } from '../state/store'
-import { indexplotSelectors } from '../state/models/indexplot'
-import { MinMax } from '../shared/dataseries'
-import { formatDate } from '../util'
-import { baseStyles } from './shared-styles'
+import { AppState, store } from '../../state/store'
+import { indexplotSelectors } from '../../state/models/indexplot'
+import { MinMax } from '../../shared/dataseries'
+import { formatDate } from '../../util'
+import { baseStyles } from '../shared-styles'
 
-import './daq-plot/daq-index-plot'
+import '../daq-plot/daq-index-plot'
 
 @customElement('view-index-plot')
 export class ViewIndexPlotElement extends connect(store, LitElement) {

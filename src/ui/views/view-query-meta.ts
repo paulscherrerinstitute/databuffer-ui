@@ -1,12 +1,12 @@
 import { LitElement, customElement, html, state, css } from 'lit-element'
 
-import { formatDate } from '../util'
-import { AppState, store } from '../state/store'
-import { PlotDataSeries, plotSelectors } from '../state/models/plot'
+import { formatDate } from '../../util'
+import { AppState, store } from '../../state/store'
+import { PlotDataSeries, plotSelectors } from '../../state/models/plot'
 
-import { baseStyles } from './shared-styles'
+import { baseStyles } from '../shared-styles'
 import { connect } from '@captaincodeman/rdx'
-import { channelToId, DataUiChannel } from '../shared/channel'
+import { channelToId, DataUiChannel } from '../../shared/channel'
 
 @customElement('view-query-meta')
 export class QueryMetaElement extends connect(store, LitElement) {

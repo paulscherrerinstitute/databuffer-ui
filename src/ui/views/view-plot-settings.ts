@@ -1,22 +1,22 @@
 import { LitElement, customElement, html, state, css } from 'lit-element'
 
-import { AppState, store } from '../state/store'
+import { AppState, store } from '../../state/store'
 import {
 	YAxis,
 	YAxisType,
 	plotSelectors,
 	PlotVariation,
 	PlotDataSeries,
-} from '../state/models/plot'
+} from '../../state/models/plot'
 
-import { baseStyles } from './shared-styles'
+import { baseStyles } from '../shared-styles'
 import { connect } from '@captaincodeman/rdx'
 import '@material/mwc-list/mwc-list-item'
 import '@material/mwc-select'
 import '@material/mwc-textfield'
 import { TextField } from '@material/mwc-textfield'
 import { Select } from '@material/mwc-select'
-import { DataUiChannel } from '../shared/channel'
+import { DataUiChannel } from '../../shared/channel'
 
 @customElement('view-plot-settings')
 export class PlotSettingsElement extends connect(store, LitElement) {

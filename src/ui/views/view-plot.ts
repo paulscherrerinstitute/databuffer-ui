@@ -25,28 +25,28 @@ import { Radio } from '@material/mwc-radio'
 import '@material/mwc-textfield'
 import '@material/mwc-snackbar'
 import { Snackbar } from '@material/mwc-snackbar'
-import './daq-plot/daq-plot-separate-axes'
-import './daq-plot/daq-plot-separate-plots'
-import './daq-plot/daq-plot-single-axis'
+import '../daq-plot/daq-plot-separate-axes'
+import '../daq-plot/daq-plot-separate-plots'
+import '../daq-plot/daq-plot-single-axis'
 
-import { formatDate, TimeRange } from '../util'
-import { AppState, store } from '../state/store'
+import { formatDate, TimeRange } from '../../util'
+import { AppState, store } from '../../state/store'
 import {
 	PlotDataSeries,
 	DownloadAggregation,
 	plotSelectors,
 	PlotVariation,
 	YAxis,
-} from '../state/models/plot'
+} from '../../state/models/plot'
 
-import type { DataResponse } from '../api/queryrest'
-import { baseStyles } from './shared-styles'
+import type { DataResponse } from '../../api/queryrest'
+import { baseStyles } from '../shared-styles'
 import { connect } from '@captaincodeman/rdx'
-import type { DaqPlotSingleAxisElement } from './daq-plot/daq-plot-single-axis'
-import type { DaqPlotSeparateAxesElement } from './daq-plot/daq-plot-separate-axes'
-import type { DaqPlotSeparatePlotsElement } from './daq-plot/daq-plot-separate-plots'
-import './daq-range-select'
-import type { DataUiChannel } from '../shared/channel'
+import type { DaqPlotSingleAxisElement } from '../daq-plot/daq-plot-single-axis'
+import type { DaqPlotSeparateAxesElement } from '../daq-plot/daq-plot-separate-axes'
+import type { DaqPlotSeparatePlotsElement } from '../daq-plot/daq-plot-separate-plots'
+import '../daq-range-select'
+import type { DataUiChannel } from '../../shared/channel'
 
 const IS_MAC = window.navigator.appVersion.toLowerCase().indexOf('mac') >= 0
 const KEY_RELOAD_ZOOM = IS_MAC ? 'Meta' : 'Control'

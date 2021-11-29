@@ -5,10 +5,10 @@ import '@material/mwc-textfield'
 import { TextField } from '@material/mwc-textfield'
 import '@paulscherrerinstitute/databuffer-web-components/daq-pill-list'
 
-import { store, AppState } from '../state/store'
+import { store, AppState } from '../../state/store'
 
-import { channelsearchSelectors } from '../state/models/channelsearch'
-import { appcfgSelectors } from '../state/models/appcfg'
+import { channelsearchSelectors } from '../../state/models/channelsearch'
+import { appcfgSelectors } from '../../state/models/appcfg'
 
 @customElement('view-home')
 export class HomeElement extends connect(store, LitElement) {

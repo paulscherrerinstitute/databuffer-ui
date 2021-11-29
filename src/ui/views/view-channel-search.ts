@@ -18,14 +18,14 @@ import type { Snackbar } from '@material/mwc-snackbar'
 import '@material/mwc-textfield'
 import type { TextField } from '@material/mwc-textfield'
 
-import type { DataUiChannel } from '../shared/channel'
-import { AppState, store } from '../state/store'
-import { channelsearchSelectors } from '../state/models/channelsearch'
+import type { DataUiChannel } from '../../shared/channel'
+import { AppState, store } from '../../state/store'
+import { channelsearchSelectors } from '../../state/models/channelsearch'
 import { TemplateResult } from 'lit-html'
 
-import './channel-search-result-list'
-import './channel-search-selected-list'
-import { baseStyles } from './shared-styles'
+import '../channel-search-result-list'
+import '../channel-search-selected-list'
+import { baseStyles } from '../shared-styles'
 import { connect } from '@captaincodeman/rdx'
 
 const MAX_NUM_RESULTS = 100

@@ -1,5 +1,5 @@
 import { customElement, html, LitElement } from 'lit-element'
-import { baseStyles } from './shared-styles'
+import { baseStyles } from '../shared-styles'
 
 @customElement('view-not-found')
 export class ViewNotFoundElement extends LitElement {

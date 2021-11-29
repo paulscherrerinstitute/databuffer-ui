@@ -1,0 +1,8 @@
+import './view-channel-search'
+import './view-home'
+import './view-index-plot'
+import './view-not-found'
+import './view-plot-settings'
+import './view-plot'
+import './view-preselect'
+import './view-query-meta'

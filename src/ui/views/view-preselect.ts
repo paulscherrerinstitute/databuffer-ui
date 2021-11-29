@@ -1,5 +1,5 @@
 import { customElement, css, html, LitElement } from 'lit-element'
-import { baseStyles } from './shared-styles'
+import { baseStyles } from '../shared-styles'
 
 @customElement('view-preselect')
 export class ViewPreselectElement extends LitElement {
