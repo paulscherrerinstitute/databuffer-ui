@@ -62,7 +62,7 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 			this.activeFilters.length === 0
 				? this.searchResults
 				: this.searchResults.filter(x =>
-						this.activeFilters.every(f => x.tags?.indexOf(f) ?? -1 >= 0)
+						this.activeFilters.every(f => (x.tags?.indexOf(f) ?? -1) >= 0)
 				  )
 		).slice(0, this.maxResults)
 	}
