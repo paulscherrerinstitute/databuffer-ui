@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.6.0](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.5.2...v4.6.0) (2021-11-29)
+
+
+### Features
+
+* add index plot to app bar title ([08d08fd](https://github.com/paulscherrerinstitute/databuffer-ui/commit/08d08fd48d3224eaaef88469b5f356e0cc357a58)), closes [#133](https://github.com/paulscherrerinstitute/databuffer-ui/issues/133)
+* add query expansion ([41fb8de](https://github.com/paulscherrerinstitute/databuffer-ui/commit/41fb8de24cfb30382332ffd6b3f708d699fa3b4d)), closes [#12](https://github.com/paulscherrerinstitute/databuffer-ui/issues/12)
+* configure contact email through environment ([56d9827](https://github.com/paulscherrerinstitute/databuffer-ui/commit/56d9827e1d989c5346ddcb92c6efec2e10659fe8)), closes [#121](https://github.com/paulscherrerinstitute/databuffer-ui/issues/121)
+* disable tooltip ([d34bf74](https://github.com/paulscherrerinstitute/databuffer-ui/commit/d34bf74de2fb0b5f028ff7e2e287847f017776e2))
+* display info page while metadata is loading ([c2e0d59](https://github.com/paulscherrerinstitute/databuffer-ui/commit/c2e0d59f66058c57634685d6363ddf80b84b7cec))
+* implement index plot ([738f184](https://github.com/paulscherrerinstitute/databuffer-ui/commit/738f184882b6df8f8a46dc86deb134a14b286b40)), closes [#19](https://github.com/paulscherrerinstitute/databuffer-ui/issues/19)
+* plot string values ([0a06af8](https://github.com/paulscherrerinstitute/databuffer-ui/commit/0a06af8bc01e8042d30b86d5a1d63e3aee512d75)), closes [#45](https://github.com/paulscherrerinstitute/databuffer-ui/issues/45)
+* put date on x axis ([c098d23](https://github.com/paulscherrerinstitute/databuffer-ui/commit/c098d23b7b8c30e3037a98137344fed7a4b3960d)), closes [#97](https://github.com/paulscherrerinstitute/databuffer-ui/issues/97)
+* request data for channels separately ([77cd8d2](https://github.com/paulscherrerinstitute/databuffer-ui/commit/77cd8d2d9e844e050c0ad470c24bc3e579872a62)), closes [#120](https://github.com/paulscherrerinstitute/databuffer-ui/issues/120)
+* simplify highcharts datapoint format ([58d303f](https://github.com/paulscherrerinstitute/databuffer-ui/commit/58d303fa1268c9046466d141042e43d404d90dbc))
+* support multiple api providers ([44f49c3](https://github.com/paulscherrerinstitute/databuffer-ui/commit/44f49c39f92d5b4c1f192a4de769488c4ae326dc)), closes [#124](https://github.com/paulscherrerinstitute/databuffer-ui/issues/124)
+* use darker colours ([818a7ef](https://github.com/paulscherrerinstitute/databuffer-ui/commit/818a7efa86b56a9f7729108b3c5647bc9061a4ec)), closes [#108](https://github.com/paulscherrerinstitute/databuffer-ui/issues/108)
+
+
+### Bug Fixes
+
+* calculate channelsWithoutData correctly ([8f9b995](https://github.com/paulscherrerinstitute/databuffer-ui/commit/8f9b995659647a10231053dd908af714a8f6fbe9))
+* fix broken filter in channel search ([7dd35ea](https://github.com/paulscherrerinstitute/databuffer-ui/commit/7dd35ea272dfa4c37c0f409c51f16a9aabeeb1fb)), closes [#137](https://github.com/paulscherrerinstitute/databuffer-ui/issues/137)
+* respect UTC setting when formatting date ([223371a](https://github.com/paulscherrerinstitute/databuffer-ui/commit/223371a2e0ef260181b611c0902f0ae319ad98e0)), closes [#131](https://github.com/paulscherrerinstitute/databuffer-ui/issues/131)
+* **deps:** revert to older version of @rollup/plugin-replace ([f875b4a](https://github.com/paulscherrerinstitute/databuffer-ui/commit/f875b4aafd40e183b2ad5a9abdd2401c4d23bab1)), closes [#128](https://github.com/paulscherrerinstitute/databuffer-ui/issues/128)
+* only show snackbar when all requests finished ([c64f448](https://github.com/paulscherrerinstitute/databuffer-ui/commit/c64f4482c17585d14dd9a292826080ac5bcecaf9))
+* reload plot data on zoom with key ([46ed018](https://github.com/paulscherrerinstitute/databuffer-ui/commit/46ed0187b052f21dbd807e3bdd5349740c69bd58)), closes [#73](https://github.com/paulscherrerinstitute/databuffer-ui/issues/73)
+* set dataRequests.fetching on request ([deda7c7](https://github.com/paulscherrerinstitute/databuffer-ui/commit/deda7c7c9df90d2f4be597a33c46efe536b67c69))
+* show snackbar for partial data correctly ([19dcdbb](https://github.com/paulscherrerinstitute/databuffer-ui/commit/19dcdbb3a03f28be0492b5593ef80ee880ac6906))
+* suppres message when there was no request ([f72eabe](https://github.com/paulscherrerinstitute/databuffer-ui/commit/f72eabecb169c10648897f820c1d8ebc8032768b))
+
 ### [4.5.2](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.5.1...v4.5.2) (2021-05-27)
 
 
