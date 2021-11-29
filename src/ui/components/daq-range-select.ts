@@ -17,16 +17,16 @@ import {
 import 'weightless/popover'
 import type { Popover } from 'weightless/popover'
 
-import { AppState, dispatch, store } from '../state/store'
-import { plotSelectors } from '../state/models/plot'
+import { AppState, dispatch, store } from '../../state/store'
+import { plotSelectors } from '../../state/models/plot'
 import {
 	formatDate,
 	TimeRange,
 	timeRangeDay,
 	timeRangeMonth,
 	timeRangeWeek,
-} from '../util'
-import { baseStyles } from './shared-styles'
+} from '../../util'
+import { baseStyles } from '../shared-styles'
 
 const TIMESTAMP_PATTERN = `^\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}\\.\\d{3}$`
 const TIMESTAMP_REGEX = new RegExp(TIMESTAMP_PATTERN)

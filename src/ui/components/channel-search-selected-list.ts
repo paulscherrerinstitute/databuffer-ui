@@ -8,9 +8,9 @@ import 'weightless/list-item'
 
 import './channel-search-selected-item'
 
-import { store, AppState } from '../state/store'
-import { plotSelectors } from '../state/models/plot'
-import { DataUiChannel } from '../shared/channel'
+import { store, AppState } from '../../state/store'
+import { plotSelectors } from '../../state/models/plot'
+import { DataUiChannel } from '../../shared/channel'
 
 @customElement('channel-search-selected-list')
 export class ChannelSearchSelectedListElement extends connect(

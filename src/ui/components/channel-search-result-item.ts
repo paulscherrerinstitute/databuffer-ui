@@ -4,7 +4,7 @@ import type { Checkbox } from 'weightless/checkbox'
 import 'weightless/list-item'
 import '@paulscherrerinstitute/databuffer-web-components/daq-pill'
 import '@paulscherrerinstitute/databuffer-web-components/daq-pill-list'
-import { DataUiChannel } from '../shared/channel'
+import { DataUiChannel } from '../../shared/channel'
 
 @customElement('channel-search-result-item')
 export class ChannelSearchResultItemElement extends LitElement {

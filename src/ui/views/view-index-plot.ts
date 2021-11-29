@@ -7,7 +7,7 @@ import { MinMax } from '../../shared/dataseries'
 import { formatDate } from '../../util'
 import { baseStyles } from '../shared-styles'
 
-import '../daq-plot/daq-index-plot'
+import '../components/daq-index-plot'
 
 @customElement('view-index-plot')
 export class ViewIndexPlotElement extends connect(store, LitElement) {

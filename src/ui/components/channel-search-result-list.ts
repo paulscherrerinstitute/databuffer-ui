@@ -8,7 +8,7 @@ import {
 	PropertyValues,
 } from 'lit-element'
 import { connect } from '@captaincodeman/rdx'
-import { store, AppState } from '../state/store'
+import { store, AppState } from '../../state/store'
 import pluralize from 'pluralize'
 
 import './channel-search-result-item'
@@ -20,10 +20,10 @@ import type {
 	DaqPillListElement,
 	DaqPillListSelectedEvent,
 } from '@paulscherrerinstitute/databuffer-web-components/daq-pill-list'
-import { channelsearchSelectors } from '../state/models/channelsearch'
-import { plotSelectors } from '../state/models/plot'
+import { channelsearchSelectors } from '../../state/models/channelsearch'
+import { plotSelectors } from '../../state/models/plot'
 import { nothing } from 'lit-html'
-import { DataUiChannel } from '../shared/channel'
+import { DataUiChannel } from '../../shared/channel'
 
 function _onChannelRemove(e: CustomEvent<{ index: number }>) {
 	store.dispatch.plot.unselectChannel(e.detail.index)
