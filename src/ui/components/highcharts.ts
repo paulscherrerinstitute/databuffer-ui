@@ -123,7 +123,6 @@ export function dataSeries2HighchartsSeriesOptions(
 ) {
 	const result: Highcharts.SeriesOptionsType[] = []
 	for (const ds of dataSeries) {
-		const isBinned = ds.channel.dataType !== 'string'
 		const color = getColor(ds.yAxisIndex)
 		const opts: Highcharts.SeriesOptionsType = {
 			name: ds.label,
@@ -169,13 +168,19 @@ export function dataSeries2HighchartsSeriesOptions(
 						},
 					}
 				}
-				opts.data = (
-					ds.datapoints as DataUiDataPoint<number, DataUiAggregatedValue>[]
-				).map(pt => [pt.x, pt.y.mean])
+				if (ds.isReduced) {
+					opts.data = (
+						ds.datapoints as DataUiDataPoint<number, DataUiAggregatedValue>[]
+					).map(pt => [pt.x, pt.y.mean])
+				} else {
+					opts.data = (ds.datapoints as DataUiDataPoint<number, number>[]).map(
+						pt => [pt.x, pt.y]
+					)
+				}
 			}
 		}
 		result.push(opts)
-		if (!isBinned) continue
+		if (!ds.isReduced) continue
 		// for binned data series, add a background band with min/max
 		const minMaxSeries: Highcharts.SeriesOptionsType = {
 			name: `${ds.label} - min/max`,

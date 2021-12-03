@@ -32,28 +32,26 @@ export class QueryMetaElement extends connect(store, LitElement) {
 				<thead>
 					<tr>
 						<th>Channel</th>
-						<th>Request sent</th>
-						<th>Request finished</th>
-						<th>Request duration</th>
-						<th>Error</th>
-						<th>Number of data points</th>
+						<th>Data type</th>
+						<th>Data shape</th>
+						<th>Reduced?</th>
+						<th>#plot points</th>
+						<th>#data events</th>
 					</tr>
 				</thead>
 				<tbody>
 					${this.dataSeries.map(
-						(x, idx) => html`<tr>
-							<td>${channelToId(this.channels[idx])}</td>
-							<td>${x.requestSentAt ? formatDate(x.requestSentAt) : ''}</td>
+						x => html`<tr>
+							<td>${channelToId(x.channel)}</td>
+							<td>${x.channel.dataType}</td>
 							<td>
-								${x.requestFinishedAt ? formatDate(x.requestFinishedAt) : ''}
+								${x.channel.dataType === 'string'
+									? 'string'
+									: x.channel.dataShape}
 							</td>
-							<td>
-								${x.requestFinishedAt && x.requestSentAt
-									? (x.requestFinishedAt - x.requestSentAt) / 1000 + ' sec'
-									: ''}
-							</td>
-							<td>${x.error?.message ?? ''}</td>
+							<td>${x.isReduced ? 'Y' : 'N'}</td>
 							<td>${x.datapoints?.length ?? ''}</td>
+							<td>${x.numDatapoints ?? ''}</td>
 						</tr>`
 					)}
 				</tbody>

@@ -8,7 +8,11 @@ import { EffectsStore } from '../../store'
 import { ROUTE } from '../../routing'
 import { make_debug, make_error, make_info } from '../applog'
 import { channelToId, DataUiChannel } from '../../../shared/channel'
-import { DataUiDataPoint, DataUiDataSeries } from '../../../shared/dataseries'
+import {
+	DataUiAggregatedValue,
+	DataUiDataPoint,
+	DataUiDataSeries,
+} from '../../../shared/dataseries'
 
 import {
 	CsvFieldQuotes,
@@ -26,6 +30,7 @@ import { appcfgSelectors } from '../appcfg'
 import { waitUntil } from '../../../util'
 import { createCsvFile, DataUiCsvDataSeries } from './csv'
 import { saveAs } from 'file-saver'
+import { NR_OF_BINS } from '../../../api/queryrest'
 
 // helper functions
 const findIndexOfChannel = (state: PlotState, ch: DataUiChannel): number =>
@@ -173,6 +178,8 @@ export const plot = createModel({
 				requestSentAt: timestamp,
 				requestFinishedAt: undefined,
 				datapoints: undefined,
+				isReduced: undefined,
+				numDatapoints: undefined,
 			}
 			return {
 				...state,
@@ -185,16 +192,23 @@ export const plot = createModel({
 			payload: {
 				index: number
 				timestamp: number
-				datapoints: DataUiDataPoint<number, unknown>[]
+				datapoints: DataUiDataPoint<
+					number,
+					string | number | DataUiAggregatedValue
+				>[]
+				isReduced: boolean
+				numDatapoints: number
 			}
 		) {
-			const { index, timestamp, datapoints } = payload
+			const { index, timestamp, datapoints, isReduced, numDatapoints } = payload
 			const dataSeries = [...state.dataSeries]
 			dataSeries[index] = {
 				...dataSeries[index],
 				fetching: false,
 				requestFinishedAt: timestamp,
-				datapoints: datapoints,
+				datapoints,
+				isReduced,
+				numDatapoints,
 			}
 			const result = {
 				...state,
@@ -383,24 +397,50 @@ export const plot = createModel({
 						const queryExpansion = plotSelectors.queryExpansion(
 							store.getState()
 						)
-						const response =
-							channel.dataType === 'string'
-								? await api.queryStringData(
-										channel,
-										startDate,
-										endDate,
-										queryExpansion
-								  )
-								: await api.queryBinnedData(
-										channel,
-										startDate,
-										endDate,
-										queryExpansion
-								  )
+						let response: DataUiDataSeries<
+							number,
+							number | string | DataUiAggregatedValue
+						>
+						let isReduced = false
+						let numDatapoints = 0
+						if (channel.dataType === 'string') {
+							response = await api.queryStringData(
+								channel,
+								startDate,
+								endDate,
+								queryExpansion
+							)
+							numDatapoints = response.datapoints.length
+						} else {
+							isReduced = true
+							response = await api.queryBinnedData(
+								channel,
+								startDate,
+								endDate,
+								queryExpansion
+							)
+							numDatapoints = (
+								response as DataUiDataSeries<number, DataUiAggregatedValue>
+							).datapoints
+								.map(item => item.y.count)
+								.reduce((prev, current) => current + prev, 0)
+							if (numDatapoints > 0 && numDatapoints < NR_OF_BINS) {
+								isReduced = false
+								response = await api.queryRawData(
+									channel,
+									startDate,
+									endDate,
+									queryExpansion
+								)
+								numDatapoints = response.datapoints.length
+							}
+						}
 						dispatch.plot.drawPlotSuccess({
 							index,
 							timestamp: Date.now(),
 							datapoints: response.datapoints,
+							isReduced,
+							numDatapoints,
 						})
 						dispatch.applog.log(
 							make_debug(`received response for ${channelId}`)

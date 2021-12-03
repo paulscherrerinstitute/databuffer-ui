@@ -1,5 +1,8 @@
 import { DataUiChannel } from '../../../shared/channel'
-import { DataUiDataPoint } from '../../../shared/dataseries'
+import {
+	DataUiAggregatedValue,
+	DataUiDataPoint,
+} from '../../../shared/dataseries'
 
 export enum PlotVariation {
 	/** 1 Y axis for all channels */
@@ -59,7 +62,12 @@ export type PlotDataSeries = {
 	error?: Error
 	requestSentAt?: number
 	requestFinishedAt?: number
-	datapoints?: DataUiDataPoint<number, unknown>[]
+	datapoints?: DataUiDataPoint<
+		number,
+		string | number | DataUiAggregatedValue
+	>[]
+	isReduced?: boolean
+	numDatapoints?: number
 }
 
 export interface PlotState {
