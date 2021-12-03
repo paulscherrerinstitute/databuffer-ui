@@ -16,7 +16,6 @@ export class QueryMetaElement extends connect(store, LitElement) {
 
 	mapState(state: AppState) {
 		return {
-			channels: plotSelectors.channels(state),
 			pendingRequests: plotSelectors.pendingRequests(state),
 			dataSeries: plotSelectors.plotDataSeries(state),
 		}
@@ -26,14 +25,14 @@ export class QueryMetaElement extends connect(store, LitElement) {
 		if (this.pendingRequests > 0)
 			return html`<p>Still ${this.pendingRequests} queries in progress</p>`
 		return html`
-			<h1>Summary</h1>
-			<h2>Data requests</h2>
+			<h1>Query Meta Data</h1>
 			<table>
 				<thead>
 					<tr>
 						<th>Channel</th>
 						<th>Data type</th>
 						<th>Data shape</th>
+						<th>Unit</th>
 						<th>Reduced?</th>
 						<th>#plot points</th>
 						<th>#data events</th>
@@ -42,13 +41,14 @@ export class QueryMetaElement extends connect(store, LitElement) {
 				<tbody>
 					${this.dataSeries.map(
 						x => html`<tr>
-							<td>${channelToId(x.channel)}</td>
+							<td>${channelToId(x.channel)}<br />${x.channel.description}</td>
 							<td>${x.channel.dataType}</td>
 							<td>
 								${x.channel.dataType === 'string'
 									? 'string'
 									: x.channel.dataShape}
 							</td>
+							<td>${x.channel.unit}</td>
 							<td>${x.isReduced ? 'Y' : 'N'}</td>
 							<td>${x.datapoints?.length ?? ''}</td>
 							<td>${x.numDatapoints ?? ''}</td>
