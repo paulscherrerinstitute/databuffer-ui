@@ -20,11 +20,14 @@ import '@material/mwc-button'
 import '@material/mwc-dialog'
 import '@material/mwc-formfield'
 import '@material/mwc-icon-button'
+import '@material/mwc-list/mwc-list-item'
 import '@material/mwc-radio'
-import { Radio } from '@material/mwc-radio'
+import type { Radio } from '@material/mwc-radio'
+import '@material/mwc-select'
+import type { Select } from '@material/mwc-select'
 import '@material/mwc-textfield'
 import '@material/mwc-snackbar'
-import { Snackbar } from '@material/mwc-snackbar'
+import type { Snackbar } from '@material/mwc-snackbar'
 import '../components/daq-plot-separate-axes'
 import '../components/daq-plot-separate-plots'
 import '../components/daq-plot-single-axis'
@@ -33,6 +36,9 @@ import { formatDate, TimeRange } from '../../util'
 import { AppState, store } from '../../state/store'
 import {
 	PlotDataSeries,
+	CsvFieldQuotes,
+	CsvFieldSeparator,
+	CsvLineTerminator,
 	DownloadAggregation,
 	plotSelectors,
 	PlotVariation,
@@ -77,6 +83,9 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@state()
 	dialogDownloadShowing: boolean = false
 	@state() dialogDownloadAggregation!: string
+	@state() csvFieldSeparator!: CsvFieldSeparator
+	@state() csvFieldQuotes!: CsvFieldQuotes
+	@state() csvLineTerminator!: CsvLineTerminator
 	@state() plotVariation!: PlotVariation
 	@state() plotTitle: string = ''
 	@state() plotSubTitle: string = ''
@@ -141,7 +150,9 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				plotSelectors.dialogShareLinkChannelsTruncated(state),
 			dialogDownloadShowing: plotSelectors.dialogDownloadShowing(state),
 			dialogDownloadAggregation: plotSelectors.dialogDownloadAggregation(state),
-			dialogDownloadCurlCommand: plotSelectors.dialogDownloadCurlCommand(state),
+			csvFieldQuotes: plotSelectors.csvFieldQuotes(state),
+			csvFieldSeparator: plotSelectors.csvFieldSeparator(state),
+			csvLineTerminator: plotSelectors.csvLineTerminator(state),
 			plotVariation: plotSelectors.plotVariation(state),
 			plotTitle: plotSelectors.plotTitle(state),
 			plotSubTitle: plotSelectors.plotSubTitle(state),
@@ -411,19 +422,111 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			}}
 		>
 			<div>
+				<mwc-select
+					label="Create data point every"
+					@change=${(e: Event) => {
+						if (e.target === null) return
+						const v = (e.target as Select).value
+						store.dispatch.plot.setDownloadAggregation(v as DownloadAggregation)
+					}}
+				>
+					<mwc-list-item
+						?selected=${this.dialogDownloadAggregation === 'PT5S'}
+						value="PT5S"
+						>5 seconds</mwc-list-item
+					>
+					<mwc-list-item
+						?selected=${this.dialogDownloadAggregation === 'PT1M'}
+						value="PT1M"
+						>1 minute</mwc-list-item
+					>
+					<mwc-list-item
+						?selected=${this.dialogDownloadAggregation === 'PT1H'}
+						value="PT1H"
+						>1 hour</mwc-list-item
+					>
+				</mwc-select>
+				<mwc-select
+					label="Field separator"
+					@change=${(e: Event) => {
+						if (e.target === null) return
+						const v = (e.target as Select).value
+						store.dispatch.plot.setCsvFieldSeparator(v as CsvFieldSeparator)
+					}}
+				>
+					<mwc-list-item
+						value="tab"
+						?selected=${this.csvFieldSeparator === 'tab'}
+						>Tab</mwc-list-item
+					>
+					<mwc-list-item
+						value="comma"
+						?selected=${this.csvFieldSeparator === 'comma'}
+						>Comma</mwc-list-item
+					>
+					<mwc-list-item
+						value="semicolon"
+						?selected=${this.csvFieldSeparator === 'semicolon'}
+						>Semicolon</mwc-list-item
+					>
+				</mwc-select>
+				<mwc-select
+					label="Field quotes"
+					@change=${(e: Event) => {
+						if (e.target === null) return
+						const v = (e.target as Select).value
+						store.dispatch.plot.setCsvFieldQuotes(v as CsvFieldQuotes)
+					}}
+				>
+					<mwc-list-item
+						value="none"
+						?selected=${this.csvFieldQuotes === 'none'}
+						>None</mwc-list-item
+					>
+					<mwc-list-item
+						value="double"
+						?selected=${this.csvFieldQuotes === 'double'}
+						>Double quotes</mwc-list-item
+					>
+					<mwc-list-item
+						value="single"
+						?selected=${this.csvFieldQuotes === 'single'}
+						>Single quotes</mwc-list-item
+					>
+				</mwc-select>
+				<mwc-select
+					label="Line ends"
+					@change=${(e: Event) => {
+						if (e.target === null) return
+						const v = (e.target as Select).value
+						store.dispatch.plot.setCsvLineTerminator(v as CsvLineTerminator)
+					}}
+				>
+					<mwc-list-item
+						value="crlf"
+						?selected=${this.csvLineTerminator === 'crlf'}
+						>Windows (CR LF)</mwc-list-item
+					>
+					<mwc-list-item value="lf" ?selected=${this.csvLineTerminator === 'lf'}
+						>Unix (LF)</mwc-list-item
+					>
+				</mwc-select>
 				<p>
-					We are very sorry, but the download feature is disabled while we are
-					migrating API versions.
+					<strong>Please note</strong> that you are about to fetch
+					<strong>raw data</strong> from the data API. Depending on the number
+					of data points this <strong>may take a long time</strong> and result
+					in a <strong>very large file</strong>.
 				</p>
 			</div>
+			<mwc-button
+				raised
+				icon="cloud_download"
+				slot="primaryAction"
+				dialogAction="download"
+				>download</mwc-button
+			>
 			<mwc-button slot="secondaryAction" dialogAction="close">close</mwc-button>
 		</mwc-dialog>`
-	}
-
-	_updateAggregation(e: Event) {
-		const el = e.target as Radio
-		if (!el.checked) return
-		store.dispatch.plot.setDownloadAggregation(el.value as DownloadAggregation)
 	}
 
 	static get styles() {
@@ -462,15 +565,12 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				#dialog-share > div {
 					flex-direction: column;
 				}
-				#dialog-download div,
-				#dialog-download mwc-radio {
+				#dialog-download div {
 					display: flex;
-				}
-				#dialog-download mwc-textfield {
-					flex: 1;
-				}
-				#dialog-download > div {
 					flex-direction: column;
+				}
+				#dialog-download mwc-select {
+					margin-top: 8px;
 				}
 				#dialog-download [hidden] {
 					display: none;

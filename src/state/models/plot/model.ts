@@ -7,6 +7,9 @@ import { channelToId, DataUiChannel } from '../../../shared/channel'
 import { DataUiDataPoint } from '../../../shared/dataseries'
 
 import {
+	CsvFieldQuotes,
+	CsvFieldSeparator,
+	CsvLineTerminator,
 	DownloadAggregation,
 	PlotState,
 	PlotVariation,
@@ -41,7 +44,10 @@ export const plot = createModel({
 		dialogShareLinkShowing: false,
 		dialogShareLinkAbsoluteTimes: true,
 		dialogDownloadShowing: false,
-		dialogDownloadAggregation: 'as-is',
+		dialogDownloadAggregation: 'PT1M',
+		csvFieldSeparator: 'tab',
+		csvFieldQuotes: 'none',
+		csvLineTerminator: 'crlf',
 	} as PlotState,
 	reducers: {
 		selectChannel(state, channel: DataUiChannel) {
@@ -321,6 +327,16 @@ export const plot = createModel({
 				...state,
 				dialogDownloadAggregation: aggregation,
 			}
+		},
+
+		setCsvFieldSeparator(state, csvFieldSeparator: CsvFieldSeparator) {
+			return { ...state, csvFieldSeparator }
+		},
+		setCsvFieldQuotes(state, csvFieldQuotes: CsvFieldQuotes) {
+			return { ...state, csvFieldQuotes }
+		},
+		setCsvLineTerminator(state, csvLineTerminator: CsvLineTerminator) {
+			return { ...state, csvLineTerminator }
 		},
 	},
 

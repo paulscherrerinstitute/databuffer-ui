@@ -41,7 +41,10 @@ export interface YAxis {
 	categories?: string[]
 }
 
-export type DownloadAggregation = 'as-is' | 'PT5S' | 'PT1M' | 'PT1H' | 'raw'
+export type DownloadAggregation = 'PT5S' | 'PT1M' | 'PT1H'
+export type CsvFieldSeparator = 'tab' | 'comma' | 'semicolon'
+export type CsvFieldQuotes = 'none' | 'double' | 'single'
+export type CsvLineTerminator = 'crlf' | 'lf'
 
 export type PlotDataSeries = {
 	channel: DataUiChannel
@@ -67,4 +70,7 @@ export interface PlotState {
 	dialogShareLinkAbsoluteTimes: boolean
 	dialogDownloadShowing: boolean
 	dialogDownloadAggregation: DownloadAggregation
+	csvFieldSeparator: CsvFieldSeparator
+	csvFieldQuotes: CsvFieldQuotes
+	csvLineTerminator: CsvLineTerminator
 }

@@ -182,6 +182,21 @@ export const dialogDownloadAggregation = createSelector(
 	state => state.dialogDownloadAggregation
 )
 
+export const csvFieldSeparator = createSelector(
+	[getState],
+	state => state.csvFieldSeparator
+)
+
+export const csvFieldQuotes = createSelector(
+	[getState],
+	state => state.csvFieldQuotes
+)
+
+export const csvLineTerminator = createSelector(
+	[getState],
+	state => state.csvLineTerminator
+)
+
 export const plotQuery = createSelector(
 	[channels, startTime, endTime],
 	(channels, startTime, endTime) => {
@@ -207,62 +222,5 @@ export const plotQuery = createSelector(
 			},
 		}
 		return query
-	}
-)
-
-export const downloadQuery = createSelector(
-	[channels, startTime, endTime, dialogDownloadAggregation],
-	(channels, startTime, endTime, dialogDownloadAggregation) => {
-		const query: DataQuery = {
-			channels,
-			range: {
-				startSeconds: startTime / 1000,
-				endSeconds: endTime / 1000,
-			},
-			eventFields: [
-				EventField.GLOBAL_DATE,
-				EventField.VALUE,
-				EventField.EVENT_COUNT,
-			],
-			response: {
-				format: DataResponseFormatType.CSV,
-			},
-			mapping: {
-				alignment: MappingAlignment.BY_TIME,
-			},
-		}
-		const aggregation: AggregationSpecification = {
-			aggregationType: AggregationType.VALUE,
-			aggregations: [
-				AggregationOperation.MAX,
-				AggregationOperation.MEAN,
-				AggregationOperation.MIN,
-			],
-		}
-		if (dialogDownloadAggregation === 'raw') {
-			// do nothing
-		} else if (dialogDownloadAggregation === 'as-is') {
-			query.aggregation = { ...aggregation, nrOfBins: NR_OF_BINS }
-		} else {
-			query.aggregation = {
-				...aggregation,
-				durationPerBin: dialogDownloadAggregation,
-			}
-		}
-		return query
-	}
-)
-
-export const dialogDownloadCurlCommand = createSelector(
-	[downloadQuery, startTime, endTime],
-	(q, startTime, endTime) => {
-		// for curl, replace millisecond timestamps with ISO strings
-		q.range = {
-			startDate: formatDate(startTime, 'T'),
-			endDate: formatDate(endTime, 'T'),
-		}
-		return `curl -L -H 'Content-Type: application/json' -X POST -d '${JSON.stringify(
-			q
-		)}' ${window.DatabufferUi.QUERY_API}/query`
 	}
 )

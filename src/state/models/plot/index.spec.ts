@@ -112,7 +112,19 @@ describe('plot model', () => {
 		})
 
 		it('dialogDownloadAggregation', () => {
-			expect(plot.state.dialogDownloadAggregation).toBe('as-is')
+			expect(plot.state.dialogDownloadAggregation).toBe('PT1M')
+		})
+
+		it('csvFieldSeparator', () => {
+			expect(plot.state.csvFieldSeparator).toBe('tab')
+		})
+
+		it('csvFieldQuotes', () => {
+			expect(plot.state.csvFieldQuotes).toBe('none')
+		})
+
+		it('csvLineTerminator', () => {
+			expect(plot.state.csvLineTerminator).toBe('crlf')
 		})
 	})
 
