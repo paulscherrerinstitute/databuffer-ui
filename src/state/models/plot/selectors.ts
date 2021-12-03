@@ -182,6 +182,13 @@ export const dialogDownloadAggregation = createSelector(
 	state => state.dialogDownloadAggregation
 )
 
+export const csvStepSize = createSelector([dialogDownloadAggregation], aggr => {
+	if (aggr === 'PT1H') return 3_600_000
+	if (aggr === 'PT1M') return 60_000
+	if (aggr === 'PT5S') return 5_000
+	throw new Error('Invalid download aggregation')
+})
+
 export const csvFieldSeparator = createSelector(
 	[getState],
 	state => state.csvFieldSeparator
@@ -195,32 +202,4 @@ export const csvFieldQuotes = createSelector(
 export const csvLineTerminator = createSelector(
 	[getState],
 	state => state.csvLineTerminator
-)
-
-export const plotQuery = createSelector(
-	[channels, startTime, endTime],
-	(channels, startTime, endTime) => {
-		const query: DataQuery = {
-			channels,
-			range: {
-				startSeconds: startTime / 1000,
-				endSeconds: endTime / 1000,
-			},
-			eventFields: [
-				EventField.GLOBAL_MILLIS,
-				EventField.VALUE,
-				EventField.EVENT_COUNT,
-			],
-			aggregation: {
-				aggregationType: AggregationType.VALUE,
-				aggregations: [
-					AggregationOperation.MAX,
-					AggregationOperation.MEAN,
-					AggregationOperation.MIN,
-				],
-				nrOfBins: NR_OF_BINS,
-			},
-		}
-		return query
-	}
 )

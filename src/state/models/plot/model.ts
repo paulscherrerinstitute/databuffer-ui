@@ -1,16 +1,21 @@
 import { createModel, RoutingState } from '@captaincodeman/rdx'
+import {
+	Datapoint,
+	transformToLinePlotData,
+} from '@paulscherrerinstitute/databuffer-query-js/transforms'
 
 import { EffectsStore } from '../../store'
 import { ROUTE } from '../../routing'
 import { make_debug, make_error, make_info } from '../applog'
 import { channelToId, DataUiChannel } from '../../../shared/channel'
-import { DataUiDataPoint } from '../../../shared/dataseries'
+import { DataUiDataPoint, DataUiDataSeries } from '../../../shared/dataseries'
 
 import {
 	CsvFieldQuotes,
 	CsvFieldSeparator,
 	CsvLineTerminator,
 	DownloadAggregation,
+	PlotDataSeries,
 	PlotState,
 	PlotVariation,
 	YAxisType,
@@ -19,6 +24,8 @@ import { handleRoutePreselect } from './preselect'
 import * as plotSelectors from './selectors'
 import { appcfgSelectors } from '../appcfg'
 import { waitUntil } from '../../../util'
+import { createCsvFile, DataUiCsvDataSeries } from './csv'
+import { saveAs } from 'file-saver'
 
 // helper functions
 const findIndexOfChannel = (state: PlotState, ch: DataUiChannel): number =>
@@ -417,15 +424,89 @@ export const plot = createModel({
 			},
 
 			async downloadData() {
-				// const aggregationSelection = plotSelectors.dialogDownloadAggregation(
-				// 	store.getState()
-				// )
-				// const query = plotSelectors.downloadQuery(store.getState())
-				// const response = await queryRestApi.queryDataRaw(query)
-				// const blob = await response.blob()
-				// const ts = formatDate(Date.now())
-				// const fname = `export_${ts}_${aggregationSelection}.csv`
-				// FileSaver.saveAs(blob, fname)
+				const state = store.getState()
+				const dataseries = plotSelectors.plotDataSeries(state)
+				const startTime = plotSelectors.startTime(state)
+				const startDate = new Date(startTime).toISOString()
+				const endTime = plotSelectors.endTime(state)
+				const endDate = new Date(endTime).toISOString()
+				const queryExpansion = plotSelectors.queryExpansion(state)
+				const stepSize = plotSelectors.csvStepSize(state)
+				const fieldQuotes = plotSelectors.csvFieldQuotes(state)
+				const fieldSeparator = plotSelectors.csvFieldSeparator(state)
+				const lineTerminator = plotSelectors.csvLineTerminator(state)
+
+				dispatch.applog.log(
+					make_info(
+						`downloading csv for channels: ${dataseries
+							.map(x => channelToId(x.channel))
+							.join(', ')}`
+					)
+				)
+				const queryApis = appcfgSelectors.backendToQueryApi(store.getState())
+				async function handleDataSeries(
+					series: PlotDataSeries
+				): Promise<DataUiCsvDataSeries> {
+					const channel = series.channel
+					const channelId = channelToId(channel)
+					try {
+						const api = queryApis.get(channel.backend)
+						if (!api) {
+							throw new Error(`no api provider for ${channelId}`)
+						}
+						dispatch.applog.log(make_debug(`querying data for ${channelId}`))
+						let response: DataUiDataSeries<number, number | string>
+						if (channel.dataType === 'string') {
+							response = await api.queryStringData(
+								channel,
+								startDate,
+								endDate,
+								queryExpansion
+							)
+						} else {
+							response = await api.queryRawData(
+								channel,
+								startDate,
+								endDate,
+								queryExpansion
+							)
+						}
+						dispatch.applog.log(
+							make_debug(`received response for ${channelId}`)
+						)
+
+						const data: Datapoint<number | string | undefined>[] =
+							transformToLinePlotData(response.datapoints, {
+								startAt: startTime,
+								endAt: endTime,
+								stepSize,
+							})
+						const result: DataUiCsvDataSeries = {
+							name: series.label,
+							datapoints: data,
+						}
+						return result
+					} catch (err) {
+						const error = err as Error
+						dispatch.applog.log(
+							make_error(`error querying ${channelId}: ${error.message}`)
+						)
+						throw err
+					}
+				}
+				const promises = dataseries.map(x => handleDataSeries(x))
+				const csvDataSeries = await Promise.all(promises)
+				const csvText = createCsvFile(csvDataSeries, {
+					fieldQuotes,
+					fieldSeparator,
+					lineTerminator,
+				})
+				const blob = new Blob([csvText], {
+					type: 'text/csv;charset=utf-8',
+				})
+				const ts = new Date().toISOString()
+				const fname = `export_${ts}_.csv`
+				saveAs(blob, fname)
 			},
 
 			async 'routing/change'(payload: RoutingState<ROUTE>) {

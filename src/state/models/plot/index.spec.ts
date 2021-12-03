@@ -2163,18 +2163,18 @@ describe('plot model', () => {
 				...state,
 				plot: {
 					...state.plot,
-					dialogDownloadAggregation: 'as-is',
+					dialogDownloadAggregation: 'PT5S',
 				},
 			}
 			const state2: AppState = {
 				...state,
 				plot: {
 					...state.plot,
-					dialogDownloadAggregation: 'raw',
+					dialogDownloadAggregation: 'PT1M',
 				},
 			}
-			expect(plotSelectors.dialogDownloadAggregation(state1)).toBe('as-is')
-			expect(plotSelectors.dialogDownloadAggregation(state2)).toBe('raw')
+			expect(plotSelectors.dialogDownloadAggregation(state1)).toBe('PT5S')
+			expect(plotSelectors.dialogDownloadAggregation(state2)).toBe('PT1M')
 		})
 
 		it('retrieves plotQuery', () => {

@@ -45,6 +45,11 @@ export type DownloadAggregation = 'PT5S' | 'PT1M' | 'PT1H'
 export type CsvFieldSeparator = 'tab' | 'comma' | 'semicolon'
 export type CsvFieldQuotes = 'none' | 'double' | 'single'
 export type CsvLineTerminator = 'crlf' | 'lf'
+export type CsvOptions = {
+	fieldQuotes: CsvFieldQuotes
+	fieldSeparator: CsvFieldSeparator
+	lineTerminator: CsvLineTerminator
+}
 
 export type PlotDataSeries = {
 	channel: DataUiChannel

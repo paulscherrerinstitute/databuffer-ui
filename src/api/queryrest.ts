@@ -41,6 +41,14 @@ export interface DataApiProvider {
 		queryExpansion: boolean
 	) => Promise<DataUiDataSeries<number, string>>
 
+	/** query for raw data (not aggregated) */
+	queryRawData: (
+		channel: DataUiChannel,
+		start: string,
+		end: string,
+		queryExpansion: boolean
+	) => Promise<DataUiDataSeries<number, number>>
+
 	/**
 	 * query for the timestamps for all the events inside the bin.
 	 * the promise resolves to an array of timestamps.
@@ -222,6 +230,42 @@ export class ApiV0QueryProvider implements DataApiProvider {
 			break
 		}
 		const result: DataUiDataSeries<number, string> = {
+			name: id,
+			datapoints,
+		}
+		return result
+	}
+	public async queryRawData(
+		channel: DataUiChannel,
+		start: string,
+		end: string,
+		queryExpansion: boolean = false
+	): Promise<DataUiDataSeries<number, number>> {
+		const id = channelToId(channel)
+		if (channel.dataType === 'string') {
+			throw new Error(`internal error: not a numeric channel: ${id}`)
+		}
+		const response = await this.api.queryData({
+			channels: [{ name: channel.name, backend: channel.backend }],
+			range: {
+				startDate: start,
+				endDate: end,
+				startExpansion: queryExpansion,
+				endExpansion: queryExpansion,
+			},
+			eventFields: [EventField.GLOBAL_MILLIS, EventField.VALUE],
+		})
+		let datapoints: DataUiDataPoint<number, number>[] = []
+		for (const respItem of response) {
+			if (respItem.channel.backend !== channel.backend) continue
+			if (respItem.channel.name !== channel.name) continue
+			datapoints = respItem.data.map(e => ({
+				x: e[EventField.GLOBAL_MILLIS] as number,
+				y: e[EventField.VALUE] as number,
+			}))
+			break
+		}
+		const result: DataUiDataSeries<number, number> = {
 			name: id,
 			datapoints,
 		}
