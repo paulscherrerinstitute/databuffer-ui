@@ -31,7 +31,6 @@ const appVersion = github
 
 // which documentation / commits to reference
 const gitRef = github && github.tag ? github.tag : 'master'
-console.log('### DEBUG ### gitRef == ' + JSON.stringify(gitRef))
 
 export default {
 	input: 'src/index.ts',
