@@ -21,11 +21,11 @@ export class AppBarTitleElement extends connect(store, LitElement) {
 
 	private titleByPage: { [key: string]: string } = {
 		[ROUTE.HOME]: ``,
+		[ROUTE.CHANNEL_INFO]: `Channel info`,
 		[ROUTE.CHANNEL_SEARCH]: `Search`,
 		[ROUTE.INDEX_PLOT]: `Index plot`,
 		[ROUTE.PLOT]: `Plot`,
 		[ROUTE.PLOT_SETTINGS]: `Plot settings`,
-		[ROUTE.QUERY_META]: `About data query`,
 	}
 
 	shouldUpdate(changedProperties: PropertyValues) {

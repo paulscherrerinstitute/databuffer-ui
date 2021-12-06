@@ -8,8 +8,8 @@ import { baseStyles } from '../shared-styles'
 import { connect } from '@captaincodeman/rdx'
 import { channelToId, DataUiChannel } from '../../shared/channel'
 
-@customElement('view-query-meta')
-export class QueryMetaElement extends connect(store, LitElement) {
+@customElement('view-channel-info')
+export class ViewChannelInfoElement extends connect(store, LitElement) {
 	@state() channels: DataUiChannel[] = []
 	@state() pendingRequests!: number
 	@state() dataSeries!: PlotDataSeries[]
@@ -22,10 +22,16 @@ export class QueryMetaElement extends connect(store, LitElement) {
 	}
 
 	render() {
+		return html`<h1>Plot info</h1>
+			${this.renderPlotInfo()}
+			<h1>Dispatcher info</h1>
+			${this.renderDispatcherInfo()}`
+	}
+
+	private renderPlotInfo() {
 		if (this.pendingRequests > 0)
 			return html`<p>Still ${this.pendingRequests} queries in progress</p>`
 		return html`
-			<h1>Query Meta Data</h1>
 			<table>
 				<thead>
 					<tr>
@@ -57,6 +63,10 @@ export class QueryMetaElement extends connect(store, LitElement) {
 				</tbody>
 			</table>
 		`
+	}
+
+	private renderDispatcherInfo() {
+		return html`<p>Work in progress...</p>`
 	}
 
 	static get styles() {

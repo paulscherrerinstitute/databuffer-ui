@@ -30,7 +30,7 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 				store.dispatch.plot.toggleQueryRange()
 			},
 			'plot:info'() {
-				store.dispatch.routing.push('/query-meta')
+				store.dispatch.routing.push('/channel-info')
 			},
 			'plot:settings'() {
 				store.dispatch.routing.push('/plot-settings')
