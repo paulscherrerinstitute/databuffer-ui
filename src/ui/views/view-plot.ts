@@ -45,7 +45,6 @@ import {
 	YAxis,
 } from '../../state/models/plot'
 
-import type { DataResponse } from '../../api/queryrest'
 import { baseStyles } from '../shared-styles'
 import { connect } from '@captaincodeman/rdx'
 import type { DaqPlotSingleAxisElement } from '../components/daq-plot-single-axis'
@@ -62,7 +61,6 @@ highchartsMore(Highcharts)
 
 @customElement('view-plot')
 export class StandardPlotElement extends connect(store, LitElement) {
-	@state() response: DataResponse = []
 	@state() startTime: number = 1
 	@state() endTime: number = 2
 	@state() queryExpansion: boolean = false

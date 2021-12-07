@@ -11,7 +11,7 @@ import {
 import { channelToId } from '../../../shared/channel'
 import { formatDate } from '../../../util'
 import { AppState } from '../../store'
-import { NR_OF_BINS } from '../../../api/queryrest'
+import { NR_OF_BINS } from '../../../api/queryapi'
 
 const getState = (state: AppState) => state.plot
 

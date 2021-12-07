@@ -2,7 +2,7 @@ import { ChannelConfigsQuery } from '@paulscherrerinstitute/databuffer-query-js/
 import { createModel, RoutingState } from '@captaincodeman/rdx'
 import { createSelector } from 'reselect'
 import { EffectsStore, AppState } from '../store'
-import type { DataApiProvider } from '../../api/queryrest'
+import type { DataUiQueryApi } from '../../api/queryapi'
 import { ROUTE } from '../routing'
 import {
 	channelToId,
@@ -115,7 +115,7 @@ export const channelsearch = createModel({
 
 export async function _searchChannel(
 	query: ChannelConfigsQuery,
-	api: DataApiProvider
+	api: DataUiQueryApi
 ): Promise<IdToChannelMap> {
 	const channels = await api.searchChannels(query.regex)
 	const result: IdToChannelMap = {}

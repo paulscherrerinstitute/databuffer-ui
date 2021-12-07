@@ -30,7 +30,7 @@ import { appcfgSelectors } from '../appcfg'
 import { waitUntil } from '../../../util'
 import { createCsvFile, DataUiCsvDataSeries } from './csv'
 import { saveAs } from 'file-saver'
-import { NR_OF_BINS } from '../../../api/queryrest'
+import { NR_OF_BINS } from '../../../api/queryapi'
 
 // helper functions
 const findIndexOfChannel = (state: PlotState, ch: DataUiChannel): number =>

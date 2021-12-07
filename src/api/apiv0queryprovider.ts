@@ -1,109 +1,23 @@
 import { QueryRest } from '@paulscherrerinstitute/databuffer-query-js/api/v0'
-import type {
-	DataResponse,
-	ChannelNamesResponse,
-} from '@paulscherrerinstitute/databuffer-query-js/api/v0'
-import {
-	channelToId,
-	dataShapeDisplay,
-	DataUiChannel,
-	DataUiChannelShape,
-} from '../shared/channel'
+import { ChannelConfig } from '@paulscherrerinstitute/databuffer-query-js/api/v0/query-channel-configs'
 import {
 	AggregationOperation,
 	AggregationResult,
 	AggregationType,
 	EventField,
 } from '@paulscherrerinstitute/databuffer-query-js/api/v0/query-data'
-import { ChannelConfig } from '@paulscherrerinstitute/databuffer-query-js/api/v0/query-channel-configs/response'
-import {
+
+import { channelToId, dataShapeDisplay } from '../shared/channel'
+import type { DataUiChannel, DataUiChannelShape } from '../shared/channel'
+import type {
 	DataUiAggregatedValue,
 	DataUiDataPoint,
 	DataUiDataSeries,
 } from '../shared/dataseries'
-import { formatDate } from '../util'
+import { NR_OF_BINS } from './queryapi'
+import type { DataUiQueryApi } from './queryapi'
 
-export const NR_OF_BINS = 500
-export type { DataResponse, ChannelNamesResponse }
-
-/** the operations used on an Data API provider */
-export interface DataApiProvider {
-	apiVersion: () => string
-
-	/** list the backends available through this API provider */
-	listBackends: () => Promise<string[]>
-
-	/** query for string data (cannot be aggregated) */
-	queryStringData: (
-		channel: DataUiChannel,
-		start: string,
-		end: string,
-		queryExpansion: boolean
-	) => Promise<DataUiDataSeries<number, string>>
-
-	/** query for raw data (not aggregated) */
-	queryRawData: (
-		channel: DataUiChannel,
-		start: string,
-		end: string,
-		queryExpansion: boolean
-	) => Promise<DataUiDataSeries<number, number>>
-
-	/**
-	 * query for the timestamps for all the events inside the bin.
-	 * the promise resolves to an array of timestamps.
-	 */
-	queryEventTimestampsInBin: (
-		channel: DataUiChannel,
-		start: string,
-		end: string
-	) => Promise<number[]>
-
-	/**
-	 * query raw data of a waveform for one timestamp.
-	 * the promise resolves to the array of Y values.
-	 */
-	queryWaveFormAtTimestamp: (
-		channel: DataUiChannel,
-		ts: number
-	) => Promise<number[]>
-
-	/** for a waveform, query the index-aggregated minimum/maximum values in the bin */
-	queryIndexedMinMaxInBin: (
-		channel: DataUiChannel,
-		start: string,
-		end: string
-	) => Promise<{ min: number; max: number }[]>
-
-	/** query for binned/aggregated data (count/min/mean/max) */
-	queryBinnedData: (
-		channel: DataUiChannel,
-		start: string,
-		end: string,
-		queryExpansion: boolean
-	) => Promise<DataUiDataSeries<number, DataUiAggregatedValue>>
-
-	/** search for channels available in the backend */
-	searchChannels: (nameRegex?: string) => Promise<DataUiChannel[]>
-}
-
-export const createDataApiProvider = async (
-	url: string
-): Promise<DataApiProvider> => {
-	// TODO: try to determine api version from known endpoints
-	// const resp = await fetch(`${url}/meta`)
-	// if (resp.ok) {
-	// 	const meta = await resp.json()
-	// 	if (meta.apiversion && meta.apiversion === '4') {
-	// 		return new ApiV4QueryProvider(url)
-	// 	}
-	//	throw new Error(`api version of ${url} not supported: ${meta.apiversion}`)
-	// }
-	// no enpoint found? fall back to APIv0 (which doesn't have such an endpoint)
-	return new ApiV0QueryProvider(url)
-}
-
-export class ApiV0QueryProvider implements DataApiProvider {
+export class ApiV0QueryProvider implements DataUiQueryApi {
 	private api: QueryRest
 
 	constructor(private url: string) {

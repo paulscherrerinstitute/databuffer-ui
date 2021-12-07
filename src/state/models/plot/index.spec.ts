@@ -3,7 +3,7 @@ import { plot, plotSelectors } from './index'
 import { PlotState, YAxis, PlotVariation, PlotDataSeries } from './types'
 import { DataUiChannel, channelToId } from '../../../shared/channel'
 import { store, AppState } from '../../store'
-import { NR_OF_BINS } from '../../../api/queryrest'
+import { NR_OF_BINS } from '../../../api/queryapi'
 import {
 	EventField,
 	AggregationOperation,

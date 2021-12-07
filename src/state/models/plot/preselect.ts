@@ -3,7 +3,7 @@
 import { RoutingState } from '@captaincodeman/rdx'
 import { parseISO } from 'date-fns'
 
-import type { DataApiProvider } from '../../../api/queryrest'
+import type { DataUiQueryApi } from '../../../api/queryapi'
 import {
 	channelToId,
 	DataUiChannel,
@@ -124,7 +124,7 @@ export const extractPreselectParams = (
 async function getChannelConfig(
 	backend: string,
 	name: string,
-	api: DataApiProvider
+	api: DataUiQueryApi
 ): Promise<DataUiChannel | undefined> {
 	const re = `^${name}$`
 	const temp = await api.searchChannels(re)
@@ -172,7 +172,7 @@ async function configureDataSeries(
 export async function handleRoutePreselect(
 	dispatch: AppDispatch,
 	routingState: RoutingState<ROUTE>,
-	queryApiMap: Map<string, DataApiProvider>
+	queryApiMap: Map<string, DataUiQueryApi>
 ) {
 	// if there are no query params, start over at home view
 	const params = extractPreselectParams(routingState.queries)

@@ -2,12 +2,12 @@ import { createModel } from '@captaincodeman/rdx'
 import { createSelector } from 'reselect'
 import { AppState } from '../store'
 import type { EffectsStore } from '../store'
-import { createDataApiProvider } from '../../api/queryrest'
-import type { DataApiProvider } from '../../api/queryrest'
+import { createQueryProvider } from '../../api'
+import type { DataUiQueryApi } from '../../api'
 
 type QueryApiProviderInfo = {
 	url: string
-	api: DataApiProvider
+	api: DataUiQueryApi
 	backends: string[]
 }
 
@@ -60,7 +60,7 @@ export const appcfg = createModel({
 				dispatch.appcfg.queryApiProvidersRequest()
 
 				async function _processApiUrl(url: string) {
-					const api = await createDataApiProvider(url)
+					const api = await createQueryProvider(url)
 					const backends = await api?.listBackends()
 					return { url, api, backends }
 				}
@@ -98,7 +98,7 @@ export namespace appcfgSelectors {
 	export const backendToQueryApi = createSelector(
 		[queryApiProviders],
 		queryApiProviders => {
-			const result = new Map<string, DataApiProvider>()
+			const result = new Map<string, DataUiQueryApi>()
 			queryApiProviders.forEach(item => {
 				for (const backend of item.backends) {
 					if (result.has(backend)) continue
