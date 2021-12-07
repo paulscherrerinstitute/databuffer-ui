@@ -160,6 +160,7 @@ export class HomeElement extends connect(store, LitElement) {
 
 				#bottom {
 					flex: 0;
+					margin-top: 16px;
 					padding: 16px 0;
 					font-size: 80%;
 					background-color: hsl(0, 0%, 30%);
