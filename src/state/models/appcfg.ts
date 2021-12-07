@@ -4,6 +4,7 @@ import { AppState } from '../store'
 import type { EffectsStore } from '../store'
 import { createQueryProvider } from '../../api'
 import type { DataUiQueryApi } from '../../api'
+import { make_error } from './applog'
 
 type QueryApiProviderInfo = {
 	url: string
@@ -60,16 +61,31 @@ export const appcfg = createModel({
 				dispatch.appcfg.queryApiProvidersRequest()
 
 				async function _processApiUrl(url: string) {
-					const api = await createQueryProvider(url)
-					const backends = await api?.listBackends()
-					return { url, api, backends }
+					try {
+						const api = await createQueryProvider(url)
+						const backends = await api?.listBackends()
+						return { url, api, backends }
+					} catch (e) {
+						dispatch.applog.log(
+							make_error(`error during initialization for ${url}: ${e}`)
+						)
+						throw e
+					}
 				}
 
-				try {
-					const apis = await Promise.all(urls.map(url => _processApiUrl(url)))
+				const promises = await Promise.allSettled(
+					urls.map(url => _processApiUrl(url))
+				)
+				const fulfilled = promises.filter(
+					p => p.status === 'fulfilled'
+				) as PromiseFulfilledResult<QueryApiProviderInfo>[]
+				if (fulfilled.length > 0) {
+					const apis = fulfilled.map(p => p.value)
 					dispatch.appcfg.queryApiProvidersSuccess(apis)
-				} catch (e) {
-					dispatch.appcfg.queryApiProvidersFailure(e as Error)
+				} else {
+					dispatch.appcfg.queryApiProvidersFailure(
+						new Error('No query API available')
+					)
 				}
 			},
 		}

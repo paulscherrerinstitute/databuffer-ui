@@ -10,6 +10,7 @@ import {
 	DataUiChannel,
 } from '../../shared/channel'
 import { appcfgSelectors } from './appcfg'
+import { make_error } from './applog'
 
 export type IdToChannelMap = { [id: string]: DataUiChannel }
 
@@ -80,22 +81,36 @@ export const channelsearch = createModel({
 					// @ts-ignore
 					dispatch.routing.push('/search')
 				}
-				try {
-					const apis = appcfgSelectors
-						.queryApiProviders(store.getState())
-						.map(x => x.api)
-					// first query all api providers
-					const allEntities = await Promise.all(
-						apis.map(api => _searchChannel(query, api))
-					)
+				const apiProviders = appcfgSelectors.queryApiProviders(store.getState())
+				// first query all api providers
+				const promises = await Promise.allSettled(
+					apiProviders.map(item => {
+						try {
+							const result = _searchChannel(query, item.api)
+							return result
+						} catch (e) {
+							dispatch.applog.log(
+								make_error(`error searching channels in ${item.url}`)
+							)
+							throw e
+						}
+					})
+				)
+				const fulfilled = promises.filter(
+					p => p.status === 'fulfilled'
+				) as PromiseFulfilledResult<IdToChannelMap>[]
+				if (fulfilled.length > 0) {
 					// then remove duplicates
+					const allEntities = fulfilled.map(p => p.value)
 					const entities = allEntities.reduce(
 						(prev, curr) => ({ ...curr, ...prev }),
 						{}
 					)
 					dispatch.channelsearch.searchSuccess(entities)
-				} catch (err) {
-					dispatch.channelsearch.searchFailure(err)
+				} else {
+					dispatch.channelsearch.searchFailure(
+						new Error('No query API available')
+					)
 				}
 			},
 
