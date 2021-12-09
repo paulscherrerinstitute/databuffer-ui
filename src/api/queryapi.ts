@@ -55,12 +55,18 @@ export interface DataUiQueryApi {
 		end: string
 	) => Promise<{ min: number; max: number }[]>
 
-	/** query for binned/aggregated data (count/min/mean/max) */
-	queryBinnedData: (
+	/**
+	 * query for aggregated data (count/min/mean/max)
+	 *
+	 * @param nrOfBins set to `undefined` to disable time binning (but waveforms will
+	 *                 still get binned along their index)
+	 */
+	queryAggregatedData: (
 		channel: DataUiChannel,
 		start: string,
 		end: string,
-		queryExpansion: boolean
+		queryExpansion: boolean,
+		nrOfBins?: number
 	) => Promise<DataUiDataSeries<number, DataUiAggregatedValue>>
 
 	/** search for channels available in the backend */

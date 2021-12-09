@@ -186,15 +186,18 @@ export class ApiV0QueryProvider implements DataUiQueryApi {
 		return result
 	}
 
-	public async queryBinnedData(
+	public async queryAggregatedData(
 		channel: DataUiChannel,
 		start: string,
 		end: string,
-		queryExpansion: boolean = false
+		queryExpansion: boolean,
+		nrOfBins: number
 	): Promise<DataUiDataSeries<number, DataUiAggregatedValue>> {
 		const id = channelToId(channel)
 		if (channel.dataType === 'string') {
-			throw new Error(`internal error: string channel: ${id}`)
+			throw new Error(
+				`internal error: string channel cannot be aggregated: ${id}`
+			)
 		}
 		const response = await this.api.queryData({
 			channels: [{ name: channel.name, backend: channel.backend }],
@@ -215,7 +218,7 @@ export class ApiV0QueryProvider implements DataUiQueryApi {
 					AggregationOperation.MEAN,
 					AggregationOperation.MAX,
 				],
-				nrOfBins: NR_OF_BINS,
+				nrOfBins,
 			},
 		})
 		let datapoints: DataUiDataPoint<number, DataUiAggregatedValue>[] = []

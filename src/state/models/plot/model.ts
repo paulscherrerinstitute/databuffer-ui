@@ -413,11 +413,12 @@ export const plot = createModel({
 							numDatapoints = response.datapoints.length
 						} else {
 							isReduced = true
-							response = await api.queryBinnedData(
+							response = await api.queryAggregatedData(
 								channel,
 								startDate,
 								endDate,
-								queryExpansion
+								queryExpansion,
+								NR_OF_BINS
 							)
 							numDatapoints = (
 								response as DataUiDataSeries<number, DataUiAggregatedValue>
@@ -425,13 +426,23 @@ export const plot = createModel({
 								.map(item => item.y.count)
 								.reduce((prev, current) => current + prev, 0)
 							if (numDatapoints > 0 && numDatapoints < NR_OF_BINS) {
-								isReduced = false
-								response = await api.queryRawData(
-									channel,
-									startDate,
-									endDate,
-									queryExpansion
-								)
+								if (channel.dataShape === 'scalar') {
+									isReduced = false
+									response = await api.queryRawData(
+										channel,
+										startDate,
+										endDate,
+										queryExpansion
+									)
+								} else if (channel.dataShape === 'waveform') {
+									response = await api.queryAggregatedData(
+										channel,
+										startDate,
+										endDate,
+										queryExpansion,
+										undefined // deactivate time binning, but keep binning for each waveform data event
+									)
+								}
 								numDatapoints = response.datapoints.length
 							}
 						}
