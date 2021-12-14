@@ -12,6 +12,7 @@ import {
 	DataUiAggregatedValue,
 	DataUiDataPoint,
 	DataUiDataSeries,
+	DataUiScalarValue,
 } from '../../../shared/dataseries'
 
 import {
@@ -194,7 +195,7 @@ export const plot = createModel({
 				timestamp: number
 				datapoints: DataUiDataPoint<
 					number,
-					string | number | DataUiAggregatedValue
+					DataUiScalarValue | DataUiAggregatedValue
 				>[]
 				isReduced: boolean
 				numDatapoints: number
@@ -214,7 +215,12 @@ export const plot = createModel({
 				...state,
 				dataSeries,
 			}
-			if (dataSeries[index].channel.dataType === 'string') {
+			if (dataSeries[index].channel.dataType === 'bool') {
+				const yAxes = [...state.yAxes]
+				const yAxisIndex = dataSeries[index].yAxisIndex
+				yAxes[yAxisIndex].categories = ['false', 'true']
+				result.yAxes = yAxes
+			} else if (dataSeries[index].channel.dataType === 'string') {
 				const yAxes = [...state.yAxes]
 				const yAxisIndex = dataSeries[index].yAxisIndex
 				yAxes[yAxisIndex].categories = Array.from(
@@ -399,12 +405,20 @@ export const plot = createModel({
 						)
 						let response: DataUiDataSeries<
 							number,
-							number | string | DataUiAggregatedValue
+							DataUiScalarValue | DataUiAggregatedValue
 						>
 						let isReduced = false
 						let numDatapoints = 0
 						if (channel.dataType === 'string') {
 							response = await api.queryStringData(
+								channel,
+								startDate,
+								endDate,
+								queryExpansion
+							)
+							numDatapoints = response.datapoints.length
+						} else if (channel.dataType === 'bool') {
+							response = await api.queryBoolData(
 								channel,
 								startDate,
 								endDate,

@@ -2,6 +2,7 @@ import { DataUiChannel } from '../../../shared/channel'
 import {
 	DataUiAggregatedValue,
 	DataUiDataPoint,
+	DataUiScalarValue,
 } from '../../../shared/dataseries'
 
 export enum PlotVariation {
@@ -64,7 +65,7 @@ export type PlotDataSeries = {
 	requestFinishedAt?: number
 	datapoints?: DataUiDataPoint<
 		number,
-		string | number | DataUiAggregatedValue
+		DataUiScalarValue | DataUiAggregatedValue
 	>[]
 	isReduced?: boolean
 	numDatapoints?: number

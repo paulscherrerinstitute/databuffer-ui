@@ -13,6 +13,14 @@ export interface DataUiQueryApi {
 	/** list the backends available through this API provider */
 	listBackends: () => Promise<string[]>
 
+	/** query for boolean data (cannot be aggregated) */
+	queryBoolData: (
+		channel: DataUiChannel,
+		start: string,
+		end: string,
+		queryExpansion: boolean
+	) => Promise<DataUiDataSeries<number, boolean>>
+
 	/** query for string data (cannot be aggregated) */
 	queryStringData: (
 		channel: DataUiChannel,

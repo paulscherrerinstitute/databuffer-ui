@@ -3,6 +3,8 @@ export interface DataUiDataPoint<X, Y> {
 	y: Y
 }
 
+export type DataUiScalarValue = number | boolean | string
+
 export type DataUiAggregatedValue = {
 	count: number
 	min: number

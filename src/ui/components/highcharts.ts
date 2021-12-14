@@ -133,7 +133,11 @@ export function dataSeries2HighchartsSeriesOptions(
 			zIndex: 1,
 		}
 		if (ds.datapoints) {
-			if (ds.channel.dataType === 'string') {
+			if (ds.channel.dataType === 'bool') {
+				opts.data = (ds.datapoints as DataUiDataPoint<number, boolean>[]).map(
+					pt => [pt.x, pt.y ? 1 : 0]
+				)
+			} else if (ds.channel.dataType === 'string') {
 				const categories = Array.from(new Set(ds.datapoints.map(pt => pt.y)))
 				opts.data = (ds.datapoints as DataUiDataPoint<number, string>[]).map(
 					pt => [pt.x, categories.indexOf(pt.y)]

@@ -149,6 +149,44 @@ export class ApiV0QueryProvider implements DataUiQueryApi {
 		}
 		return result
 	}
+
+	public async queryBoolData(
+		channel: DataUiChannel,
+		start: string,
+		end: string,
+		queryExpansion: boolean = false
+	): Promise<DataUiDataSeries<number, boolean>> {
+		const id = channelToId(channel)
+		if (channel.dataType !== 'bool') {
+			throw new Error(`internal error: not a bool channel: ${id}`)
+		}
+		const response = await this.api.queryData({
+			channels: [{ name: channel.name, backend: channel.backend }],
+			range: {
+				startDate: start,
+				endDate: end,
+				startExpansion: queryExpansion,
+				endExpansion: queryExpansion,
+			},
+			eventFields: [EventField.GLOBAL_MILLIS, EventField.VALUE],
+		})
+		let datapoints: DataUiDataPoint<number, boolean>[] = []
+		for (const respItem of response) {
+			if (respItem.channel.backend !== channel.backend) continue
+			if (respItem.channel.name !== channel.name) continue
+			datapoints = respItem.data.map(e => ({
+				x: e[EventField.GLOBAL_MILLIS] as number,
+				y: e[EventField.VALUE] as boolean,
+			}))
+			break
+		}
+		const result: DataUiDataSeries<number, boolean> = {
+			name: id,
+			datapoints,
+		}
+		return result
+	}
+
 	public async queryRawData(
 		channel: DataUiChannel,
 		start: string,
@@ -191,7 +229,7 @@ export class ApiV0QueryProvider implements DataUiQueryApi {
 		start: string,
 		end: string,
 		queryExpansion: boolean,
-		nrOfBins: number
+		nrOfBins?: number
 	): Promise<DataUiDataSeries<number, DataUiAggregatedValue>> {
 		const id = channelToId(channel)
 		if (channel.dataType === 'string') {
