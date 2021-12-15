@@ -102,6 +102,51 @@ Adhering to this workflow provides the following benefits:
 - The change log entries and the GitHub issues contain links to the commit, describing **how** the change was made.
 - By providing information on the three aspects, _what_ has changed, _why_ it has been changed, and _how_ it was changed, and combining them in the change log, the project history is documented rather thoroughly.
 
+### Manual testing
+
+Some manual tests may help ensure nothing slips through the cracks. These are beneficial to run on your local system before creating a release for deployment, as well as after the deployment to verify good working condition.
+
+#### Test 1: Home page
+
+**Steps**
+
+- Go to the home page (http://localhost:3000/ for local development, or of course, you're deployment URL)
+
+**Things to check for**
+
+- Was the environment applied correctly?
+  - Are the colors correct?
+  - Is the email address correct?
+  - Is the title correct?
+  - Are the backends listed? (If not, are you in the right network? Is VPN on?)
+- Was the build information applied correctly?
+  - Is the version ID correct?
+  - Does the link to the documentation point at the right version tag / commit?
+
+#### Test 2: Preselected plot
+
+**Steps**
+
+- Go to http://localhost:3000/preselect?c1=gls-archive%2FD_WBGB_IELAG_0101_EX030_D01_H&c2=gls-archive%2FD_WBGB_IELAG_0101_EX030_D02_H&c3=proscan-archive%2FXPROSCAN%3ASTAB%3A2&c4=sf-databuffer%2FS10CB01-RBOC-DCP10%3AFOR-AMPLT&c5=sf-archiverappliance%2FS10-CMON-DIA1431%3ACURRENT-3-3&duration=777600000&queryExpansion=1&plotVariation=separate-axes
+- After plotting finished, go to the channel information view.
+- Go back to the plot, and click on a data point in the wave form to open the index plot.
+
+**Things to check for**
+
+- In the plot view...
+  - Do all 5 channels plot values?
+  - Is there a min/max band in the background of the waveform?
+- In the channel information view...
+  - Are the `string` and `bool` channels raw (i.e. _not_ reduced)? (aggregation makes no sense for `string` and `bool`)
+  - Is the `float64` scalar channel raw (i.e. _not_ reduced)? (There should've been two requests, one aggregated, and then another one for raw data.)
+  - Is the `uint16` waveform reduced?
+- In the index plot view...
+  - Does navigating the time bins work?
+  - When you zoom in (possibly a lot)...
+    - Is there a min/max band around the data?
+    - Does the min/max band stay in place when you navigate the bin?
+    - Does the raw data change (wiggle) when you navigate the bin?
+
 ### Deploying
 
 Deployments are done through docker images. The docker images are built and published on GitHub container registry through GitHub Actions:
