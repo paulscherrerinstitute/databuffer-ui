@@ -13,6 +13,7 @@ import type {
 	DataUiAggregatedValue,
 	DataUiDataPoint,
 	DataUiDataSeries,
+	DataUiScalarValue,
 } from '../shared/dataseries'
 import { NR_OF_BINS } from './queryapi'
 import type { DataUiQueryApi } from './queryapi'
@@ -113,15 +114,15 @@ export class ApiV0QueryProvider implements DataUiQueryApi {
 		return this.api.queryBackends()
 	}
 
-	public async queryStringData(
+	public async queryRawScalarData<T extends DataUiScalarValue>(
 		channel: DataUiChannel,
 		start: string,
 		end: string,
 		queryExpansion: boolean = false
-	): Promise<DataUiDataSeries<number, string>> {
+	): Promise<DataUiDataSeries<number, T>> {
 		const id = channelToId(channel)
-		if (channel.dataType !== 'string') {
-			throw new Error(`internal error: not a string channel: ${id}`)
+		if (channel.dataShape !== 'scalar') {
+			throw new Error(`internal error: not a scalar channel: ${id}`)
 		}
 		const response = await this.api.queryData({
 			channels: [{ name: channel.name, backend: channel.backend }],
@@ -133,17 +134,17 @@ export class ApiV0QueryProvider implements DataUiQueryApi {
 			},
 			eventFields: [EventField.GLOBAL_MILLIS, EventField.VALUE],
 		})
-		let datapoints: DataUiDataPoint<number, string>[] = []
+		let datapoints: DataUiDataPoint<number, T>[] = []
 		for (const respItem of response) {
 			if (respItem.channel.backend !== channel.backend) continue
 			if (respItem.channel.name !== channel.name) continue
 			datapoints = respItem.data.map(e => ({
 				x: e[EventField.GLOBAL_MILLIS] as number,
-				y: e[EventField.VALUE] as string,
+				y: e[EventField.VALUE] as T,
 			}))
 			break
 		}
-		const result: DataUiDataSeries<number, string> = {
+		const result: DataUiDataSeries<number, T> = {
 			name: id,
 			datapoints,
 		}

@@ -409,16 +409,10 @@ export const plot = createModel({
 						>
 						let isReduced = false
 						let numDatapoints = 0
-						if (channel.dataType === 'string') {
-							response = await api.queryStringData(
-								channel,
-								startDate,
-								endDate,
-								queryExpansion
-							)
-							numDatapoints = response.datapoints.length
-						} else if (channel.dataType === 'bool') {
-							response = await api.queryBoolData(
+						// data types 'string' and 'bool' can never be aggregated
+						// (makes no sense; what's the mean of 'open', 'moving', and 'closed'?!)
+						if (channel.dataType === 'string' || channel.dataType === 'bool') {
+							response = await api.queryRawScalarData(
 								channel,
 								startDate,
 								endDate,
@@ -442,7 +436,7 @@ export const plot = createModel({
 							if (numDatapoints > 0 && numDatapoints < NR_OF_BINS) {
 								if (channel.dataShape === 'scalar') {
 									isReduced = false
-									response = await api.queryRawData(
+									response = await api.queryRawScalarData(
 										channel,
 										startDate,
 										endDate,
@@ -520,27 +514,17 @@ export const plot = createModel({
 							throw new Error(`no api provider for ${channelId}`)
 						}
 						dispatch.applog.log(make_debug(`querying data for ${channelId}`))
-						let response: DataUiDataSeries<number, number | string>
-						if (channel.dataType === 'string') {
-							response = await api.queryStringData(
-								channel,
-								startDate,
-								endDate,
-								queryExpansion
-							)
-						} else {
-							response = await api.queryRawData(
-								channel,
-								startDate,
-								endDate,
-								queryExpansion
-							)
-						}
+						const response = await api.queryRawScalarData(
+							channel,
+							startDate,
+							endDate,
+							queryExpansion
+						)
 						dispatch.applog.log(
 							make_debug(`received response for ${channelId}`)
 						)
 
-						const data: Datapoint<number | string | undefined>[] =
+						const data: Datapoint<DataUiScalarValue | undefined>[] =
 							transformToLinePlotData(response.datapoints, {
 								startAt: startTime,
 								endAt: endTime,

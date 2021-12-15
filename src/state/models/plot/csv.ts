@@ -1,9 +1,12 @@
-import type { DataUiDataSeries } from '../../../shared/dataseries'
+import type {
+	DataUiDataSeries,
+	DataUiScalarValue,
+} from '../../../shared/dataseries'
 import type { CsvOptions } from './types'
 
 export type DataUiCsvDataSeries = DataUiDataSeries<
 	number,
-	string | number | undefined
+	DataUiScalarValue | undefined
 >
 
 const FIELD_SEPARATOR = {
@@ -24,7 +27,7 @@ const LINE_TERMINATOR = {
 }
 
 export function createCsvLine(
-	values: (string | number)[],
+	values: DataUiScalarValue[],
 	opts: CsvOptions
 ): string {
 	const sep = FIELD_SEPARATOR[opts.fieldSeparator]

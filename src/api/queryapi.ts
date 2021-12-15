@@ -2,6 +2,7 @@ import type { DataUiChannel } from '../shared/channel'
 import type {
 	DataUiAggregatedValue,
 	DataUiDataSeries,
+	DataUiScalarValue,
 } from '../shared/dataseries'
 
 export const NR_OF_BINS = 500
@@ -13,29 +14,13 @@ export interface DataUiQueryApi {
 	/** list the backends available through this API provider */
 	listBackends: () => Promise<string[]>
 
-	/** query for boolean data (cannot be aggregated) */
-	queryBoolData: (
+	/** query for scalar data without aggregation */
+	queryRawScalarData: <T extends DataUiScalarValue>(
 		channel: DataUiChannel,
 		start: string,
 		end: string,
 		queryExpansion: boolean
-	) => Promise<DataUiDataSeries<number, boolean>>
-
-	/** query for string data (cannot be aggregated) */
-	queryStringData: (
-		channel: DataUiChannel,
-		start: string,
-		end: string,
-		queryExpansion: boolean
-	) => Promise<DataUiDataSeries<number, string>>
-
-	/** query for raw data (not aggregated) */
-	queryRawData: (
-		channel: DataUiChannel,
-		start: string,
-		end: string,
-		queryExpansion: boolean
-	) => Promise<DataUiDataSeries<number, number>>
+	) => Promise<DataUiDataSeries<number, T>>
 
 	/**
 	 * query for the timestamps for all the events inside the bin.
