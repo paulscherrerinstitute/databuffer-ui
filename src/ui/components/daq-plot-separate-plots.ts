@@ -151,6 +151,12 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 		}
 	}
 
+	public reflow() {
+		for (const chart of this.charts) {
+			chart.reflow()
+		}
+	}
+
 	connectedCallback() {
 		super.connectedCallback()
 		__registerElem()

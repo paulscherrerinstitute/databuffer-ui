@@ -53,6 +53,10 @@ export class DaqPlotSeparateAxesElement extends LitElement {
 		this.chart.zoomOut()
 	}
 
+	public reflow() {
+		this.chart.reflow()
+	}
+
 	firstUpdated() {
 		this.chart = initChart(this.chartDiv)
 	}
