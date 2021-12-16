@@ -281,6 +281,7 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 					grid-template-columns: 100%;
 					grid-auto-rows: 1fr;
 					grid-row-gap: 8px;
+					overflow-y: scroll;
 				}
 				#chartgroup > div {
 					min-height: 200px;

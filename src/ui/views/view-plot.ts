@@ -176,6 +176,9 @@ export class StandardPlotElement extends connect(store, LitElement) {
 		if (this.anyRequestErrors) {
 			this.__snackError.show()
 		}
+		if (changedProperties.has('queryRangeShowing')) {
+			this.__daqplot.reflow()
+		}
 	}
 
 	connectedCallback() {
@@ -292,7 +295,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				@highchartszoom=${this.__onHighchartsZoom}
 				@highchartspointclick=${this.__onHighchartsPointClick}
 				id="chart"
-				?hidden="${!this.shouldDisplayChart}"
+				?hidden=${!this.shouldDisplayChart}
 			>
 				${this.renderPlot()}
 			</div>
@@ -533,9 +536,10 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			css`
 				:host {
 					height: 100%;
+					width: 100%;
 					padding: 8px;
-					display: block;
-					overflow-y: auto;
+					display: flex;
+					flex-direction: column;
 				}
 				wl-progress-spinner {
 					width: 96px;
@@ -546,12 +550,22 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					display: none;
 				}
 				#queryrange {
-					z-index: 1;
-					position: absolute;
-					width: calc(100% - 16px);
+					margin-bottom: 8px;
 				}
 				#chart {
-					height: 100%;
+					flex: 1;
+					/*
+					overflow-y: hidden forces the plot to realize it needs to
+					shrink and recalculate its size, as the contents would
+					get clipped otherwise.
+					Without this setting, the chart will grow bigger when the time
+					range is hidden, but it won't shrink, when it is toggled back.
+					*/
+					overflow-y: hidden;
+					border-radius: 2px;
+					box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px,
+						rgba(0, 0, 0, 0.14) 0px 4px 5px 0px,
+						rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
 				}
 				#dialog-share div,
 				#dialog-share mwc-radio {
