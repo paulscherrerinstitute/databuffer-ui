@@ -11,6 +11,12 @@ export interface DataUiChannel {
 	unit?: string
 }
 
+export interface DataUiChannelState {
+	recording: boolean
+	connected: boolean
+	latestEventDate: string
+}
+
 export const BACKEND_SEPARATOR = '/'
 
 export function channelToId(ch: DataUiChannel): string {
