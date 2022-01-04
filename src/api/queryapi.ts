@@ -2,7 +2,10 @@ import type { DataUiChannel } from '../shared/channel'
 import type {
 	DataUiAggregatedValue,
 	DataUiDataSeries,
+	DataUiImage,
 	DataUiScalarValue,
+	DataUiWaveform,
+	MinMax,
 } from '../shared/dataseries'
 
 export const NR_OF_BINS = 500
@@ -39,14 +42,14 @@ export interface DataUiQueryApi {
 	queryWaveFormAtTimestamp: (
 		channel: DataUiChannel,
 		ts: number
-	) => Promise<number[]>
+	) => Promise<DataUiWaveform>
 
 	/** for a waveform, query the index-aggregated minimum/maximum values in the bin */
 	queryIndexedMinMaxInBin: (
 		channel: DataUiChannel,
 		start: string,
 		end: string
-	) => Promise<{ min: number; max: number }[]>
+	) => Promise<MinMax[]>
 
 	/**
 	 * query for aggregated data (count/min/mean/max)
@@ -64,4 +67,15 @@ export interface DataUiQueryApi {
 
 	/** search for channels available in the backend */
 	searchChannels: (nameRegex?: string) => Promise<DataUiChannel[]>
+
+	queryImageThumbnails: (
+		channel: DataUiChannel,
+		start: string,
+		end: string
+	) => Promise<DataUiImage[]>
+
+	queryImageAtTimestamp: (
+		channel: DataUiChannel,
+		ts: number
+	) => Promise<DataUiImage>
 }
