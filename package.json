@@ -1,6 +1,6 @@
 {
 	"name": "@paulscherrerinstitute/databuffer-ui",
-	"version": "4.6.0",
+	"version": "4.7.0",
 	"description": "Databuffer UI",
 	"scripts": {
 		"build": "rollup -c",

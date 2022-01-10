@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.7.0](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.6.0...v4.7.0) (2022-01-10)
+
+
+### Features
+
+* add CSV format parameters to dialog ([b2e26b0](https://github.com/paulscherrerinstitute/databuffer-ui/commit/b2e26b01c15cc14c2592814238399227a6c5145f)), closes [#32](https://github.com/paulscherrerinstitute/databuffer-ui/issues/32)
+* allow single api providers to fail ([28e7683](https://github.com/paulscherrerinstitute/databuffer-ui/commit/28e7683199ef861edf83da026aa60704a45c28bd)), closes [#141](https://github.com/paulscherrerinstitute/databuffer-ui/issues/141)
+* implement CSV download ([344588a](https://github.com/paulscherrerinstitute/databuffer-ui/commit/344588ac0396c68ca80085ac5e43947dd2d72570)), closes [#31](https://github.com/paulscherrerinstitute/databuffer-ui/issues/31) [#140](https://github.com/paulscherrerinstitute/databuffer-ui/issues/140)
+* plot boolean values ([2c88c5c](https://github.com/paulscherrerinstitute/databuffer-ui/commit/2c88c5cee7aec8452a89363d29a2bdd1488fc464)), closes [#28](https://github.com/paulscherrerinstitute/databuffer-ui/issues/28)
+* show channel details ([2b52c58](https://github.com/paulscherrerinstitute/databuffer-ui/commit/2b52c5873d7f233d5c8bcd656c07834bf238b4b6)), closes [#41](https://github.com/paulscherrerinstitute/databuffer-ui/issues/41)
+* show raw data for sparse series ([9a4bbc5](https://github.com/paulscherrerinstitute/databuffer-ui/commit/9a4bbc509b5f18847b18c8d728d00f7b42c23af4)), closes [#139](https://github.com/paulscherrerinstitute/databuffer-ui/issues/139)
+* time selection does not cover up the plot ([8b63b64](https://github.com/paulscherrerinstitute/databuffer-ui/commit/8b63b647885a64f6cee739b96c12e6c9805f4b76)), closes [#144](https://github.com/paulscherrerinstitute/databuffer-ui/issues/144)
+
+
+### Bug Fixes
+
+* aggregate waveform in x but not t ([df2977a](https://github.com/paulscherrerinstitute/databuffer-ui/commit/df2977a810a18d02d44c0edea7c7e29e0aeaeea1)), closes [#139](https://github.com/paulscherrerinstitute/databuffer-ui/issues/139)
+* fix links to documentation ([afe00b8](https://github.com/paulscherrerinstitute/databuffer-ui/commit/afe00b854ce06194bf98eb87b855ca1a55e2694b)), closes [#138](https://github.com/paulscherrerinstitute/databuffer-ui/issues/138)
+
 ## [4.6.0](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.5.2...v4.6.0) (2021-11-29)
 
 
