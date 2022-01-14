@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.7.1](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.7.0...v4.7.1) (2022-01-14)
+
+
+### Bug Fixes
+
+* update data series label from plot settings ([f1bec62](https://github.com/paulscherrerinstitute/databuffer-ui/commit/f1bec62b3a27a8cbd6831570c1a4a1151bfccbb7)), closes [#146](https://github.com/paulscherrerinstitute/databuffer-ui/issues/146)
+
 ## [4.7.0](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.6.0...v4.7.0) (2022-01-10)
 
 
