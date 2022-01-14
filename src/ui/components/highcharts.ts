@@ -1,5 +1,7 @@
 import Highcharts from 'highcharts'
 import highchartsMore from 'highcharts/highcharts-more'
+import highchartsExporting from 'highcharts/modules/exporting'
+import highchartsOfflineExporting from 'highcharts/modules/offline-exporting'
 import { DataUiChannel } from '../../shared/channel'
 import { DataUiDataPoint, DataUiAggregatedValue } from '../../shared/dataseries'
 import { PlotDataSeries, YAxis } from '../../state/models/plot'
@@ -8,6 +10,10 @@ import { TimeRange } from '../../util'
 // extend Highcharts with the "Highcharts More" module
 // see https://www.highcharts.com/forum/viewtopic.php?t=35113
 highchartsMore(Highcharts)
+
+//enable exporting module
+highchartsExporting(Highcharts)
+highchartsOfflineExporting(Highcharts)
 
 // specify colors as hex string
 // if it is set as "hsl(...)" the opacity of the min/max area plot won't work anymore
@@ -86,6 +92,10 @@ export function initChart(container: HTMLElement) {
 		},
 		tooltip: {
 			enabled: false,
+		},
+		exporting: {
+			enabled: true,
+			fallbackToExportServer: false,
 		},
 	})
 }
