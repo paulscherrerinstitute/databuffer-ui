@@ -147,7 +147,7 @@ export const plot = createModel({
 			return {
 				...state,
 				dataSeries: state.dataSeries.map((series, idx) =>
-					idx !== payload.index ? series : { ...series, name: payload.label }
+					idx !== payload.index ? series : { ...series, label: payload.label }
 				),
 				yAxes: state.yAxes.map((axis, idx) =>
 					idx !== payload.index ? axis : { ...axis, title: payload.label }
