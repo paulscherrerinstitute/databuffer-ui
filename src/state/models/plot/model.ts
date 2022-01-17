@@ -49,8 +49,6 @@ export const plot = createModel({
 		startTime: Date.now() - 60_000,
 		endTime: Date.now(),
 		queryExpansion: false,
-		channels: [],
-		dataRequests: [],
 		yAxes: [],
 		dataSeries: [],
 		queryRangeShowing: false,
