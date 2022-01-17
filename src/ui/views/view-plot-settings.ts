@@ -16,7 +16,7 @@ import '@material/mwc-select'
 import '@material/mwc-textfield'
 import { TextField } from '@material/mwc-textfield'
 import { Select } from '@material/mwc-select'
-import { DataUiChannel } from '../../shared/channel'
+import { channelToId, DataUiChannel } from '../../shared/channel'
 
 @customElement('view-plot-settings')
 export class PlotSettingsElement extends connect(store, LitElement) {
@@ -73,9 +73,8 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 				>
 			</mwc-select>
 			<h2>Data series and axes</h2>
-			<table>
+			<table class="fullwidth">
 				<tr>
-					<th>Backend</th>
 					<th>Channel</th>
 					<th>Label</th>
 					<th>Axis type</th>
@@ -85,8 +84,11 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 					const yAxis = this.yAxes[x.yAxisIndex]
 					return html`
 						<tr>
-							<td>${x.channel.backend}</td>
-							<td>${x.channel.name}</td>
+							<td>
+								${channelToId(x.channel)}<br /><span class="description"
+									>${x.channel.description}</span
+								>
+							</td>
 							<td>
 								<mwc-textfield
 									.value=${x.label}
@@ -172,11 +174,14 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 					height: 100%;
 					padding: 8px;
 				}
+
 				.fullwidth {
 					width: 100%;
 				}
-				table {
-					width: 100%;
+
+				.description {
+					font-size: 75%;
+					color: rgba(0, 0, 0, 0.7);
 				}
 			`,
 		]

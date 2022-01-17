@@ -32,7 +32,7 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 		if (this.pendingRequests > 0)
 			return html`<p>Still ${this.pendingRequests} queries in progress</p>`
 		return html`
-			<table>
+			<table class="fullwidth">
 				<thead>
 					<tr>
 						<th>Channel</th>
@@ -47,7 +47,11 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 				<tbody>
 					${this.dataSeries.map(
 						x => html`<tr>
-							<td>${channelToId(x.channel)}<br />${x.channel.description}</td>
+							<td>
+								${channelToId(x.channel)}<br /><span class="description"
+									>${x.channel.description}</span
+								>
+							</td>
 							<td>${x.channel.dataType}</td>
 							<td>
 								${x.channel.dataType === 'string'
@@ -76,6 +80,15 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 				:host {
 					height: 100%;
 					padding: 8px;
+				}
+
+				.fullwidth {
+					width: 100%;
+				}
+
+				.description {
+					font-size: 75%;
+					color: rgba(0, 0, 0, 0.7);
 				}
 			`,
 		]
