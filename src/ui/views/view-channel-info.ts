@@ -1,16 +1,28 @@
 import { LitElement, customElement, html, state, css } from 'lit-element'
 
-import { formatDate } from '../../util'
 import { AppState, store } from '../../state/store'
 import { PlotDataSeries, plotSelectors } from '../../state/models/plot'
 
 import { baseStyles } from '../shared-styles'
 import { connect } from '@captaincodeman/rdx'
-import { channelToId, DataUiChannel } from '../../shared/channel'
+import { channelToId } from '../../shared/channel'
+import type { DataUiChannelState } from '../../shared/channel'
+
+function formatBool(
+	val: boolean | undefined,
+	opts: { valIfTrue: string; valIfFalse: string; valIfUndefined: string } = {
+		valIfFalse: 'N',
+		valIfTrue: 'Y',
+		valIfUndefined: '?',
+	}
+): string {
+	const { valIfFalse, valIfTrue, valIfUndefined } = opts
+	if (val === undefined) return valIfUndefined
+	return val ? valIfTrue : valIfFalse
+}
 
 @customElement('view-channel-info')
 export class ViewChannelInfoElement extends connect(store, LitElement) {
-	@state() channels: DataUiChannel[] = []
 	@state() pendingRequests!: number
 	@state() dataSeries!: PlotDataSeries[]
 
@@ -22,17 +34,10 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 	}
 
 	render() {
-		return html`<h1>Plot info</h1>
-			${this.renderPlotInfo()}
-			<h1>Dispatcher info</h1>
-			${this.renderDispatcherInfo()}`
-	}
-
-	private renderPlotInfo() {
 		if (this.pendingRequests > 0)
 			return html`<p>Still ${this.pendingRequests} queries in progress</p>`
 		return html`
-			<table class="fullwidth">
+			<table class="fullwidth text-small">
 				<thead>
 					<tr>
 						<th>Channel</th>
@@ -42,35 +47,45 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 						<th>Reduced?</th>
 						<th>#plot points</th>
 						<th>#data events</th>
+						<th>Recording?</th>
+						<th>Connected?</th>
+						<th>Configured?</th>
+						<th>Latest event</th>
 					</tr>
 				</thead>
 				<tbody>
-					${this.dataSeries.map(
-						x => html`<tr>
+					${this.dataSeries.map((ds, idx) => {
+						return html`<tr>
 							<td>
-								${channelToId(x.channel)}<br /><span class="description"
-									>${x.channel.description}</span
+								${channelToId(ds.channel)}<br /><span class="description"
+									>${ds.channel.description}</span
 								>
 							</td>
-							<td>${x.channel.dataType}</td>
+							<td>${ds.channel.dataType}</td>
 							<td>
-								${x.channel.dataType === 'string'
+								${ds.channel.dataType === 'string'
 									? 'string'
-									: x.channel.dataShape}
+									: ds.channel.dataShape}
 							</td>
-							<td>${x.channel.unit}</td>
-							<td>${x.isReduced ? 'Y' : 'N'}</td>
-							<td>${x.datapoints?.length ?? ''}</td>
-							<td>${x.numDatapoints ?? ''}</td>
+							<td>${ds.channel.unit}</td>
+							<td class="text-centered">${formatBool(ds.isReduced)}</td>
+							<td class="text-right">${ds.datapoints?.length ?? ''}</td>
+							<td class="text-right">${ds.numDatapoints ?? ''}</td>
+							<td class="text-centered">
+								${formatBool(ds.channel.channelState?.recording)}
+							</td>
+							<td class="text-centered">
+								${formatBool(ds.channel.channelState?.connected)}
+							</td>
+							<td class="text-centered">
+								${formatBool(ds.channel.channelState?.configured)}
+							</td>
+							<td>${ds.channel.channelState?.latestEventDate ?? '?'}</td>
 						</tr>`
-					)}
+					})}
 				</tbody>
 			</table>
 		`
-	}
-
-	private renderDispatcherInfo() {
-		return html`<p>Work in progress...</p>`
 	}
 
 	static get styles() {
@@ -80,6 +95,18 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 				:host {
 					height: 100%;
 					padding: 8px;
+				}
+
+				.text-centered {
+					text-align: center;
+				}
+
+				.text-right {
+					text-align: end;
+				}
+
+				.text-small {
+					font-size: 10pt;
 				}
 
 				.fullwidth {

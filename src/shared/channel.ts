@@ -1,5 +1,12 @@
 export type DataUiChannelShape = 'scalar' | 'waveform' | 'image'
 
+export interface DataUiChannelState {
+	recording: boolean
+	connected: boolean
+	configured: boolean
+	latestEventDate: string
+}
+
 export interface DataUiChannel {
 	name: string
 	backend: string
@@ -9,6 +16,7 @@ export interface DataUiChannel {
 	source?: string
 	tags?: string[]
 	unit?: string
+	channelState?: DataUiChannelState
 }
 
 export const BACKEND_SEPARATOR = '/'
