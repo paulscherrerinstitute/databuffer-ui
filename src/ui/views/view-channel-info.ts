@@ -12,7 +12,6 @@ import type { DataUiChannelState } from '../../shared/channel'
 export class ViewChannelInfoElement extends connect(store, LitElement) {
 	@state() pendingRequests!: number
 	@state() dataSeries!: PlotDataSeries[]
-	@state() channelStates: DataUiChannelState[] = []
 
 	mapState(state: AppState) {
 		return {
@@ -42,7 +41,6 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 				</thead>
 				<tbody>
 					${this.dataSeries.map((ds, idx) => {
-						const chState = this.channelStates[idx]
 						return html`<tr>
 							<td>
 								${channelToId(ds.channel)}<br /><span class="description"
@@ -59,9 +57,25 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 							<td>${ds.isReduced ? 'Y' : 'N'}</td>
 							<td>${ds.datapoints?.length ?? ''}</td>
 							<td>${ds.numDatapoints ?? ''}</td>
-							<td>${chState ? (chState.recording ? 'Y' : 'N') : '?'}</td>
-							<td>${chState ? (chState.connected ? 'Y' : 'N') : '?'}</td>
-							<td>${chState ? chState.latestEventDate : '?'}</td>
+							<td>
+								${ds.channel.channelState
+									? ds.channel.channelState.recording
+										? 'Y'
+										: 'N'
+									: '?'}
+							</td>
+							<td>
+								${ds.channel.channelState
+									? ds.channel.channelState.connected
+										? 'Y'
+										: 'N'
+									: '?'}
+							</td>
+							<td>
+								${ds.channel.channelState
+									? ds.channel.channelState.latestEventDate
+									: '?'}
+							</td>
 						</tr>`
 					})}
 				</tbody>
