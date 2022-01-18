@@ -68,12 +68,18 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 									: ds.channel.dataShape}
 							</td>
 							<td>${ds.channel.unit}</td>
-							<td>${formatBool(ds.isReduced)}</td>
-							<td>${ds.datapoints?.length ?? ''}</td>
-							<td>${ds.numDatapoints ?? ''}</td>
-							<td>${formatBool(ds.channel.channelState?.recording)}</td>
-							<td>${formatBool(ds.channel.channelState?.connected)}</td>
-							<td>${formatBool(ds.channel.channelState?.configured)}</td>
+							<td class="text-centered">${formatBool(ds.isReduced)}</td>
+							<td class="text-right">${ds.datapoints?.length ?? ''}</td>
+							<td class="text-right">${ds.numDatapoints ?? ''}</td>
+							<td class="text-centered">
+								${formatBool(ds.channel.channelState?.recording)}
+							</td>
+							<td class="text-centered">
+								${formatBool(ds.channel.channelState?.connected)}
+							</td>
+							<td class="text-centered">
+								${formatBool(ds.channel.channelState?.configured)}
+							</td>
 							<td>${ds.channel.channelState?.latestEventDate ?? '?'}</td>
 						</tr>`
 					})}
@@ -89,6 +95,14 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 				:host {
 					height: 100%;
 					padding: 8px;
+				}
+
+				.text-centered {
+					text-align: center;
+				}
+
+				.text-right {
+					text-align: end;
 				}
 
 				.text-small {
