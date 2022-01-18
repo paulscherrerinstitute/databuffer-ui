@@ -78,6 +78,7 @@ export interface PlotState {
 	endTime: number
 	queryExpansion: boolean
 	dataSeries: PlotDataSeries[]
+	channelStateFetching: (number | undefined)[]
 	yAxes: YAxis[]
 	queryRangeShowing: boolean
 	dialogShareLinkShowing: boolean

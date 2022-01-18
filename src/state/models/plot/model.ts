@@ -7,7 +7,11 @@ import {
 import { EffectsStore } from '../../store'
 import { ROUTE } from '../../routing'
 import { make_debug, make_error, make_info } from '../applog'
-import { channelToId, DataUiChannel } from '../../../shared/channel'
+import {
+	channelToId,
+	DataUiChannel,
+	DataUiChannelState,
+} from '../../../shared/channel'
 import {
 	DataUiAggregatedValue,
 	DataUiDataPoint,
@@ -51,6 +55,7 @@ export const plot = createModel({
 		queryExpansion: false,
 		yAxes: [],
 		dataSeries: [],
+		channelStateFetching: [],
 		queryRangeShowing: false,
 		dialogShareLinkShowing: false,
 		dialogShareLinkAbsoluteTimes: true,
@@ -251,6 +256,43 @@ export const plot = createModel({
 				...state,
 				dataSeries,
 			}
+		},
+
+		clearChannelStates(state) {
+			const dataSeries = state.dataSeries.map(x => ({
+				...x,
+				channel: { ...x.channel, channelState: undefined },
+			}))
+			return { ...state, dataSeries }
+		},
+
+		channelStateRequest(state, payload: { index: number; timestamp: number }) {
+			const { index, timestamp } = payload
+			const channelStateFetching = [...state.channelStateFetching]
+			channelStateFetching[index] = timestamp
+			return { ...state, channelStateFetching }
+		},
+
+		channelStateSuccess(
+			state,
+			payload: { index: number; channelState: DataUiChannelState }
+		) {
+			const { index, channelState } = payload
+			const channelStateFetching = [...state.channelStateFetching]
+			channelStateFetching[index] = undefined
+			const dataSeries = [...state.dataSeries]
+			dataSeries[index] = {
+				...dataSeries[index],
+				channel: { ...dataSeries[index].channel, channelState },
+			}
+			return { ...state, channelStateFetching, dataSeries }
+		},
+
+		channelStateFailure(state, payload: { index: number }) {
+			const { index } = payload
+			const channelStateFetching = [...state.channelStateFetching]
+			channelStateFetching[index] = undefined
+			return { ...state, channelStateFetching }
 		},
 
 		setQueryExpansion(state, queryExpansion: boolean) {
@@ -556,8 +598,49 @@ export const plot = createModel({
 				saveAs(blob, fname)
 			},
 
+			async loadChannelState() {
+				dispatch.plot.clearChannelStates()
+				const dispatcherApis = appcfgSelectors.backendToDispatcherApi(
+					store.getState()
+				)
+				async function _handleChannel(index: number, ch: DataUiChannel) {
+					const channelId = channelToId(ch)
+					const api = dispatcherApis.get(ch.backend)
+					if (api === undefined) {
+						dispatch.applog.log(
+							make_debug(`no dispatcher api configured for ${channelId}`)
+						)
+						return
+					}
+					const timestamp = Date.now()
+					dispatch.plot.channelStateRequest({ index, timestamp })
+					try {
+						const channelState = await api.queryChannelState(ch)
+						dispatch.plot.channelStateSuccess({
+							index,
+							channelState,
+						})
+					} catch (err) {
+						dispatch.applog.log(
+							make_error(
+								`error querying dispatcher for ${channelId}: ${
+									(err as unknown as Error).message
+								}`
+							)
+						)
+						dispatch.plot.channelStateFailure({ index })
+					}
+				}
+				const channels = plotSelectors.channels(store.getState())
+				channels.map((ch, idx) => _handleChannel(idx, ch))
+			},
+
 			async 'routing/change'(payload: RoutingState<ROUTE>) {
 				switch (payload.page) {
+					case ROUTE.CHANNEL_INFO:
+						dispatch.plot.loadChannelState()
+						break
+
 					case ROUTE.PLOT:
 						// automatically display the query range pop up,
 						// but only if we haven't already drawn a plot
