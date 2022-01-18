@@ -8,6 +8,19 @@ import { connect } from '@captaincodeman/rdx'
 import { channelToId } from '../../shared/channel'
 import type { DataUiChannelState } from '../../shared/channel'
 
+function formatBool(
+	val: boolean | undefined,
+	opts: { valIfTrue: string; valIfFalse: string; valIfUndefined: string } = {
+		valIfFalse: 'N',
+		valIfTrue: 'Y',
+		valIfUndefined: '?',
+	}
+): string {
+	const { valIfFalse, valIfTrue, valIfUndefined } = opts
+	if (val === undefined) return valIfUndefined
+	return val ? valIfTrue : valIfFalse
+}
+
 @customElement('view-channel-info')
 export class ViewChannelInfoElement extends connect(store, LitElement) {
 	@state() pendingRequests!: number
@@ -55,35 +68,13 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 									: ds.channel.dataShape}
 							</td>
 							<td>${ds.channel.unit}</td>
-							<td>${ds.isReduced ? 'Y' : 'N'}</td>
+							<td>${formatBool(ds.isReduced)}</td>
 							<td>${ds.datapoints?.length ?? ''}</td>
 							<td>${ds.numDatapoints ?? ''}</td>
-							<td>
-								${ds.channel.channelState
-									? ds.channel.channelState.recording
-										? 'Y'
-										: 'N'
-									: '?'}
-							</td>
-							<td>
-								${ds.channel.channelState
-									? ds.channel.channelState.connected
-										? 'Y'
-										: 'N'
-									: '?'}
-							</td>
-							<td>
-								${ds.channel.channelState
-									? ds.channel.channelState.configured
-										? 'Y'
-										: 'N'
-									: '?'}
-							</td>
-							<td>
-								${ds.channel.channelState
-									? ds.channel.channelState.latestEventDate
-									: '?'}
-							</td>
+							<td>${formatBool(ds.channel.channelState?.recording)}</td>
+							<td>${formatBool(ds.channel.channelState?.connected)}</td>
+							<td>${formatBool(ds.channel.channelState?.configured)}</td>
+							<td>${ds.channel.channelState?.latestEventDate ?? '?'}</td>
 						</tr>`
 					})}
 				</tbody>
