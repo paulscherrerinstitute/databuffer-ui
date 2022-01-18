@@ -36,6 +36,7 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 						<th>#data events</th>
 						<th>Recording?</th>
 						<th>Connected?</th>
+						<th>Configured?</th>
 						<th>Latest event</th>
 					</tr>
 				</thead>
@@ -67,6 +68,13 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 							<td>
 								${ds.channel.channelState
 									? ds.channel.channelState.connected
+										? 'Y'
+										: 'N'
+									: '?'}
+							</td>
+							<td>
+								${ds.channel.channelState
+									? ds.channel.channelState.configured
 										? 'Y'
 										: 'N'
 									: '?'}

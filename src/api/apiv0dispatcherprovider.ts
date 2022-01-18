@@ -31,6 +31,7 @@ export class ApiV0DispatcherProvider implements DataUiDispatcherApi {
 			throw new Error(`multiple results returned from dispatcher`)
 		const item = data[0]
 		const result: DataUiChannelState = {
+			configured: item.configured,
 			connected: item.connected,
 			recording: item.recording,
 			latestEventDate: item.latestEventDate,

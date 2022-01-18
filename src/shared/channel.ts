@@ -3,6 +3,7 @@ export type DataUiChannelShape = 'scalar' | 'waveform' | 'image'
 export interface DataUiChannelState {
 	recording: boolean
 	connected: boolean
+	configured: boolean
 	latestEventDate: string
 }
 
