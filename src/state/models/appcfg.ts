@@ -2,9 +2,15 @@ import { createModel } from '@captaincodeman/rdx'
 import { createSelector } from 'reselect'
 import { AppState } from '../store'
 import type { EffectsStore } from '../store'
-import { createQueryProvider } from '../../api'
-import type { DataUiQueryApi } from '../../api'
+import { createDispatcherProvider, createQueryProvider } from '../../api'
+import type { DataUiDispatcherApi, DataUiQueryApi } from '../../api'
 import { make_error } from './applog'
+
+type DispatcherApiProviderInfo = {
+	url: string
+	api: DataUiDispatcherApi
+	backends: string[]
+}
 
 type QueryApiProviderInfo = {
 	url: string
@@ -13,6 +19,9 @@ type QueryApiProviderInfo = {
 }
 
 export interface AppcfgState {
+	dispatcherApiProviders: DispatcherApiProviderInfo[]
+	dispatcherApiProvidersFetching: boolean
+	dispatcherApiProvidersError?: Error
 	queryApiProviders: QueryApiProviderInfo[]
 	queryApiProvidersFetching: boolean
 	queryApiProvidersError?: Error
@@ -20,11 +29,39 @@ export interface AppcfgState {
 
 export const appcfg = createModel({
 	state: {
+		dispatcherApiProviders: [],
+		dispatcherApiProvidersFetching: false,
+		dispatcherApiProvidersError: undefined,
 		queryApiProviders: [],
 		queryApiProvidersFetching: false,
 		queryApiProvidersError: undefined,
 	} as AppcfgState,
 	reducers: {
+		dispatcherApiProvidersRequest(state: AppcfgState) {
+			return {
+				...state,
+				dispatcherApiProviders: [],
+				dispatcherApiProvidersFetching: true,
+				dispatcherApiProvidersError: undefined,
+			}
+		},
+		dispatcherApiProvidersSuccess(
+			state: AppcfgState,
+			dispatcherApiProviders: DispatcherApiProviderInfo[]
+		) {
+			return {
+				...state,
+				dispatcherApiProviders,
+				dispatcherApiProvidersFetching: false,
+			}
+		},
+		dispatcherApiProvidersFailure(state: AppcfgState, error: Error) {
+			return {
+				...state,
+				dispatcherApiProvidersFetching: false,
+				dispatcherApiProvidersError: error,
+			}
+		},
 		queryApiProvidersRequest(state: AppcfgState) {
 			return {
 				...state,
@@ -60,7 +97,7 @@ export const appcfg = createModel({
 
 				dispatch.appcfg.queryApiProvidersRequest()
 
-				async function _processApiUrl(url: string) {
+				async function _processQueryApiUrl(url: string) {
 					try {
 						const api = await createQueryProvider(url)
 						const backends = await api?.listBackends()
@@ -73,8 +110,27 @@ export const appcfg = createModel({
 					}
 				}
 
+				async function _deriveDispatcherApis(
+					queryApis: QueryApiProviderInfo[]
+				) {
+					const promises = queryApis.map(async q => {
+						const url = q.url.replace('/data-api.', '/dispatcher-api.')
+						if (url === q.url) return null
+						const result: DispatcherApiProviderInfo = {
+							api: await createDispatcherProvider(url),
+							backends: q.backends,
+							url,
+						}
+						return result
+					})
+					const dispatcherApis = (await Promise.all(promises)).filter(
+						x => x !== null
+					) as DispatcherApiProviderInfo[]
+					return dispatcherApis
+				}
+
 				const promises = await Promise.allSettled(
-					urls.map(url => _processApiUrl(url))
+					urls.map(url => _processQueryApiUrl(url))
 				)
 				const fulfilled = promises.filter(
 					p => p.status === 'fulfilled'
@@ -82,6 +138,11 @@ export const appcfg = createModel({
 				if (fulfilled.length > 0) {
 					const apis = fulfilled.map(p => p.value)
 					dispatch.appcfg.queryApiProvidersSuccess(apis)
+					// not ideal, but while dispatcher api does not provide a way to
+					// list backends, we get the query apis first, and then we try
+					// to guess the corresponding dispatcher api
+					const dispatcherApis = await _deriveDispatcherApis(apis)
+					dispatch.appcfg.dispatcherApiProvidersSuccess(dispatcherApis)
 				} else {
 					dispatch.appcfg.queryApiProvidersFailure(
 						new Error('No query API available')
@@ -96,6 +157,21 @@ const getState = (state: AppState) => state.appcfg
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace appcfgSelectors {
+	export const dispatcherApiProviders = createSelector(
+		[getState],
+		state => state.dispatcherApiProviders
+	)
+
+	export const dispatcherApiProvidersFetching = createSelector(
+		[getState],
+		state => state.dispatcherApiProvidersFetching
+	)
+
+	export const dispatcherApiProvidersError = createSelector(
+		[getState],
+		state => state.dispatcherApiProvidersError
+	)
+
 	export const queryApiProviders = createSelector(
 		[getState],
 		state => state.queryApiProviders
@@ -116,6 +192,20 @@ export namespace appcfgSelectors {
 		queryApiProviders => {
 			const result = new Map<string, DataUiQueryApi>()
 			queryApiProviders.forEach(item => {
+				for (const backend of item.backends) {
+					if (result.has(backend)) continue
+					result.set(backend, item.api)
+				}
+			})
+			return result
+		}
+	)
+
+	export const backendToDispatcherApi = createSelector(
+		[dispatcherApiProviders],
+		dispatcherApiProviders => {
+			const result = new Map<string, DataUiDispatcherApi>()
+			dispatcherApiProviders.forEach(item => {
 				for (const backend of item.backends) {
 					if (result.has(backend)) continue
 					result.set(backend, item.api)
