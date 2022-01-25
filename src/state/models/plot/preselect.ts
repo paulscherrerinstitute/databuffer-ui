@@ -108,6 +108,9 @@ export const extractPreselectParams = (
 		plotVariation: PlotVariation.SeparateAxes,
 		items: [],
 	}
+	if (q.title) {
+		p.title = q.title as string
+	}
 	if (isPlotVariation(q.plotVariation)) {
 		p.plotVariation = q.plotVariation
 	}
