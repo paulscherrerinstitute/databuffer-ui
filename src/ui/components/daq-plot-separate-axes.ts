@@ -47,14 +47,14 @@ export class DaqPlotSeparateAxesElement extends LitElement {
 	@query('#chart')
 	private chartDiv!: HTMLDivElement
 
-	private chart!: Highcharts.Chart
+	private chart?: Highcharts.Chart
 
 	public zoomOut() {
-		this.chart.zoomOut()
+		this.chart?.zoomOut()
 	}
 
 	public reflow() {
-		this.chart.reflow()
+		this.chart?.reflow()
 	}
 
 	firstUpdated() {
@@ -79,13 +79,13 @@ export class DaqPlotSeparateAxesElement extends LitElement {
 			opts.series = dataSeries2HighchartsSeriesOptions(this.series)
 		}
 		if (!isEmptyObj(opts as Record<string, unknown>)) {
-			this.chart.update(opts, true, true)
+			this.chart?.update(opts, true, true)
 			// Initially may show up as 600x400px, if it cannot pick up the
 			// size of the container. Calling reflow() adjusts the size to
 			// the container.
 			//
 			// see also https://stackoverflow.com/questions/16436666/highcharts-issue-about-full-chart-width
-			this.chart.reflow()
+			this.chart?.reflow()
 		}
 	}
 

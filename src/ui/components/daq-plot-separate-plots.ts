@@ -141,7 +141,7 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 	@query('#chartgroup')
 	private chartgroupDiv!: HTMLDivElement
 
-	private charts!: Highcharts.Chart[]
+	private charts: Highcharts.Chart[] = []
 
 	private previousCount: number = 0
 

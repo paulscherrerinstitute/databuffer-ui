@@ -42,7 +42,7 @@ export class DaqIndexPlotElement extends LitElement {
 	@query('#chart')
 	private chartDiv!: HTMLDivElement
 
-	private chart!: Highcharts.Chart
+	private chart?: Highcharts.Chart
 
 	firstUpdated() {
 		this.chart = Highcharts.chart(this.chartDiv, {
