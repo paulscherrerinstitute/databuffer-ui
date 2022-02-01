@@ -5,15 +5,8 @@ import '@material/mwc-formfield'
 import '@material/mwc-switch'
 import type { Switch } from '@material/mwc-switch'
 import * as datefns from 'date-fns'
-import {
-	LitElement,
-	css,
-	customElement,
-	html,
-	query,
-	PropertyValues,
-	state,
-} from 'lit-element'
+import { LitElement, css, html, PropertyValues } from 'lit'
+import { customElement, query, state } from 'lit/decorators.js'
 import 'weightless/popover'
 import type { Popover } from 'weightless/popover'
 

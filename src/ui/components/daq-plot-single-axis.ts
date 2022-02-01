@@ -1,12 +1,5 @@
-import {
-	LitElement,
-	PropertyValues,
-	css,
-	customElement,
-	html,
-	state,
-	query,
-} from 'lit-element'
+import { LitElement, PropertyValues, css, html } from 'lit'
+import { customElement, query, state } from 'lit/decorators.js'
 import { isEmptyObj } from '../../util'
 
 import {

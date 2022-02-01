@@ -1,13 +1,12 @@
 import {
 	LitElement,
-	customElement,
 	html,
-	state,
 	css,
-	query,
 	CSSResultArray,
 	PropertyValues,
-} from 'lit-element'
+	TemplateResult,
+} from 'lit'
+import { customElement, query, state } from 'lit/decorators.js'
 
 import 'weightless/expansion'
 import 'weightless/progress-spinner'
@@ -21,7 +20,6 @@ import type { TextField } from '@material/mwc-textfield'
 import type { DataUiChannel } from '../../shared/channel'
 import { AppState, store } from '../../state/store'
 import { channelsearchSelectors } from '../../state/models/channelsearch'
-import { TemplateResult } from 'lit-html'
 
 import '../components/channel-search-result-list'
 import '../components/channel-search-selected-list'

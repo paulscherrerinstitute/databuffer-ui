@@ -1,4 +1,5 @@
-import { customElement, css, html, LitElement } from 'lit-element'
+import { css, html, LitElement } from 'lit'
+import { customElement } from 'lit/decorators.js'
 import { baseStyles } from '../shared-styles'
 
 @customElement('view-preselect')

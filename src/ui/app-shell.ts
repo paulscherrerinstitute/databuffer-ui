@@ -1,4 +1,5 @@
-import { LitElement, customElement, html, css } from 'lit-element'
+import { LitElement, html, css } from 'lit'
+import { customElement } from 'lit/decorators.js'
 import './app-router'
 import '@material/mwc-icon-button'
 import '@material/mwc-top-app-bar-fixed'

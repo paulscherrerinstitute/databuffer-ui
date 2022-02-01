@@ -1,4 +1,5 @@
-import { LitElement, css, customElement, html, state } from 'lit-element'
+import { LitElement, css, html } from 'lit'
+import { customElement, state } from 'lit/decorators.js'
 import { connect } from '@captaincodeman/rdx'
 import pluralize from 'pluralize'
 
