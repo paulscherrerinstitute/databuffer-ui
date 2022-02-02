@@ -1,12 +1,5 @@
-import {
-	LitElement,
-	css,
-	customElement,
-	html,
-	state,
-	query,
-	PropertyValues,
-} from 'lit-element'
+import { LitElement, css, html, PropertyValues } from 'lit'
+import { customElement, query, state } from 'lit/decorators.js'
 
 import {
 	dataSeries2HighchartsSeriesOptions,

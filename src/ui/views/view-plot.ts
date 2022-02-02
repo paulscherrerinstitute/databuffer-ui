@@ -1,12 +1,5 @@
-import {
-	LitElement,
-	customElement,
-	html,
-	state,
-	css,
-	query,
-	PropertyValues,
-} from 'lit-element'
+import { LitElement, html, css, PropertyValues } from 'lit'
+import { customElement, query, state } from 'lit/decorators.js'
 
 import Highcharts from 'highcharts'
 import highchartsMore from 'highcharts/highcharts-more'

@@ -49,7 +49,12 @@ export default {
 			preventAssignment: true, // as per recommendation
 		}),
 		resolve({
-			dedupe: ['lit-html', 'lit-html/directives/unsafe-html', 'lit-element'],
+			// 2022-02-01:
+			// dedpuing is not feasible while not every other
+			// component is using lit (instead of lit-element
+			// and lit-html), too.
+			//
+			// dedupe: ['lit-html', 'lit-html/directives/unsafe-html', 'lit-element'],
 		}),
 		commonjs(),
 		production && minifyHTML(),

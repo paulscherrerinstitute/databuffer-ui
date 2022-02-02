@@ -1,8 +1,7 @@
 {
   "extends": [
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:mocha/recommended"
+    "plugin:@typescript-eslint/recommended"
   ],
   "env": {
     "browser": true,
@@ -23,8 +22,7 @@
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-inferrable-types": "off",
-    "@typescript-eslint/member-delimiter-style": "off",
-    "mocha/no-mocha-arrows": "off"
+    "@typescript-eslint/member-delimiter-style": "off"
   },
   "overrides": [
     {

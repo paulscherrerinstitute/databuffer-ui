@@ -1,4 +1,5 @@
-import { LitElement, customElement, html, state, css } from 'lit-element'
+import { LitElement, html, css } from 'lit'
+import { customElement, state } from 'lit/decorators.js'
 
 import { AppState, store } from '../../state/store'
 import {

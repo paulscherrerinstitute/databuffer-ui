@@ -1,4 +1,5 @@
-import { LitElement, customElement, css, html, state } from 'lit-element'
+import { LitElement, css, html } from 'lit'
+import { customElement, state } from 'lit/decorators.js'
 import 'weightless/list-item'
 import '@material/mwc-icon-button'
 import '@paulscherrerinstitute/databuffer-web-components/daq-pill'

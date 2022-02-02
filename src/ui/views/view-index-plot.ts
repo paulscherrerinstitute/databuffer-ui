@@ -1,4 +1,5 @@
-import { css, customElement, html, LitElement, state } from 'lit-element'
+import { css, html, LitElement } from 'lit'
+import { customElement, state } from 'lit/decorators.js'
 import { connect } from '@captaincodeman/rdx'
 
 import { AppState, store } from '../../state/store'

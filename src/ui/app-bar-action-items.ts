@@ -1,14 +1,8 @@
-import {
-	LitElement,
-	customElement,
-	html,
-	state,
-	PropertyValues,
-} from 'lit-element'
+import { LitElement, html, nothing, PropertyValues, TemplateResult } from 'lit'
+import { customElement, state } from 'lit/decorators.js'
 import { connect } from '@captaincodeman/rdx'
 import { store, AppState } from '../state/store'
 import { baseStyles } from './shared-styles'
-import { nothing, TemplateResult } from 'lit-html'
 
 import '@material/mwc-icon-button'
 import { ROUTE } from '../state/routing'

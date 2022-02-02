@@ -1,12 +1,5 @@
-import {
-	LitElement,
-	css,
-	customElement,
-	html,
-	state,
-	query,
-	PropertyValues,
-} from 'lit-element'
+import { LitElement, css, html, nothing, PropertyValues } from 'lit'
+import { customElement, query, state } from 'lit/decorators.js'
 import { connect } from '@captaincodeman/rdx'
 import { store, AppState } from '../../state/store'
 import pluralize from 'pluralize'
@@ -22,7 +15,6 @@ import type {
 } from '@paulscherrerinstitute/databuffer-web-components/daq-pill-list'
 import { channelsearchSelectors } from '../../state/models/channelsearch'
 import { plotSelectors } from '../../state/models/plot'
-import { nothing } from 'lit-html'
 import { DataUiChannel } from '../../shared/channel'
 
 function _onChannelRemove(e: CustomEvent<{ index: number }>) {

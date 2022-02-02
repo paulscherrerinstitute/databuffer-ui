@@ -1,12 +1,6 @@
-import {
-	LitElement,
-	customElement,
-	html,
-	state,
-	css,
-	PropertyValues,
-} from 'lit-element'
-import { unsafeHTML } from 'lit-html/directives/unsafe-html'
+import { LitElement, html, css, PropertyValues } from 'lit'
+import { customElement, state } from 'lit/decorators.js'
+import { unsafeHTML } from 'lit/directives/unsafe-html.js'
 import { connect } from '@captaincodeman/rdx'
 import { store, AppState } from '../state/store'
 import { baseStyles } from './shared-styles'

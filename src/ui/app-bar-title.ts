@@ -1,4 +1,5 @@
-import { LitElement, customElement, state, PropertyValues } from 'lit-element'
+import { LitElement, PropertyValues } from 'lit'
+import { customElement, state } from 'lit/decorators.js'
 import { connect } from '@captaincodeman/rdx'
 import { store, AppState } from '../state/store'
 import { baseStyles } from './shared-styles'

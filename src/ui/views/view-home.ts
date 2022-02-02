@@ -1,4 +1,5 @@
-import { LitElement, customElement, html, state, css, query } from 'lit-element'
+import { LitElement, html, css } from 'lit'
+import { customElement, query, state } from 'lit/decorators.js'
 import { connect } from '@captaincodeman/rdx'
 import '@material/mwc-button'
 import '@material/mwc-textfield'
