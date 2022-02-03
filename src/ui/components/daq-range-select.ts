@@ -162,10 +162,10 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 					></mwc-icon-button>
 					<mwc-formfield label="query expansion">
 						<mwc-switch
-							?checked=${this.queryExpansion}
-							@change=${(e: Event) => {
+							?selected=${this.queryExpansion}
+							@click=${(e: Event) => {
 								if (e.target === null) return
-								const val = (e.target as Switch).checked
+								const val = (e.target as Switch).selected
 								store.dispatch.plot.setQueryExpansion(val)
 							}}
 						></mwc-switch>
