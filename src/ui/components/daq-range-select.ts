@@ -4,7 +4,7 @@ import type { TextField } from '@material/mwc-textfield'
 import '@material/mwc-formfield'
 import '@material/mwc-switch'
 import type { Switch } from '@material/mwc-switch'
-import * as datefns from 'date-fns'
+import { parseISO } from 'date-fns'
 import { LitElement, css, html, PropertyValues } from 'lit'
 import { customElement, query, state } from 'lit/decorators.js'
 import 'weightless/popover'
@@ -58,7 +58,7 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 
 	private __onStartTimeChanged(e: Event) {
 		const txt = e.target as TextField
-		const d = datefns.parseISO(txt.value).getTime()
+		const d = parseISO(txt.value).getTime()
 		if (isNaN(d)) {
 			txt.focus()
 			this.dispatchEvent(new CustomEvent('badtimeformat'))
@@ -70,7 +70,7 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 
 	private __onEndTimeChanged(e: Event) {
 		const txt = e.target as TextField
-		const d = datefns.parseISO(txt.value).getTime()
+		const d = parseISO(txt.value).getTime()
 		if (isNaN(d)) {
 			txt.focus()
 			this.dispatchEvent(new CustomEvent('badtimeformat'))

@@ -1,4 +1,4 @@
-import * as datefns from 'date-fns'
+import { lastDayOfMonth, lastDayOfWeek, setDate, setDay } from 'date-fns'
 
 /**
  * Format a timestamp in local time in an ISO8601 style format.
@@ -71,8 +71,8 @@ export function timeRangeDay(baseDate: number): TimeRange {
  * @returns TimeRange object with `start` and `end` timestamps
  */
 export function timeRangeMonth(baseDate: number): TimeRange {
-	const start = datefns.setDate(baseDate, 1).setHours(0, 0, 0, 0)
-	const end = datefns.lastDayOfMonth(baseDate).setHours(23, 59, 59, 999)
+	const start = setDate(baseDate, 1).setHours(0, 0, 0, 0)
+	const end = lastDayOfMonth(baseDate).setHours(23, 59, 59, 999)
 	return { start, end }
 }
 
@@ -83,12 +83,13 @@ export function timeRangeMonth(baseDate: number): TimeRange {
  * @returns TimeRange object with `start` and `end` timestamps
  */
 export function timeRangeWeek(baseDate: number): TimeRange {
-	const start = datefns
-		.setDay(baseDate, 1, { weekStartsOn: 1 })
-		.setHours(0, 0, 0, 0)
-	const end = datefns
-		.lastDayOfWeek(baseDate, { weekStartsOn: 1 })
-		.setHours(23, 59, 59, 999)
+	const start = setDay(baseDate, 1, { weekStartsOn: 1 }).setHours(0, 0, 0, 0)
+	const end = lastDayOfWeek(baseDate, { weekStartsOn: 1 }).setHours(
+		23,
+		59,
+		59,
+		999
+	)
 	return { start, end }
 }
 
