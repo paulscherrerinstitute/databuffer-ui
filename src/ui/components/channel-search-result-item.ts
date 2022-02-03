@@ -1,7 +1,7 @@
 import { LitElement, css, html } from 'lit'
 import { customElement, state } from 'lit/decorators.js'
-import 'weightless/checkbox'
-import type { Checkbox } from 'weightless/checkbox'
+import '@material/mwc-checkbox'
+import type { Checkbox } from '@material/mwc-checkbox'
 import 'weightless/list-item'
 import '@paulscherrerinstitute/databuffer-web-components/daq-pill'
 import '@paulscherrerinstitute/databuffer-web-components/daq-pill-list'
@@ -16,7 +16,7 @@ export class ChannelSearchResultItemElement extends LitElement {
 	public render() {
 		return html`
 			<wl-list-item>
-				<wl-checkbox
+				<mwc-checkbox
 					slot="before"
 					?checked=${this.selectedIndex >= 0}
 					@change=${(e: Event) => {
@@ -40,7 +40,7 @@ export class ChannelSearchResultItemElement extends LitElement {
 							})
 						)
 					}}
-				></wl-checkbox>
+				></mwc-checkbox>
 				<daq-pill-list
 					slot="after"
 					selectable
@@ -58,6 +58,9 @@ export class ChannelSearchResultItemElement extends LitElement {
 	public static get styles() {
 		return [
 			css`
+				mwc-checkbox {
+					--mdc-theme-secondary: var(--mdc-theme-primary);
+				}
 				.channel-name {
 					font-size: inherit;
 				}
