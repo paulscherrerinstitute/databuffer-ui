@@ -8,8 +8,6 @@ import {
 } from 'lit'
 import { customElement, query, state } from 'lit/decorators.js'
 
-import 'weightless/expansion'
-
 import '@material/mwc-button'
 import '@material/mwc-circular-progress'
 import '@material/mwc-snackbar'
