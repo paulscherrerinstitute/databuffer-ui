@@ -7,18 +7,13 @@ import type { Switch } from '@material/mwc-switch'
 import { parseISO } from 'date-fns'
 import { LitElement, css, html, PropertyValues } from 'lit'
 import { customElement, query, state } from 'lit/decorators.js'
-import 'weightless/popover'
-import type { Popover } from 'weightless/popover'
+
+import './daq-range-quickdial.js'
+import type { DaqRangeSelectedEvent } from './daq-range-quickdial.js'
 
 import { AppState, dispatch, store } from '../../state/store'
 import { plotSelectors } from '../../state/models/plot'
-import {
-	formatDate,
-	TimeRange,
-	timeRangeDay,
-	timeRangeMonth,
-	timeRangeWeek,
-} from '../../util'
+import { formatDate, TimeRange } from '../../util'
 import { baseStyles } from '../shared-styles'
 
 const TIMESTAMP_PATTERN = `^\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}\\.\\d{3}$`
@@ -30,9 +25,6 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 	@state() startTime: number = 1
 	@state() endTime: number = 2
 	@state() queryExpansion: boolean = false
-
-	@query('#quickdial')
-	private __quickDial!: Popover
 
 	@query('#starttime')
 	private __txtStartTime!: TextField
@@ -85,42 +77,6 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 		store.dispatch.plot.changeStartTime(range.start)
 	}
 
-	private __quickDialRelative(deltaMs: number) {
-		const end = Date.now()
-		const start = end - deltaMs
-		this.__setTimeRange({ start, end })
-	}
-
-	private __quickDialYesterday() {
-		const range = timeRangeDay(datefns.subDays(new Date(), 1).getTime())
-		this.__setTimeRange(range)
-	}
-
-	private __quickDialToday() {
-		const range = timeRangeDay(Date.now())
-		this.__setTimeRange(range)
-	}
-
-	private __quickDialLastWeek() {
-		const range = timeRangeWeek(datefns.subWeeks(new Date(), 1).getTime())
-		this.__setTimeRange(range)
-	}
-
-	private __quickDialThisWeek() {
-		const range = timeRangeWeek(Date.now())
-		this.__setTimeRange(range)
-	}
-
-	private __quickDialLastMonth() {
-		const range = timeRangeMonth(datefns.subMonths(new Date(), 1).getTime())
-		this.__setTimeRange(range)
-	}
-
-	private __quickDialThisMonth() {
-		const range = timeRangeMonth(Date.now())
-		this.__setTimeRange(range)
-	}
-
 	firstUpdated() {
 		this.canPlot = this.__calcCanPlot()
 	}
@@ -154,12 +110,10 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 					helper="yyyy-mm-dd HH:MM:DD.SSS"
 				></mwc-textfield>
 				<div id="buttons">
-					<mwc-icon-button
-						id="btnQuickDial"
-						@click="${() => this.__quickDial.show()}"
-						icon="more_horiz"
-						label="quick-dial"
-					></mwc-icon-button>
+					<daq-range-quickdial
+						@daq-range-selected=${(e: DaqRangeSelectedEvent) =>
+							this.__setTimeRange(e.detail)}
+					></daq-range-quickdial>
 					<mwc-formfield label="query expansion">
 						<mwc-switch
 							?selected=${this.queryExpansion}
@@ -178,61 +132,6 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 						raised
 					></mwc-button>
 				</div>
-				<wl-popover id="quickdial" closeOnClick fixed anchor="#btnQuickDial">
-					<wl-popover-card>
-						<wl-list-item
-							clickable
-							@click="${() => this.__quickDialRelative(60_000)}"
-							>last 1m</wl-list-item
-						>
-						<wl-list-item
-							clickable
-							@click="${() => this.__quickDialRelative(600_000)}"
-							>last 10m</wl-list-item
-						>
-						<wl-list-item
-							clickable
-							@click="${() => this.__quickDialRelative(3_600_000)}"
-							>last 1h</wl-list-item
-						>
-						<wl-list-item
-							value="43200"
-							clickable
-							@click="${() => this.__quickDialRelative(43_200_000)}"
-							>last 12h</wl-list-item
-						>
-						<wl-list-item
-							clickable
-							@click="${() => this.__quickDialRelative(86_400_000)}"
-							>last 24h</wl-list-item
-						>
-						<wl-list-item
-							value="604800"
-							clickable
-							@click="${() => this.__quickDialRelative(604_800_000)}"
-							>last 7d</wl-list-item
-						>
-						<wl-divider></wl-divider>
-						<wl-list-item clickable @click="${this.__quickDialYesterday}"
-							>yesterday</wl-list-item
-						>
-						<wl-list-item clickable @click="${this.__quickDialToday}"
-							>today</wl-list-item
-						>
-						<wl-list-item clickable @click="${this.__quickDialLastWeek}"
-							>last week</wl-list-item
-						>
-						<wl-list-item clickable @click="${this.__quickDialThisWeek}"
-							>this week</wl-list-item
-						>
-						<wl-list-item clickable @click="${this.__quickDialLastMonth}"
-							>last month</wl-list-item
-						>
-						<wl-list-item clickable @click="${this.__quickDialThisMonth}"
-							>this month</wl-list-item
-						>
-					</wl-popover-card>
-				</wl-popover>
 			</div>
 		`
 	}
@@ -267,10 +166,6 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 					display: inline-flex;
 					flex-direction: row;
 					align-items: center;
-				}
-				#quickdial {
-					max-height: 80vh;
-					--list-item-border-radius: 0;
 				}
 			`,
 		]
