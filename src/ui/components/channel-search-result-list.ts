@@ -36,6 +36,9 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 	@state() allResultsSelected: boolean = false
 	@state() someResultsSelected: boolean = false
 
+	private lastClicked = { index: -1, selected: false }
+	private shiftKeyDown: boolean = false
+
 	@query('#filterlist')
 	private _filterList!: DaqPillListElement
 
@@ -57,6 +60,7 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 						this.activeFilters.every(f => (x.tags?.indexOf(f) ?? -1) >= 0)
 				  )
 		).slice(0, this.maxResults)
+		this.lastClicked = { index: -1, selected: false }
 	}
 
 	private _selectedIdx(channel: DataUiChannel): number {
@@ -84,20 +88,42 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 			this.selectedChannels.length < this.resultsForDisplay.length
 	}
 
-	private _selectAllResults() {
-		for (const channel of this.resultsForDisplay) {
-			const i = this._selectedIdx(channel)
-			if (i >= 0) continue
+	private _selectResultsBetween(firstIdx: number, lastIdx: number) {
+		// swap index, if need be
+		if (firstIdx > lastIdx) {
+			const tmp = firstIdx
+			firstIdx = lastIdx
+			lastIdx = tmp
+		}
+		for (let i = firstIdx; i <= lastIdx; i++) {
+			const channel = this.resultsForDisplay[i]
+			const selIdx = this._selectedIdx(channel)
+			if (selIdx >= 0) continue
 			store.dispatch.plot.selectChannel(channel)
 		}
 	}
 
-	private _unselectAllResults() {
-		for (const channel of this.resultsForDisplay) {
-			const i = this._selectedIdx(channel)
-			if (i < 0) continue
-			store.dispatch.plot.unselectChannel(i)
+	private _unselectResultsBetween(firstIdx: number, lastIdx: number) {
+		// swap index, if need be
+		if (firstIdx > lastIdx) {
+			const tmp = firstIdx
+			firstIdx = lastIdx
+			lastIdx = tmp
 		}
+		for (let i = firstIdx; i <= lastIdx; i++) {
+			const channel = this.resultsForDisplay[i]
+			const selIdx = this._selectedIdx(channel)
+			if (selIdx < 0) continue
+			store.dispatch.plot.unselectChannel(selIdx)
+		}
+	}
+
+	private _selectAllResults() {
+		this._selectResultsBetween(0, this.resultsForDisplay.length - 1)
+	}
+
+	private _unselectAllResults() {
+		this._unselectResultsBetween(0, this.resultsForDisplay.length - 1)
 	}
 
 	updated(changedProperties: PropertyValues): void {
@@ -156,17 +182,33 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 		</div>`
 	}
 
-	private _renderItem(item: DataUiChannel, selectedIndex: number) {
+	private _renderItem(
+		item: DataUiChannel,
+		resultIndex: number,
+		selectedIndex: number
+	) {
 		return html`
 			<div>
 				<mwc-checkbox
 					?checked=${selectedIndex !== -1}
 					@change=${(e: Event) => {
 						const cb = e.target as Checkbox
-						if (cb.checked) {
-							store.dispatch.plot.selectChannel(item)
+						if (this.lastClicked.index >= 0 && this.shiftKeyDown) {
+							if (this.lastClicked.selected) {
+								this._selectResultsBetween(this.lastClicked.index, resultIndex)
+							} else {
+								this._unselectResultsBetween(
+									this.lastClicked.index,
+									resultIndex
+								)
+							}
 						} else {
-							store.dispatch.plot.unselectChannel(selectedIndex)
+							if (cb.checked) {
+								store.dispatch.plot.selectChannel(item)
+							} else {
+								store.dispatch.plot.unselectChannel(selectedIndex)
+							}
+							this.lastClicked = { index: resultIndex, selected: cb.checked }
 						}
 					}}
 				></mwc-checkbox>
@@ -187,7 +229,16 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 
 	public _renderItems() {
 		if (this.resultsForDisplay.length === 0) return nothing
-		return html` <div id="list" class="fullwidth text-small">
+		return html` <div
+			id="list"
+			class="fullwidth text-small"
+			@keydown=${(e: KeyboardEvent) => {
+				this.shiftKeyDown = e.shiftKey
+			}}
+			@keyup=${(e: KeyboardEvent) => {
+				this.shiftKeyDown = e.shiftKey
+			}}
+		>
 			<div class="list-header">
 				<mwc-checkbox
 					reducedTouchTarget
@@ -208,12 +259,9 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 			<div class="list-header"><span>Data type</span></div>
 			<div class="list-header"><span>Data shape</span></div>
 			<div class="list-header"><span>Unit</span></div>
-			${this.resultsForDisplay.map(item => {
-				const selectedIndex = this.selectedChannels.findIndex(
-					selected =>
-						selected.name === item.name && selected.backend === item.backend
-				)
-				return this._renderItem(item, selectedIndex)
+			${this.resultsForDisplay.map((item, idx) => {
+				const selectedIndex = this._selectedIdx(item)
+				return this._renderItem(item, idx, selectedIndex)
 			})}
 		</div>`
 	}
