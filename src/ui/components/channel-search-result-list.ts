@@ -16,7 +16,7 @@ import type {
 } from '@paulscherrerinstitute/databuffer-web-components/daq-pill-list'
 import { channelsearchSelectors } from '../../state/models/channelsearch'
 import { plotSelectors } from '../../state/models/plot'
-import { DataUiChannel } from '../../shared/channel'
+import { compareNameThenBackend, DataUiChannel } from '../../shared/channel'
 import {
 	mwcCheckboxPrimaryColor,
 	opacityHelpers,
@@ -33,6 +33,8 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 	@state() activeFilters: string[] = []
 	@state() selectedChannels: DataUiChannel[] = []
 	@state() maxResults: number = 0
+	@state() allResultsSelected: boolean = false
+	@state() someResultsSelected: boolean = false
 
 	@query('#filterlist')
 	private _filterList!: DaqPillListElement
@@ -57,7 +59,49 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 		).slice(0, this.maxResults)
 	}
 
+	private _selectedIdx(channel: DataUiChannel): number {
+		return this.selectedChannels.findIndex(
+			selected => compareNameThenBackend(channel, selected) === 0
+		)
+	}
+
+	private _recalcAllResultsSelected() {
+		const selectedResults = this.resultsForDisplay.filter(
+			item => this._selectedIdx(item) >= 0
+		)
+		this.allResultsSelected =
+			this.resultsForDisplay.length > 0 &&
+			this.resultsForDisplay.length === selectedResults.length
+	}
+
+	private _recalcSomeResultsSelected() {
+		const i = this.resultsForDisplay.findIndex(
+			item => this._selectedIdx(item) >= 0
+		)
+		this.someResultsSelected =
+			i >= 0 &&
+			this.resultsForDisplay.length > 0 &&
+			this.selectedChannels.length < this.resultsForDisplay.length
+	}
+
+	private _selectAllResults() {
+		for (const channel of this.resultsForDisplay) {
+			const i = this._selectedIdx(channel)
+			if (i >= 0) continue
+			store.dispatch.plot.selectChannel(channel)
+		}
+	}
+
+	private _unselectAllResults() {
+		for (const channel of this.resultsForDisplay) {
+			const i = this._selectedIdx(channel)
+			if (i < 0) continue
+			store.dispatch.plot.unselectChannel(i)
+		}
+	}
+
 	updated(changedProperties: PropertyValues): void {
+		let recalcResultsSelected = false
 		// re-calculate resultsForDisplay when either the search results or the filters have changed
 		if (
 			changedProperties.has('activeFilters') ||
@@ -65,6 +109,14 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 			changedProperties.has('maxResults')
 		) {
 			this._recalcResultsForDisplay()
+			recalcResultsSelected = true
+		}
+		if (changedProperties.has('selectedChannels')) {
+			recalcResultsSelected = true
+		}
+		if (recalcResultsSelected) {
+			this._recalcAllResultsSelected()
+			this._recalcSomeResultsSelected()
 		}
 	}
 
@@ -137,14 +189,25 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 		if (this.resultsForDisplay.length === 0) return nothing
 		return html` <div id="list" class="fullwidth text-small">
 			<div class="list-header">
-				&nbsp;
-				<!-- spacer; need nonbreaking space to render at full height like regular text -->
+				<mwc-checkbox
+					reducedTouchTarget
+					?checked=${this.allResultsSelected}
+					?indeterminate=${this.someResultsSelected}
+					@change=${(e: Event) => {
+						const cb = e.target as Checkbox
+						if (cb.checked) {
+							this._selectAllResults()
+						} else {
+							this._unselectAllResults()
+						}
+					}}
+				></mwc-checkbox>
 			</div>
-			<div class="list-header">Channel</div>
-			<div class="list-header">Backend</div>
-			<div class="list-header">Data type</div>
-			<div class="list-header">Data shape</div>
-			<div class="list-header">Unit</div>
+			<div class="list-header"><span>Channel</span></div>
+			<div class="list-header"><span>Backend</span></div>
+			<div class="list-header"><span>Data type</span></div>
+			<div class="list-header"><span>Data shape</span></div>
+			<div class="list-header"><span>Unit</span></div>
 			${this.resultsForDisplay.map(item => {
 				const selectedIndex = this.selectedChannels.findIndex(
 					selected =>
@@ -193,6 +256,14 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 					background-color: var(--dui-primary);
 					color: var(--dui-on-primary);
 					padding: 4px 8px;
+					align-self: stretch;
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					justify-content: space-around;
+				}
+				.list-header mwc-checkbox {
+					--mdc-theme-secondary: var(--dui-secondary);
 				}
 
 				.fullwidth {
