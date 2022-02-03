@@ -1,5 +1,18 @@
 import { lastDayOfMonth, lastDayOfWeek, setDate, setDay } from 'date-fns'
 
+/** helper for writing legible time spans, e.g. `const duration = 2 * MILLISECOND` */
+export const MILLISECOND = 1
+/** helper for writing legible time spans, e.g. `const duration = 2 * SECOND` */
+export const SECOND = 1_000 * MILLISECOND
+/** helper for writing legible time spans, e.g. `const duration = 2 * MINUTE` */
+export const MINUTE = 60 * SECOND
+/** helper for writing legible time spans, e.g. `const duration = 2 * HOUR` */
+export const HOUR = 60 * MINUTE
+/** helper for writing legible time spans, e.g. `const duration = 2 * DAY` */
+export const DAY = 24 * HOUR
+/** helper for writing legible time spans, e.g. `const duration = 2 * WEEK` */
+export const WEEK = 7 * DAY
+
 /**
  * Format a timestamp in local time in an ISO8601 style format.
  *
