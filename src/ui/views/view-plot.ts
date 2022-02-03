@@ -8,8 +8,8 @@ import 'weightless/divider'
 import 'weightless/expansion'
 import 'weightless/list-item'
 import 'weightless/popover-card'
-import 'weightless/progress-spinner'
 import '@material/mwc-button'
+import '@material/mwc-circular-progress'
 import '@material/mwc-dialog'
 import '@material/mwc-formfield'
 import '@material/mwc-icon-button'
@@ -281,9 +281,11 @@ export class StandardPlotElement extends connect(store, LitElement) {
 				?hidden=${!this.queryRangeShowing}
 				@badtimeformat=${() => this.__snackBadTimeFormat.show()}
 			></daq-range-select>
-			<wl-progress-spinner
+			<mwc-circular-progress
+				indeterminate
+				?closed=${this.pendingRequests === 0}
 				?hidden=${this.pendingRequests === 0}
-			></wl-progress-spinner>
+			></mwc-circular-progress>
 			<div
 				@highchartszoom=${this.__onHighchartsZoom}
 				@highchartspointclick=${this.__onHighchartsPointClick}
@@ -534,9 +536,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					display: flex;
 					flex-direction: column;
 				}
-				wl-progress-spinner {
-					width: 96px;
-					height: 96px;
+				mwc-circular-progress {
 					margin: 8px auto;
 				}
 				[hidden] {
