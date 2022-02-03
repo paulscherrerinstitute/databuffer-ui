@@ -4,7 +4,8 @@ import { connect } from '@captaincodeman/rdx'
 import { store, AppState } from '../../state/store'
 import pluralize from 'pluralize'
 
-import './channel-search-result-item'
+import '@material/mwc-checkbox'
+import type { Checkbox } from '@material/mwc-checkbox'
 
 import '@paulscherrerinstitute/databuffer-web-components/daq-pill'
 import type { DaqPillSelectedEvent } from '@paulscherrerinstitute/databuffer-web-components/daq-pill'
@@ -16,14 +17,11 @@ import type {
 import { channelsearchSelectors } from '../../state/models/channelsearch'
 import { plotSelectors } from '../../state/models/plot'
 import { DataUiChannel } from '../../shared/channel'
-
-function _onChannelRemove(e: CustomEvent<{ index: number }>) {
-	store.dispatch.plot.unselectChannel(e.detail.index)
-}
-
-function _onChannelSelect(e: CustomEvent<{ channel: DataUiChannel }>) {
-	store.dispatch.plot.selectChannel(e.detail.channel)
-}
+import {
+	mwcCheckboxPrimaryColor,
+	opacityHelpers,
+	textHelpers,
+} from '../shared-styles'
 
 @customElement('channel-search-result-list')
 export class ChannelSearchResultListElement extends connect(store, LitElement) {
@@ -106,22 +104,53 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 		</div>`
 	}
 
+	private _renderItem(item: DataUiChannel, selectedIndex: number) {
+		return html`
+			<div>
+				<mwc-checkbox
+					?checked=${selectedIndex !== -1}
+					@change=${(e: Event) => {
+						const cb = e.target as Checkbox
+						if (cb.checked) {
+							store.dispatch.plot.selectChannel(item)
+						} else {
+							store.dispatch.plot.unselectChannel(selectedIndex)
+						}
+					}}
+				></mwc-checkbox>
+			</div>
+			<div>
+				${item.name}${item.description
+					? html`<br /><span class="opacity-70 text-smallest"
+								>${item.description}</span
+							>`
+					: nothing}
+			</div>
+			<div>${item.backend}</div>
+			<div>${item.dataType}</div>
+			<div>${item.dataType === 'string' ? 'string' : item.dataShape}</div>
+			<div>${item.unit}</div>
+		`
+	}
+
 	public _renderItems() {
 		if (this.resultsForDisplay.length === 0) return nothing
-		return html`<div id="list">
+		return html` <div id="list" class="fullwidth text-small">
+			<div class="list-header">
+				&nbsp;
+				<!-- spacer; need nonbreaking space to render at full height like regular text -->
+			</div>
+			<div class="list-header">Channel</div>
+			<div class="list-header">Backend</div>
+			<div class="list-header">Data type</div>
+			<div class="list-header">Data shape</div>
+			<div class="list-header">Unit</div>
 			${this.resultsForDisplay.map(item => {
 				const selectedIndex = this.selectedChannels.findIndex(
 					selected =>
 						selected.name === item.name && selected.backend === item.backend
 				)
-				return html`<channel-search-result-item
-					.item=${item}
-					.selectedIndex=${selectedIndex}
-					.activeFilters=${this.activeFilters}
-					@daq-pill-selected=${this._onItemFilterChanged}
-					@channel-remove=${_onChannelRemove}
-					@channel-select=${_onChannelSelect}
-				></channel-search-result-item>`
+				return this._renderItem(item, selectedIndex)
 			})}
 		</div>`
 	}
@@ -133,21 +162,41 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 
 	public static get styles() {
 		return [
+			textHelpers,
+			opacityHelpers,
+			mwcCheckboxPrimaryColor,
 			css`
 				:host {
 					display: flex;
 					flex-direction: column;
 					height: 100%;
 				}
-				div,
 				#filterlist {
 					margin-top: 8px;
 				}
 				#list {
 					margin-top: 8px;
 					border: 1px solid rgba(0, 0, 0, 0.54);
-					flex: 1 1 auto;
 					overflow-y: scroll;
+					display: grid;
+					grid-template-columns: auto 1fr auto auto auto auto;
+					grid-template-rows: auto;
+					gap: 2px;
+					align-items: center;
+				}
+				#list > div {
+					padding-left: 4px;
+					padding-right: 4px;
+				}
+				.list-header {
+					text-align: center;
+					background-color: var(--dui-primary);
+					color: var(--dui-on-primary);
+					padding: 4px 8px;
+				}
+
+				.fullwidth {
+					width: 100%;
 				}
 			`,
 		]
