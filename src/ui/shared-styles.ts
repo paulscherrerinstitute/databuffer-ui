@@ -33,3 +33,47 @@ export const baseStyles = css`
 		display: none;
 	}
 `
+
+export const mwcCheckboxPrimaryColor = css`
+	mwc-checkbox {
+		--mdc-theme-secondary: var(--mdc-theme-primary);
+	}
+`
+
+export const textHelpers = css`
+	.text-small {
+		font-size: 10pt;
+	}
+
+	.text-smallest {
+		font-size: 8pt;
+	}
+
+	.text-bold {
+		font-weight: bold;
+	}
+
+	.text-centered {
+		text-align: center;
+	}
+
+	.text-left {
+		text-align: start;
+	}
+
+	.text-right {
+		text-align: end;
+	}
+`
+
+export const opacityHelpers = css`
+	.opacity-70 {
+		opacity: 70%;
+	}
+	.opacity-50 {
+		opacity: 50%;
+	}
+	.opacity-30 {
+		opacity: 30%;
+	}
+`

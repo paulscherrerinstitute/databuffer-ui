@@ -8,10 +8,8 @@ import {
 } from 'lit'
 import { customElement, query, state } from 'lit/decorators.js'
 
-import 'weightless/expansion'
-import 'weightless/progress-spinner'
-
 import '@material/mwc-button'
+import '@material/mwc-circular-progress'
 import '@material/mwc-snackbar'
 import type { Snackbar } from '@material/mwc-snackbar'
 import '@material/mwc-textfield'
@@ -108,7 +106,8 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 
 	private __resultsTemplate(): TemplateResult {
 		if (!this.pattern) return html``
-		if (this.fetching) return html`<wl-progress-spinner></wl-progress-spinner>`
+		if (this.fetching)
+			return html`<mwc-circular-progress indeterminate></mwc-circular-progress>`
 		if (this.error)
 			return html`
 				<div class="error">
