@@ -48,6 +48,9 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 	private labelMenu!: Menu
 	private labelDataSeriesTarget?: number
 
+	@query('#axistypemenu')
+	private axisTypeMenu!: Menu
+
 	private _setDataSeriesLabels(selectedAction: number) {
 		if (this.labelDataSeriesTarget === undefined) {
 			for (let i = 0; i < this.dataSeries.length; i++) {
@@ -144,6 +147,21 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 					<mwc-list-item>Use name</mwc-list-item>
 					<mwc-list-item>Use description</mwc-list-item>
 				</mwc-menu>
+				<mwc-menu
+					absolute
+					id="axistypemenu"
+					@action=${(e: CustomEvent<ActionDetail>) => {
+						const selectedType = e.detail.index
+						const type: YAxisType =
+							selectedType === 0 ? 'linear' : 'logarithmic'
+						for (let index = 0; index < this.dataSeries.length; index++) {
+							store.dispatch.plot.setAxisType({ index, type })
+						}
+					}}
+				>
+					<mwc-list-item>All linear</mwc-list-item>
+					<mwc-list-item>All logarithmic</mwc-list-item>
+				</mwc-menu>
 				<div id="axeslist" class="fullwidth text-small">
 					<div class="bg-primary fg-on-primary px-8 py-2 text-centered">
 						Color
@@ -157,7 +175,7 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 					<div class="bg-primary fg-on-primary px-8 py-2 text-centered">
 						Label
 						<span
-							style="cursor:pointer; border:1px solid var(--dui-on-primary); margin:2px; padding:1px; border-radius:2px;"
+							class="minibutton"
 							@click=${(e: Event) => {
 								this.labelDataSeriesTarget = undefined
 								this.labelMenu.anchor = e.target as HTMLElement
@@ -169,6 +187,15 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 					</div>
 					<div class="bg-primary fg-on-primary px-8 py-2 text-centered">
 						Axis type
+						<span
+							class="minibutton"
+							@click=${(e: Event) => {
+								this.axisTypeMenu.anchor = e.target as HTMLElement
+								this.axisTypeMenu.show()
+							}}
+						>
+							...
+						</span>
 					</div>
 					<div class="bg-primary fg-on-primary px-8 py-2 text-centered">
 						Scaling
@@ -294,6 +321,13 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 					grid-template-rows: auto;
 					gap: 2px;
 					align-items: center;
+				}
+				.minibutton {
+					cursor: pointer;
+					border: 1px solid var(--dui-on-primary);
+					margin: 2px;
+					padding: 1px;
+					border-radius: 2px;
 				}
 				section {
 					display: grid;
