@@ -47,6 +47,12 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 			'indexplot:last'() {
 				store.dispatch.indexplot.gotoLastEvent()
 			},
+			'help:manual'() {
+				window.open(
+					'https://github.com/paulscherrerinstitute/databuffer-ui/blob/GIT_COMMIT_REF/docs/index.md',
+					'_blank'
+				)
+			},
 		}
 	}
 
@@ -102,9 +108,19 @@ export class AppBarActionItemsElement extends connect(store, LitElement) {
 			></mwc-icon-button>`,
 	}
 
+	private commonLeading = nothing
+
+	private commonTrailing = html`<mwc-icon-button
+		title="online manual"
+		icon="help_outline"
+		@click=${() => this.dispatchEvent(new CustomEvent('help:manual'))}
+	></mwc-icon-button>`
+
 	shouldUpdate(changedProperties: PropertyValues) {
 		if (changedProperties.has('page')) {
-			this.templateResult = this.actionItemsByPage[this.page] ?? nothing
+			const pageSpecific = this.actionItemsByPage[this.page] ?? nothing
+			this.templateResult = html`${this.commonLeading}${pageSpecific}${this
+				.commonTrailing}`
 		}
 		return changedProperties.has('templateResult')
 	}
