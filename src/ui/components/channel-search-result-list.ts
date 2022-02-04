@@ -20,6 +20,7 @@ import { compareNameThenBackend, DataUiChannel } from '../../shared/channel'
 import {
 	mwcCheckboxPrimaryColor,
 	opacityHelpers,
+	sizeHelpers,
 	textHelpers,
 } from '../shared-styles'
 
@@ -275,6 +276,7 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 		return [
 			textHelpers,
 			opacityHelpers,
+			sizeHelpers,
 			mwcCheckboxPrimaryColor,
 			css`
 				:host {
@@ -312,10 +314,6 @@ export class ChannelSearchResultListElement extends connect(store, LitElement) {
 				}
 				.list-header mwc-checkbox {
 					--mdc-theme-secondary: var(--dui-secondary);
-				}
-
-				.fullwidth {
-					width: 100%;
 				}
 			`,
 		]

@@ -11,7 +11,11 @@ import type { Checkbox } from '@material/mwc-checkbox'
 import { store, AppState } from '../../state/store'
 import { plotSelectors } from '../../state/models/plot'
 import { channelToId, DataUiChannel } from '../../shared/channel'
-import { mwcCheckboxPrimaryColor, textHelpers } from '../shared-styles'
+import {
+	mwcCheckboxPrimaryColor,
+	sizeHelpers,
+	textHelpers,
+} from '../shared-styles'
 
 @customElement('channel-search-selected-list')
 export class ChannelSearchSelectedListElement extends connect(
@@ -104,6 +108,7 @@ export class ChannelSearchSelectedListElement extends connect(
 	public static get styles() {
 		return [
 			textHelpers,
+			sizeHelpers,
 			mwcCheckboxPrimaryColor,
 			css`
 				:host {
@@ -141,10 +146,6 @@ export class ChannelSearchSelectedListElement extends connect(
 					background-color: var(--dui-primary);
 					color: var(--dui-on-primary);
 					padding: 4px 8px;
-				}
-
-				.fullwidth {
-					width: 100%;
 				}
 			`,
 		]

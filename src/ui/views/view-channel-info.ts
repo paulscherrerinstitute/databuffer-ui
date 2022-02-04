@@ -4,7 +4,12 @@ import { customElement, state } from 'lit/decorators.js'
 import { AppState, store } from '../../state/store'
 import { PlotDataSeries, plotSelectors } from '../../state/models/plot'
 
-import { baseStyles, opacityHelpers, textHelpers } from '../shared-styles'
+import {
+	baseStyles,
+	opacityHelpers,
+	sizeHelpers,
+	textHelpers,
+} from '../shared-styles'
 import { connect } from '@captaincodeman/rdx'
 import { channelToId } from '../../shared/channel'
 
@@ -94,14 +99,11 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 			baseStyles,
 			textHelpers,
 			opacityHelpers,
+			sizeHelpers,
 			css`
 				:host {
 					height: 100%;
 					padding: 8px;
-				}
-
-				.fullwidth {
-					width: 100%;
 				}
 			`,
 		]

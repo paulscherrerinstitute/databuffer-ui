@@ -77,3 +77,12 @@ export const opacityHelpers = css`
 		opacity: 30%;
 	}
 `
+
+export const sizeHelpers = css`
+	.fullwidth {
+		width: 100%;
+	}
+	.fullheight {
+		height: 100%;
+	}
+`

@@ -10,7 +10,7 @@ import {
 	PlotDataSeries,
 } from '../../state/models/plot'
 
-import { baseStyles } from '../shared-styles'
+import { baseStyles, sizeHelpers } from '../shared-styles'
 import { connect } from '@captaincodeman/rdx'
 import '@material/mwc-list/mwc-list-item'
 import '@material/mwc-select'
@@ -170,14 +170,11 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 	static get styles() {
 		return [
 			baseStyles,
+			sizeHelpers,
 			css`
 				:host {
 					height: 100%;
 					padding: 8px;
-				}
-
-				.fullwidth {
-					width: 100%;
 				}
 
 				.description {
