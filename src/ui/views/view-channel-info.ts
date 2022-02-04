@@ -6,7 +6,9 @@ import { PlotDataSeries, plotSelectors } from '../../state/models/plot'
 
 import {
 	baseStyles,
+	colorHelpers,
 	opacityHelpers,
+	paddingHelpers,
 	sizeHelpers,
 	textHelpers,
 } from '../shared-styles'
@@ -39,71 +41,87 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 	}
 
 	render() {
+		const headings = [
+			'Channel',
+			'Backend',
+			'Data type',
+			'Data shape',
+			'Unit',
+			'Reduced?',
+			'#plot points',
+			'#data events',
+			'Recording?',
+			'Connected?',
+			'Configured?',
+			'Latest event',
+		]
 		if (this.pendingRequests > 0)
 			return html`<p>Still ${this.pendingRequests} queries in progress</p>`
 		return html`
-			<table class="fullwidth text-small">
-				<thead>
-					<tr>
-						<th>Channel</th>
-						<th>Data type</th>
-						<th>Data shape</th>
-						<th>Unit</th>
-						<th>Reduced?</th>
-						<th>#plot points</th>
-						<th>#data events</th>
-						<th>Recording?</th>
-						<th>Connected?</th>
-						<th>Configured?</th>
-						<th>Latest event</th>
-					</tr>
-				</thead>
-				<tbody>
-					${this.dataSeries.map((ds, idx) => {
-						return html`<tr>
-							<td>
-								${channelToId(ds.channel)}<br /><span
-									class="opacity-70 text-smallest"
-									>${ds.channel.description}</span
-								>
-							</td>
-							<td>${ds.channel.dataType}</td>
-							<td>
-								${ds.channel.dataType === 'string'
-									? 'string'
-									: ds.channel.dataShape}
-							</td>
-							<td>${ds.channel.unit}</td>
-							<td class="text-centered">${formatBool(ds.isReduced)}</td>
-							<td class="text-right">${ds.datapoints?.length ?? ''}</td>
-							<td class="text-right">${ds.numDatapoints ?? ''}</td>
-							<td class="text-centered">
-								${formatBool(ds.channel.channelState?.recording)}
-							</td>
-							<td class="text-centered">
-								${formatBool(ds.channel.channelState?.connected)}
-							</td>
-							<td class="text-centered">
-								${formatBool(ds.channel.channelState?.configured)}
-							</td>
-							<td>${ds.channel.channelState?.latestEventDate ?? '?'}</td>
-						</tr>`
-					})}
-				</tbody>
-			</table>
+			<div id="list" class="fullwidth text-small">
+				${headings.map(
+					text => html`
+						<div class="bg-primary fg-on-primary px-8 py-2 text-centered">
+							${text}
+						</div>
+					`
+				)}
+				${this.dataSeries.map((ds, idx) => {
+					return html`
+						<div class="px-2">
+							${ds.channel.name}<br /><span class="opacity-70 text-smallest"
+								>${ds.channel.description}</span
+							>
+						</div>
+						<div class="px-2">${ds.channel.backend}</div>
+						<div class="px-2">${ds.channel.dataType}</div>
+						<div class="px-2">
+							${ds.channel.dataType === 'string'
+								? 'string'
+								: ds.channel.dataShape}
+						</div>
+						<div class="px-2">${ds.channel.unit}</div>
+						<div class="px-2 text-centered">${formatBool(ds.isReduced)}</div>
+						<div class="px-2 text-right">${ds.datapoints?.length ?? ''}</div>
+						<div class="px-2 text-right">${ds.numDatapoints ?? ''}</div>
+						<div class="px-2 text-centered">
+							${formatBool(ds.channel.channelState?.recording)}
+						</div>
+						<div class="px-2 text-centered">
+							${formatBool(ds.channel.channelState?.connected)}
+						</div>
+						<div class="px-2 text-centered">
+							${formatBool(ds.channel.channelState?.configured)}
+						</div>
+						<div class="px-2">
+							${ds.channel.channelState?.latestEventDate ?? '?'}
+						</div>
+					`
+				})}
+			</div>
 		`
 	}
 
 	static get styles() {
 		return [
 			baseStyles,
+			colorHelpers,
 			textHelpers,
 			opacityHelpers,
+			paddingHelpers,
 			sizeHelpers,
 			css`
 				:host {
 					height: 100%;
 					padding: 8px;
+				}
+				#list {
+					margin-top: 8px;
+					display: grid;
+					grid-template-columns: 1fr auto auto auto auto auto auto auto auto auto auto auto;
+					grid-template-rows: auto;
+					gap: 2px;
+					align-items: center;
 				}
 			`,
 		]
