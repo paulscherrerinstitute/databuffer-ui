@@ -29,7 +29,8 @@ import '@material/mwc-select'
 import type { Select } from '@material/mwc-select'
 import '@material/mwc-textfield'
 import type { TextField } from '@material/mwc-textfield'
-import { channelToId, DataUiChannel } from '../../shared/channel'
+import { DataUiChannel } from '../../shared/channel'
+import '../components/daq-color-box'
 
 @customElement('view-plot-settings')
 export class PlotSettingsElement extends connect(store, LitElement) {
@@ -124,6 +125,9 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 			</mwc-menu>
 			<div id="axeslist" class="fullwidth text-small">
 				<div class="bg-primary fg-on-primary px-8 py-2 text-centered">
+					Color
+				</div>
+				<div class="bg-primary fg-on-primary px-8 py-2 text-centered">
 					Channel
 				</div>
 				<div class="bg-primary fg-on-primary px-8 py-2 text-centered">
@@ -151,6 +155,9 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 				${this.dataSeries.map((x, idx) => {
 					const yAxis = this.yAxes[x.yAxisIndex]
 					return html`
+						<div class="px-2 text-centered">
+							<daq-color-box .index=${idx}></daq-color-box>
+						</div>
 						<div class="px-2">
 							${x.channel.name}<br /><span class="opacity-70 text-smallest"
 								>${x.channel.description}</span
@@ -256,7 +263,7 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 				#axeslist {
 					margin-top: 8px;
 					display: grid;
-					grid-template-columns: 1fr auto 1fr auto auto;
+					grid-template-columns: auto 1fr auto 1fr auto auto;
 					grid-template-rows: auto;
 					gap: 2px;
 					align-items: center;
