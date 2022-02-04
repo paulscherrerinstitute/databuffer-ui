@@ -86,3 +86,68 @@ export const sizeHelpers = css`
 		height: 100%;
 	}
 `
+
+export const paddingHelpers = css`
+	.px-2 {
+		padding-left: 2px;
+		padding-right: 2px;
+	}
+	.px-4 {
+		padding-left: 4px;
+		padding-right: 4px;
+	}
+	.px-8 {
+		padding-left: 8px;
+		padding-right: 8px;
+	}
+	.py-2 {
+		padding-top: 2px;
+		padding-bottom: 2px;
+	}
+	.py-4 {
+		padding-top: 4px;
+		padding-bottom: 4px;
+	}
+	.py-8 {
+		padding-top: 8px;
+		padding-bottom: 8px;
+	}
+`
+
+export const colorHelpers = css`
+	.bg-primary {
+		background-color: var(--dui-primary);
+	}
+	.bg-secondary {
+		background-color: var(--dui-secondary);
+	}
+	.fg-primary {
+		color: var(--dui-primary);
+	}
+	.fg-secondary {
+		color: var(--dui-secondary);
+	}
+	.fg-on-primary {
+		color: var(--dui-on-primary);
+	}
+	.fg-on-secondary {
+		color: var(--dui-on-secondary);
+	}
+`
+
+export const flexHelpers = css`
+	.flex-col {
+		display: flex;
+		flex-direction: row;
+	}
+	.flex-row {
+		display: flex;
+		flex-direction: row;
+	}
+	.flex-grow {
+		flex-grow: 1;
+	}
+	.flex-shrink {
+		flex-shrink: 1;
+	}
+`
