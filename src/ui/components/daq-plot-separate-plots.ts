@@ -120,6 +120,9 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 	subtitle: string = ''
 
 	@state()
+	tooltipEnabled: boolean = false
+
+	@state()
 	yAxes: YAxis[] = []
 
 	@state()
@@ -164,6 +167,9 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 		let needsRefitXAxes = false
 		const opts: Highcharts.Options[] = []
 		const currentCount = this.yAxes.length
+		if (changedProperties.has('tooltipEnabled')) {
+			this.updateTooltip()
+		}
 		if (changedProperties.has('yAxes') || changedProperties.has('series')) {
 			const tmpAxes = yAxis2HighchartsYAxisOptions(this.yAxes).map(
 				y =>
@@ -236,6 +242,15 @@ export class DaqPlotSeparatePlotsElement extends LitElement {
 	private refitXAxes() {
 		for (const chart of this.charts) {
 			chart.xAxis[0].setExtremes(this.xMin, this.xMax)
+		}
+	}
+
+	/**
+	 * enable or disable tooltip on all charts
+	 */
+	private updateTooltip() {
+		for (const chart of this.charts) {
+			chart.update({ tooltip: { enabled: this.tooltipEnabled } })
 		}
 	}
 

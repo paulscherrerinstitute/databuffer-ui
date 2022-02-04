@@ -90,6 +90,7 @@ export type PreselectParams = {
 	startTime: number
 	endTime: number
 	queryExpansion: boolean
+	tooltipEnabled: boolean
 	title?: string
 	plotVariation: PlotVariation
 	items: PreselectDataSeriesConfig[]
@@ -100,11 +101,13 @@ export const extractPreselectParams = (
 ): PreselectParams | undefined => {
 	if (q === undefined) return undefined
 	const queryExpansion = q.queryExpansion === '1'
+	const tooltipEnabled = q.tooltipEnabled === '1'
 	const { startTime, endTime } = extractStartEndTime(q)
 	const p: PreselectParams = {
 		endTime,
 		startTime,
 		queryExpansion,
+		tooltipEnabled,
 		plotVariation: PlotVariation.SeparateAxes,
 		items: [],
 	}
@@ -193,6 +196,7 @@ export async function handleRoutePreselect(
 		dispatch.plot.changePlotTitle(params.title)
 	}
 	dispatch.plot.setQueryExpansion(params.queryExpansion)
+	dispatch.plot.setTooltipEnabled(params.tooltipEnabled)
 
 	const configPromises = params.items.map(async item => {
 		const api = queryApiMap.get(item.channel.backend)

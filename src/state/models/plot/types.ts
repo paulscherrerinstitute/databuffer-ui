@@ -74,6 +74,7 @@ export type PlotDataSeries = {
 export interface PlotState {
 	plotVariation: PlotVariation
 	plotTitle: string
+	tooltipEnabled: boolean
 	startTime: number
 	endTime: number
 	queryExpansion: boolean

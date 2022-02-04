@@ -26,6 +26,9 @@ export class DaqPlotSeparateAxesElement extends LitElement {
 	subtitle: string = ''
 
 	@state()
+	tooltipEnabled: boolean = false
+
+	@state()
 	yAxes: YAxis[] = []
 
 	@state()
@@ -61,6 +64,9 @@ export class DaqPlotSeparateAxesElement extends LitElement {
 		}
 		if (changedProperties.has('subtitle')) {
 			opts.subtitle = { text: this.subtitle }
+		}
+		if (changedProperties.has('tooltipEnabled')) {
+			opts.tooltip = { enabled: this.tooltipEnabled }
 		}
 		if (changedProperties.has('yAxes')) {
 			opts.yAxis = yAxis2HighchartsYAxisOptions(this.yAxes)

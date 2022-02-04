@@ -50,6 +50,7 @@ export const plot = createModel({
 	state: {
 		plotVariation: PlotVariation.SeparateAxes,
 		plotTitle: '',
+		tooltipEnabled: true,
 		startTime: Date.now() - 60_000,
 		endTime: Date.now(),
 		queryExpansion: false,
@@ -404,6 +405,9 @@ export const plot = createModel({
 		},
 		setCsvLineTerminator(state, csvLineTerminator: CsvLineTerminator) {
 			return { ...state, csvLineTerminator }
+		},
+		setTooltipEnabled(state, tooltipEnabled: boolean) {
+			return { ...state, tooltipEnabled }
 		},
 	},
 

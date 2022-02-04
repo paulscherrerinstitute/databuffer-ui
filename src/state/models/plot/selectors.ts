@@ -20,6 +20,10 @@ export const plotVariation = createSelector(
 	state => state.plotVariation
 )
 export const plotTitle = createSelector([getState], state => state.plotTitle)
+export const tooltipEnabled = createSelector(
+	[getState],
+	state => state.tooltipEnabled
+)
 export const startTime = createSelector([getState], state => state.startTime)
 export const endTime = createSelector([getState], state => state.endTime)
 export const queryExpansion = createSelector(
@@ -114,6 +118,7 @@ export const dialogShareLinkUrl = createSelector(
 		startTime,
 		endTime,
 		queryExpansion,
+		tooltipEnabled,
 		plotTitle,
 		plotVariation,
 	],
@@ -125,6 +130,7 @@ export const dialogShareLinkUrl = createSelector(
 		startTime,
 		endTime,
 		queryExpansion,
+		tooltipEnabled,
 		plotTitle,
 		plotVariation
 	) => {
@@ -154,9 +160,8 @@ export const dialogShareLinkUrl = createSelector(
 		} else {
 			params.push(`duration=${endTime - startTime}`)
 		}
-		if (queryExpansion) {
-			params.push('queryExpansion=1')
-		}
+		params.push(`queryExpansion=${queryExpansion ? 1 : 0}`)
+		params.push(`tooltipEnabled=${tooltipEnabled ? 1 : 0}`)
 		if (plotTitle) {
 			params.push(`title=${encodeURIComponent(plotTitle)}`)
 		}

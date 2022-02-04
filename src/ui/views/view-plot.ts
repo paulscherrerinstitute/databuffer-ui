@@ -77,6 +77,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 	@state() plotSubTitle: string = ''
 	@state() plotYAxes: YAxis[] = []
 	@state() plotDataSeries: PlotDataSeries[] = []
+	@state() tooltipEnabled: boolean = false
 
 	private reloadOnZoom = false
 
@@ -144,6 +145,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			plotSubTitle: plotSelectors.plotSubTitle(state),
 			plotYAxes: plotSelectors.yAxes(state),
 			plotDataSeries: plotSelectors.plotDataSeries(state),
+			tooltipEnabled: plotSelectors.tooltipEnabled(state),
 		}
 	}
 
@@ -214,6 +216,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					id="daqplot"
 					.title=${this.plotTitle}
 					.subtitle=${this.plotSubTitle}
+					.tooltipEnabled=${this.tooltipEnabled}
 					.yAxes=${this.plotYAxes}
 					.xMin=${this.startTime}
 					.xMax=${this.endTime}
@@ -225,6 +228,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					id="daqplot"
 					.title=${this.plotTitle}
 					.subtitle=${this.plotSubTitle}
+					.tooltipEnabled=${this.tooltipEnabled}
 					.yAxes=${this.plotYAxes}
 					.xMin=${this.startTime}
 					.xMax=${this.endTime}
@@ -236,6 +240,7 @@ export class StandardPlotElement extends connect(store, LitElement) {
 					id="daqplot"
 					.title=${this.plotTitle}
 					.subtitle=${this.plotSubTitle}
+					.tooltipEnabled=${this.tooltipEnabled}
 					.yAxes=${this.plotYAxes}
 					.xMin=${this.startTime}
 					.xMax=${this.endTime}

@@ -106,6 +106,17 @@ The title of the plot as a string.
 | --------------------------------- | -------------------------------------------- |
 | Kühlwassertemperatur letzte Woche | `K%C3%BChlwassertemperatur%20letzte%20Woche` |
 
+## tooltipEnabled
+
+Enable the tooltip on the plot by setting to `1`.
+
+Examples:
+
+| Example                         | meaning             |
+| ------------------------------- | ------------------- |
+| `1`                             | tooltip is enabled  |
+| any other value, or not present | tooltip is disabled |
+
 ## y1 ... y16
 
 You can specify the Y axis type for channels `c1` through `c16`. The index number of the axis type must match the index number of the channel. E.g. `y3` will be the label for channel `3`.

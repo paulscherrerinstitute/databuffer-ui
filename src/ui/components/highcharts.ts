@@ -91,7 +91,8 @@ export function initChart(container: HTMLElement) {
 			useUTC: false,
 		},
 		tooltip: {
-			enabled: false,
+			enabled: true,
+			xDateFormat: '%Y-%m-%d %H:%M:%S.%L',
 		},
 		exporting: {
 			enabled: true,
