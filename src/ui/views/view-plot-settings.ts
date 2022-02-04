@@ -1,5 +1,5 @@
 import { LitElement, html, css } from 'lit'
-import { customElement, state } from 'lit/decorators.js'
+import { customElement, query, state } from 'lit/decorators.js'
 
 import { AppState, store } from '../../state/store'
 import {
@@ -20,11 +20,15 @@ import {
 	textHelpers,
 } from '../shared-styles'
 import { connect } from '@captaincodeman/rdx'
+import '@material/mwc-icon-button'
+import type { ActionDetail } from '@material/mwc-list/mwc-list.js'
 import '@material/mwc-list/mwc-list-item'
+import '@material/mwc-menu'
+import type { Menu } from '@material/mwc-menu/mwc-menu.js'
 import '@material/mwc-select'
+import type { Select } from '@material/mwc-select'
 import '@material/mwc-textfield'
-import { TextField } from '@material/mwc-textfield'
-import { Select } from '@material/mwc-select'
+import type { TextField } from '@material/mwc-textfield'
 import { channelToId, DataUiChannel } from '../../shared/channel'
 
 @customElement('view-plot-settings')
@@ -34,6 +38,31 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 	@state() plotVariation: PlotVariation = PlotVariation.SeparateAxes
 	@state() plotTitle: string = ''
 	@state() yAxes: YAxis[] = []
+
+	@query('#labelmenu')
+	private labelMenu!: Menu
+	private labelDataSeriesTarget?: number
+
+	private _setDataSeriesLabels(selectedAction: number) {
+		if (this.labelDataSeriesTarget === undefined) {
+			for (let i = 0; i < this.dataSeries.length; i++) {
+				const ch = this.dataSeries[i].channel
+				const label = selectedAction === 0 ? ch.name : ch.description ?? ''
+				this._setDataSeriesLabel(i, label)
+			}
+		} else {
+			const ch = this.dataSeries[this.labelDataSeriesTarget].channel
+			const label = selectedAction === 0 ? ch.name : ch.description ?? ''
+			this._setDataSeriesLabel(this.labelDataSeriesTarget, label)
+		}
+	}
+
+	private _setDataSeriesLabel(index: number, label: string) {
+		store.dispatch.plot.changeDataSeriesLabel({
+			index,
+			label,
+		})
+	}
 
 	mapState(state: AppState) {
 		return {
@@ -82,6 +111,17 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 				>
 			</mwc-select>
 			<h2>Data series and axes</h2>
+			<mwc-menu
+				absolute
+				id="labelmenu"
+				@action=${(e: CustomEvent<ActionDetail>) => {
+					const { index } = e.detail
+					this._setDataSeriesLabels(index)
+				}}
+			>
+				<mwc-list-item>Use name</mwc-list-item>
+				<mwc-list-item>Use description</mwc-list-item>
+			</mwc-menu>
 			<div id="axeslist" class="fullwidth text-small">
 				<div class="bg-primary fg-on-primary px-8 py-2 text-centered">
 					Channel
@@ -91,6 +131,16 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 				</div>
 				<div class="bg-primary fg-on-primary px-8 py-2 text-centered">
 					Label
+					<span
+						style="cursor:pointer; border:1px solid var(--dui-on-primary); margin:2px; padding:1px; border-radius:2px;"
+						@click=${(e: Event) => {
+							this.labelDataSeriesTarget = undefined
+							this.labelMenu.anchor = e.target as HTMLElement
+							this.labelMenu.show()
+						}}
+					>
+						...
+					</span>
 				</div>
 				<div class="bg-primary fg-on-primary px-8 py-2 text-centered">
 					Axis type
@@ -115,12 +165,17 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 								@change=${(e: Event) => {
 									if (e.target === null) return
 									const v = (e.target as TextField).value
-									store.dispatch.plot.changeDataSeriesLabel({
-										index: idx,
-										label: v,
-									})
+									this._setDataSeriesLabel(idx, v)
 								}}
 							></mwc-textfield>
+							<mwc-icon-button
+								icon="more_horiz"
+								@click=${(e: Event) => {
+									this.labelDataSeriesTarget = idx
+									this.labelMenu.anchor = e.target as HTMLElement
+									this.labelMenu.show()
+								}}
+							></mwc-icon-button>
 						</div>
 						<div>
 							<mwc-select
@@ -201,7 +256,6 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 				}
 				#axeslist {
 					margin-top: 8px;
-					border: 1px solid rgba(0, 0, 0, 0.54);
 					display: grid;
 					grid-template-columns: 1fr auto 1fr auto auto;
 					grid-template-rows: auto;
