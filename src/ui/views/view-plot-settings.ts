@@ -152,8 +152,7 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 					const yAxis = this.yAxes[x.yAxisIndex]
 					return html`
 						<div class="px-2">
-							${channelToId(x.channel)}<br /><span
-								class="opacity-70 text-smallest"
+							${x.channel.name}<br /><span class="opacity-70 text-smallest"
 								>${x.channel.description}</span
 							>
 						</div>
