@@ -10,7 +10,12 @@ import {
 	PlotDataSeries,
 } from '../../state/models/plot'
 
-import { baseStyles, sizeHelpers } from '../shared-styles'
+import {
+	baseStyles,
+	opacityHelpers,
+	sizeHelpers,
+	textHelpers,
+} from '../shared-styles'
 import { connect } from '@captaincodeman/rdx'
 import '@material/mwc-list/mwc-list-item'
 import '@material/mwc-select'
@@ -86,7 +91,8 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 					return html`
 						<tr>
 							<td>
-								${channelToId(x.channel)}<br /><span class="description"
+								${channelToId(x.channel)}<br /><span
+									class="opacity-70 text-smallest"
 									>${x.channel.description}</span
 								>
 							</td>
@@ -171,15 +177,12 @@ export class PlotSettingsElement extends connect(store, LitElement) {
 		return [
 			baseStyles,
 			sizeHelpers,
+			textHelpers,
+			opacityHelpers,
 			css`
 				:host {
 					height: 100%;
 					padding: 8px;
-				}
-
-				.description {
-					font-size: 75%;
-					color: rgba(0, 0, 0, 0.7);
 				}
 			`,
 		]
