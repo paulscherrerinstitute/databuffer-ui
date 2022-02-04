@@ -9,6 +9,7 @@
 		"deps:check": "npm-check-updates",
 		"deps:update-to-latest": "npm-check-updates -u && npm install",
 		"dev-backend:queryrest": "node dev-backend-queryrest.js",
+		"download-polyfills": "curl 'https://polyfill.io/v3/polyfill.min.js?flags=gated&features=WebAnimations,requestIdleCallback' -o public/polyfill.min.js",
 		"source": "source-map-explorer public/scripts/databuffer-ui.min.js",
 		"lint:eslint": "eslint 'src/**/*.ts'",
 		"lint:prettier": "prettier 'src/**/*.ts' --list-different || ( echo '↑↑↑  these files are not well formatted  ↑↑↑' && exit 1 )",
