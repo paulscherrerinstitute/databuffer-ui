@@ -4,10 +4,9 @@ import { customElement, state } from 'lit/decorators.js'
 import { AppState, store } from '../../state/store'
 import { PlotDataSeries, plotSelectors } from '../../state/models/plot'
 
-import { baseStyles } from '../shared-styles'
+import { baseStyles, opacityHelpers, textHelpers } from '../shared-styles'
 import { connect } from '@captaincodeman/rdx'
 import { channelToId } from '../../shared/channel'
-import type { DataUiChannelState } from '../../shared/channel'
 
 function formatBool(
 	val: boolean | undefined,
@@ -58,7 +57,8 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 					${this.dataSeries.map((ds, idx) => {
 						return html`<tr>
 							<td>
-								${channelToId(ds.channel)}<br /><span class="description"
+								${channelToId(ds.channel)}<br /><span
+									class="opacity-70 text-smallest"
 									>${ds.channel.description}</span
 								>
 							</td>
@@ -92,31 +92,16 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 	static get styles() {
 		return [
 			baseStyles,
+			textHelpers,
+			opacityHelpers,
 			css`
 				:host {
 					height: 100%;
 					padding: 8px;
 				}
 
-				.text-centered {
-					text-align: center;
-				}
-
-				.text-right {
-					text-align: end;
-				}
-
-				.text-small {
-					font-size: 10pt;
-				}
-
 				.fullwidth {
 					width: 100%;
-				}
-
-				.description {
-					font-size: 75%;
-					color: rgba(0, 0, 0, 0.7);
 				}
 			`,
 		]
