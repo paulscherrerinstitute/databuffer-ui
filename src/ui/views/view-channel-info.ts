@@ -42,6 +42,7 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 
 	render() {
 		const headings = [
+			'Color',
 			'Channel',
 			'Backend',
 			'Data type',
@@ -68,6 +69,9 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 				)}
 				${this.dataSeries.map((ds, idx) => {
 					return html`
+						<div class="px-2 text-centered">
+							<daq-color-box .index=${idx}></daq-color-box>
+						</div>
 						<div class="px-2">
 							${ds.channel.name}<br /><span class="opacity-70 text-smallest"
 								>${ds.channel.description}</span
@@ -118,7 +122,7 @@ export class ViewChannelInfoElement extends connect(store, LitElement) {
 				#list {
 					margin-top: 8px;
 					display: grid;
-					grid-template-columns: 1fr auto auto auto auto auto auto auto auto auto auto auto;
+					grid-template-columns: auto 1fr auto auto auto auto auto auto auto auto auto auto auto;
 					grid-template-rows: auto;
 					gap: 2px;
 					align-items: center;
