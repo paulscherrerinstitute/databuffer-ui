@@ -34,6 +34,8 @@ export class ChannelSearchSelectedListElement extends connect(
 		return {
 			'clear-selection': () => store.dispatch.plot.setSelectedChannels([]),
 			'channel-plot': () => store.dispatch.routing.push(`/plot`),
+			'correlation-plot': () =>
+				store.dispatch.routing.push(`/correlation-plot`),
 		}
 	}
 
@@ -83,7 +85,14 @@ export class ChannelSearchSelectedListElement extends connect(
 					raised
 					@click=${() => this.dispatchEvent(new CustomEvent('channel-plot'))}
 					?disabled=${this.selectedChannels.length === 0}
-					>Plot selected</mwc-button
+					>Plot</mwc-button
+				>
+				<mwc-button
+					icon="scatter_plot"
+					raised
+					@click=${() => this.dispatchEvent(new Event('correlation-plot'))}
+					?disabled=${this.selectedChannels.length !== 2}
+					>Correlation</mwc-button
 				>
 			</div>
 			<div id="list" class="fullwidth text-small">

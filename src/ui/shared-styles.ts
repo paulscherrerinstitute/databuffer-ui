@@ -40,6 +40,14 @@ export const mwcCheckboxPrimaryColor = css`
 	}
 `
 
+export const shadowHelpers = css`
+	.shadow {
+		box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px,
+			rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
+		border-radius: 2px;
+	}
+`
+
 export const textHelpers = css`
 	.text-small {
 		font-size: 10pt;
@@ -111,6 +119,15 @@ export const paddingHelpers = css`
 	.py-8 {
 		padding-top: 8px;
 		padding-bottom: 8px;
+	}
+	.p-2 {
+		padding: 2px;
+	}
+	.p-4 {
+		padding: 4px;
+	}
+	.p-8 {
+		padding: 8px;
 	}
 `
 

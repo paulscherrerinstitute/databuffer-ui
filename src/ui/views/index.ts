@@ -1,5 +1,6 @@
 import './view-channel-info'
 import './view-channel-search'
+import './view-correlation-plot'
 import './view-home'
 import './view-index-plot'
 import './view-not-found'

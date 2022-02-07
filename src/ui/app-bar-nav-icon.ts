@@ -31,6 +31,7 @@ export class AppBarNavIconElement extends connect(store, LitElement) {
 	private destinationByPage: { [key: string]: string } = {
 		[ROUTE.CHANNEL_INFO]: `/plot`,
 		[ROUTE.CHANNEL_SEARCH]: `/`,
+		[ROUTE.CORRELATION_PLOT]: `/search`,
 		[ROUTE.INDEX_PLOT]: `/plot`,
 		[ROUTE.PLOT]: `/search`,
 		[ROUTE.PLOT_SETTINGS]: `/plot`,
