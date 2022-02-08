@@ -1,4 +1,5 @@
 import { LitElement, css, html, nothing } from 'lit'
+import type { PropertyValues } from 'lit'
 import { customElement, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { connect } from '@captaincodeman/rdx'
@@ -24,6 +25,7 @@ export class ChannelSearchSelectedListElement extends connect(
 	LitElement
 ) {
 	@state() selectedChannels: DataUiChannel[] = []
+	@state() canCorrelate: boolean = false
 
 	public mapState(state: AppState) {
 		return {
@@ -42,6 +44,22 @@ export class ChannelSearchSelectedListElement extends connect(
 				store.dispatch.routing.push(`/correlation-plot`)
 			},
 		}
+	}
+
+	updated(changedProperties: PropertyValues) {
+		if (changedProperties.has('selectedChannels')) {
+			this.canCorrelate = this._calcCanCorrelate()
+		}
+	}
+
+	private _calcCanCorrelate() {
+		if (this.selectedChannels.length !== 2) return false
+		for (const ch of this.selectedChannels) {
+			if (ch.dataType === 'string') return false
+			if (ch.dataType === 'bool') return false
+			if (ch.dataShape !== 'scalar') return false
+		}
+		return true
 	}
 
 	private _renderItem(item: DataUiChannel, selectedIndex: number) {
@@ -105,7 +123,7 @@ export class ChannelSearchSelectedListElement extends connect(
 					icon="scatter_plot"
 					raised
 					@click=${() => this.dispatchEvent(new Event('correlation-plot'))}
-					?disabled=${this.selectedChannels.length !== 2}
+					?disabled=${!this.canCorrelate}
 					>Correlation</mwc-button
 				>
 				<mwc-button
