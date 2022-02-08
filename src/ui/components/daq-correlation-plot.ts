@@ -53,11 +53,13 @@ export class DaqCorrelationPlotElement extends LitElement {
 				title: {
 					text: this.xAxisTitle,
 				},
+				gridLineWidth: 1,
 			},
 			yAxis: {
 				title: {
 					text: this.yAxisTitle,
 				},
+				gridLineWidth: 1,
 			},
 			tooltip: {
 				enabled: false,
@@ -66,7 +68,7 @@ export class DaqCorrelationPlotElement extends LitElement {
 				{
 					name: 'correlation',
 					type: 'scatter',
-					color: getColor(1),
+					color: getColor(0),
 					data: this.data,
 				},
 			],
