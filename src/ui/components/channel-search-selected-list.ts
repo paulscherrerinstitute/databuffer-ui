@@ -34,8 +34,12 @@ export class ChannelSearchSelectedListElement extends connect(
 		return {
 			'clear-selection': () => store.dispatch.plot.setSelectedChannels([]),
 			'channel-plot': () => store.dispatch.routing.push(`/plot`),
-			'correlation-plot': () =>
-				store.dispatch.routing.push(`/correlation-plot`),
+			'correlation-plot': () => {
+				const channelX = this.selectedChannels[0]
+				const channelY = this.selectedChannels[1]
+				store.dispatch.correlationplot.selectChannels({ channelX, channelY })
+				store.dispatch.routing.push(`/correlation-plot`)
+			},
 		}
 	}
 

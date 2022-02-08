@@ -17,7 +17,7 @@ import {
 	textHelpers,
 } from '../shared-styles'
 import type { DataUiChannel } from '../../shared/channel'
-import { plotSelectors } from '../../state/models/plot'
+import { correlationplotSelectors } from '../../state/models/correlationplot'
 
 declare global {
 	interface HTMLElementTagNameMap {
@@ -27,16 +27,25 @@ declare global {
 
 @customElement('view-correlation-plot')
 export class ViewCorrelationPlotElement extends connect(store, LitElement) {
-	@state()
-	channelX?: DataUiChannel
-
-	@state()
-	channelY?: DataUiChannel
+	@state() private channelX?: DataUiChannel
+	@state() private channelY?: DataUiChannel
+	@state() private startTime: number = Date.now() - 3_600_000
+	@state() private endTime: number = Date.now()
+	@state() private queryExpansion: boolean = false
+	@state() private fetching: boolean = false
+	@state() private error?: Error
+	@state() private correlatedData: unknown
 
 	mapState(state: AppState) {
 		return {
-			channelX: plotSelectors.channels(state)[0],
-			channelY: plotSelectors.channels(state)[1],
+			channelX: correlationplotSelectors.channelX(state),
+			channelY: correlationplotSelectors.channelY(state),
+			startTime: correlationplotSelectors.startTime(state),
+			endTime: correlationplotSelectors.endTime(state),
+			queryExpansion: correlationplotSelectors.queryExpansion(state),
+			fetching: correlationplotSelectors.fetching(state),
+			error: correlationplotSelectors.error(state),
+			correlatedData: correlationplotSelectors.correlatedData(state),
 		}
 	}
 
@@ -71,11 +80,14 @@ export class ViewCorrelationPlotElement extends connect(store, LitElement) {
 			${this._renderAxesGrid()}
 			<daq-range-select
 				class="shadow"
+				.startTime=${this.startTime}
+				.endTime=${this.endTime}
+				.queryExpansion=${this.queryExpansion}
 				@plot=${(e: CustomEvent<PlotEventDetail>) => {
 					const { start, end, queryExpansion } = e.detail
-					// store.dispatch.correlation.setRange({start, end})
-					// store.dispatch.correlation.setQueryExpansion(queryExpansion)
-					// store.dispatch.correlation.drawPlot()
+					store.dispatch.correlationplot.setRange({ start, end })
+					store.dispatch.correlationplot.setQueryExpansion(queryExpansion)
+					store.dispatch.correlationplot.drawPlot()
 				}}
 			></daq-range-select>
 			<div class="shadow" id="chart">CHART</div>
