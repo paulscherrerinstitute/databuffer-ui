@@ -7,6 +7,8 @@ Here are several frequently asked questions, and their answers.
 - [3. How can I check if a channel is aggregated?](#3-how-can-i-check-if-a-channel-is-aggregated)
 - [4. How can I check if a channel is recording?](#4-how-can-i-check-if-a-channel-is-recording)
 - [5. What does 'query expansion' mean?](#5-what-does-query-expansion-mean)
+- [6. Why is the correlation plot empty?](#6-why-is-the-correlation-plot-empty)
+- [7. Why can I not correlate two channels?](#7-why-can-i-not-correlate-two-channels)
 
 ## 1. Why is my data aggregated?
 
@@ -41,3 +43,14 @@ If the channel you query does not change very frequently (e.g. it monitors a val
 The _query expansion_ feature will include, if possible, 1 datapoint on each side, so that the lines of the plot can connect all the way to the edges.
 
 See also: [How to extend the query range](./howtos/query_expansion.md)
+
+## 6. Why is the correlation plot empty?
+
+In order to correlate two channels, the datapoints must have the exact same time stamp. Otherwise no matches can be found.
+
+## 7. Why can I not correlate two channels?
+
+Correlation is only possible for channels that meet these criteria:
+
+- Data type must be numeric
+- Data shape must be scalar

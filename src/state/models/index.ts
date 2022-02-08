@@ -1,5 +1,6 @@
 export { appcfg } from './appcfg'
 export { applog } from './applog'
 export { channelsearch } from './channelsearch'
+export { correlationplot } from './correlationplot'
 export { plot } from './plot'
 export { indexplot } from './indexplot'
