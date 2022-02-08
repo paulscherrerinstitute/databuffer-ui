@@ -69,6 +69,7 @@ export function initChart(container: HTMLElement) {
 			crosshair: true,
 			startOnTick: false,
 			endOnTick: false,
+			gridLineWidth: 1,
 			dateTimeLabelFormats: {
 				day: '%Y-%m-%d',
 				week: '%Y-%m-%d',
