@@ -70,6 +70,9 @@ export class DaqCorrelationPlotElement extends LitElement {
 					data: this.data,
 				},
 			],
+			legend: {
+				enabled: false,
+			},
 		})
 	}
 
