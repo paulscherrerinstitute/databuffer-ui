@@ -12,6 +12,7 @@ import { store, AppState } from '../../state/store'
 import { plotSelectors } from '../../state/models/plot'
 import { channelToId, DataUiChannel } from '../../shared/channel'
 import {
+	flexHelpers,
 	mwcCheckboxPrimaryColor,
 	sizeHelpers,
 	textHelpers,
@@ -74,32 +75,7 @@ export class ChannelSearchSelectedListElement extends connect(
 
 	public render() {
 		return html`
-			<div id="toprow">
-				<span id="numselected">
-					${pluralize('channel', this.selectedChannels.length, true)}
-					selected</span
-				><mwc-button
-					icon="clear"
-					@click=${() => this.dispatchEvent(new CustomEvent('clear-selection'))}
-					.disabled=${this.selectedChannels.length === 0}
-					>Clear selection</mwc-button
-				>
-				<mwc-button
-					icon="show_chart"
-					raised
-					@click=${() => this.dispatchEvent(new CustomEvent('channel-plot'))}
-					?disabled=${this.selectedChannels.length === 0}
-					>Plot</mwc-button
-				>
-				<mwc-button
-					icon="scatter_plot"
-					raised
-					@click=${() => this.dispatchEvent(new Event('correlation-plot'))}
-					?disabled=${this.selectedChannels.length !== 2}
-					>Correlation</mwc-button
-				>
-			</div>
-			<div id="list" class="fullwidth text-small">
+			<div id="list" class="fullwidth text-small flex-grow flex-shrink">
 				<div class="list-header">
 					&nbsp;
 					<!-- spacer; need nonbreaking space to render at full height like regular text -->
@@ -115,11 +91,37 @@ export class ChannelSearchSelectedListElement extends connect(
 					(ch, idx) => this._renderItem(ch, idx)
 				)}
 			</div>
+			<div id="bottomrow" class="flex-row">
+				<span class="flex-grow flex-shring">
+					${pluralize('channel', this.selectedChannels.length, true)}
+					selected</span
+				><mwc-button
+					icon="clear"
+					@click=${() => this.dispatchEvent(new CustomEvent('clear-selection'))}
+					.disabled=${this.selectedChannels.length === 0}
+					>Clear selection</mwc-button
+				>
+				<mwc-button
+					icon="scatter_plot"
+					raised
+					@click=${() => this.dispatchEvent(new Event('correlation-plot'))}
+					?disabled=${this.selectedChannels.length !== 2}
+					>Correlation</mwc-button
+				>
+				<mwc-button
+					icon="show_chart"
+					raised
+					@click=${() => this.dispatchEvent(new CustomEvent('channel-plot'))}
+					?disabled=${this.selectedChannels.length === 0}
+					>Plot</mwc-button
+				>
+			</div>
 		`
 	}
 
 	public static get styles() {
 		return [
+			flexHelpers,
 			textHelpers,
 			sizeHelpers,
 			mwcCheckboxPrimaryColor,
@@ -129,24 +131,20 @@ export class ChannelSearchSelectedListElement extends connect(
 					flex-direction: column;
 					height: 100%;
 				}
-				#toprow {
-					display: flex;
-					flex-direction: row;
+				#bottomrow {
+					margin-top: 8px;
 					align-items: center;
-				}
-				#numselected {
-					flex: 1 1 auto;
 				}
 				mwc-button {
 					margin: auto 0 auto 8px;
 				}
 				#list {
-					margin-top: 8px;
 					border: 1px solid rgba(0, 0, 0, 0.54);
 					overflow-y: scroll;
 					display: grid;
 					grid-template-columns: auto 1fr auto auto auto auto;
-					grid-template-rows: auto;
+					grid-template-rows: max-content;
+					grid-auto-rows: max-content;
 					gap: 2px;
 					align-items: center;
 				}
