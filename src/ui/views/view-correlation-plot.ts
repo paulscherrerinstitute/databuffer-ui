@@ -1,8 +1,11 @@
-import { css, html, LitElement, nothing } from 'lit'
-import { customElement, property, query, state } from 'lit/decorators.js'
+import { css, html, LitElement } from 'lit'
+import { customElement, state } from 'lit/decorators.js'
 import { connect } from '@captaincodeman/rdx'
 
+import '@material/mwc-circular-progress'
+
 import '../components/daq-range-select'
+import '../components/daq-correlation-plot'
 import type { PlotEventDetail } from '../components/daq-range-select'
 
 import { store } from '../../state/store'
@@ -17,7 +20,9 @@ import {
 	textHelpers,
 } from '../shared-styles'
 import type { DataUiChannel } from '../../shared/channel'
+import type { DataUiDataPoint } from '../../shared/dataseries'
 import { correlationplotSelectors } from '../../state/models/correlationplot'
+import { formatDate } from '../../util'
 
 declare global {
 	interface HTMLElementTagNameMap {
@@ -34,7 +39,7 @@ export class ViewCorrelationPlotElement extends connect(store, LitElement) {
 	@state() private queryExpansion: boolean = false
 	@state() private fetching: boolean = false
 	@state() private error?: Error
-	@state() private correlatedData: unknown
+	@state() private correlatedData?: DataUiDataPoint<number, number>[]
 
 	mapState(state: AppState) {
 		return {
@@ -90,7 +95,19 @@ export class ViewCorrelationPlotElement extends connect(store, LitElement) {
 					store.dispatch.correlationplot.drawPlot()
 				}}
 			></daq-range-select>
-			<div class="shadow" id="chart">CHART</div>
+			${this.fetching
+				? html`<mwc-circular-progress indeterminate></mwc-circular-progress>`
+				: html`<daq-correlation-plot
+						.title=${formatDate(this.startTime) +
+						' - ' +
+						formatDate(this.endTime)}
+						.subtitle=${`Number of data points: ${
+							this.correlatedData?.length ?? 'n/a'
+						}`}
+						.xAxisTitle=${this.channelX?.name ?? ''}
+						.yAxisTitle=${this.channelY?.name ?? ''}
+						.data=${this.correlatedData?.map(pt => [pt.x, pt.y]) ?? []}
+				  ></daq-correlation-plot>`}
 		`
 	}
 
@@ -117,10 +134,6 @@ export class ViewCorrelationPlotElement extends connect(store, LitElement) {
 					display: grid;
 					grid-template-columns: auto 1fr auto;
 					gap: 2px;
-				}
-				#chart {
-					padding: 8px;
-					background-color: white;
 				}
 			`,
 		]
