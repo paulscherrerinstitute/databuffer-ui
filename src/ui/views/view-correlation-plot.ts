@@ -3,6 +3,7 @@ import { customElement, property, query, state } from 'lit/decorators.js'
 import { connect } from '@captaincodeman/rdx'
 
 import '../components/daq-range-select'
+import type { PlotEventDetail } from '../components/daq-range-select'
 
 import { store } from '../../state/store'
 import type { AppState } from '../../state/store'
@@ -15,7 +16,6 @@ import {
 	sizeHelpers,
 	textHelpers,
 } from '../shared-styles'
-import { channelToId } from '../../shared/channel'
 import type { DataUiChannel } from '../../shared/channel'
 import { plotSelectors } from '../../state/models/plot'
 
@@ -69,7 +69,15 @@ export class ViewCorrelationPlotElement extends connect(store, LitElement) {
 	render() {
 		return html`
 			${this._renderAxesGrid()}
-			<daq-range-select class="shadow"></daq-range-select>
+			<daq-range-select
+				class="shadow"
+				@plot=${(e: CustomEvent<PlotEventDetail>) => {
+					const { start, end, queryExpansion } = e.detail
+					// store.dispatch.correlation.setRange({start, end})
+					// store.dispatch.correlation.setQueryExpansion(queryExpansion)
+					// store.dispatch.correlation.drawPlot()
+				}}
+			></daq-range-select>
 			<div class="shadow" id="chart">CHART</div>
 		`
 	}

@@ -20,7 +20,7 @@ import '../components/daq-plot-separate-axes'
 import '../components/daq-plot-separate-plots'
 import '../components/daq-plot-single-axis'
 
-import { formatDate, TimeRange } from '../../util'
+import type { TimeRange } from '../../util'
 import { AppState, store } from '../../state/store'
 import {
 	PlotDataSeries,
@@ -39,6 +39,7 @@ import type { DaqPlotSingleAxisElement } from '../components/daq-plot-single-axi
 import type { DaqPlotSeparateAxesElement } from '../components/daq-plot-separate-axes'
 import type { DaqPlotSeparatePlotsElement } from '../components/daq-plot-separate-plots'
 import '../components/daq-range-select'
+import type { PlotEventDetail } from '../components/daq-range-select'
 import type { DataUiChannel } from '../../shared/channel'
 
 const IS_MAC = window.navigator.appVersion.toLowerCase().indexOf('mac') >= 0
@@ -279,7 +280,20 @@ export class StandardPlotElement extends connect(store, LitElement) {
 			<daq-range-select
 				id="queryrange"
 				?hidden=${!this.queryRangeShowing}
+				.startTime=${this.startTime}
+				.endTime=${this.endTime}
+				.queryExpansion=${this.queryExpansion}
 				@badtimeformat=${() => this.__snackBadTimeFormat.show()}
+				@startchanged=${(e: CustomEvent<{ time: number }>) =>
+					store.dispatch.plot.changeStartTime(e.detail.time)}
+				@endchanged=${(e: CustomEvent<{ time: number }>) =>
+					store.dispatch.plot.changeEndTime(e.detail.time)}
+				@plot=${(e: CustomEvent<PlotEventDetail>) => {
+					store.dispatch.plot.changeStartTime(e.detail.start)
+					store.dispatch.plot.changeEndTime(e.detail.end)
+					store.dispatch.plot.setQueryExpansion(e.detail.queryExpansion)
+					store.dispatch.plot.drawPlot()
+				}}
 			></daq-range-select>
 			<mwc-circular-progress
 				indeterminate

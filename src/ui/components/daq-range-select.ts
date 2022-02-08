@@ -1,4 +1,3 @@
-import { connect } from '@captaincodeman/rdx'
 import '@material/mwc-textfield'
 import type { TextField } from '@material/mwc-textfield'
 import '@material/mwc-formfield'
@@ -6,25 +5,41 @@ import '@material/mwc-switch'
 import type { Switch } from '@material/mwc-switch'
 import { parseISO } from 'date-fns'
 import { LitElement, css, html, PropertyValues } from 'lit'
-import { customElement, query, state } from 'lit/decorators.js'
+import { customElement, property, query, state } from 'lit/decorators.js'
 
 import './daq-range-quickdial.js'
 import type { DaqRangeSelectedEvent } from './daq-range-quickdial.js'
 
-import { AppState, dispatch, store } from '../../state/store'
-import { plotSelectors } from '../../state/models/plot'
 import { formatDate, TimeRange } from '../../util'
 import { baseStyles } from '../shared-styles'
 
 const TIMESTAMP_PATTERN = `^\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}\\.\\d{3}$`
 const TIMESTAMP_REGEX = new RegExp(TIMESTAMP_PATTERN)
 
+export type PlotEventDetail = {
+	start: number
+	end: number
+	queryExpansion: boolean
+}
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'daq-range-select': DaqRangeSelectElement
+	}
+}
+
 @customElement('daq-range-select')
-export class DaqRangeSelectElement extends connect(store, LitElement) {
+export class DaqRangeSelectElement extends LitElement {
 	@state() canPlot: boolean = false
-	@state() startTime: number = 1
-	@state() endTime: number = 2
-	@state() queryExpansion: boolean = false
+
+	@property({ type: Number })
+	startTime: number = 1
+
+	@property({ type: Number })
+	endTime: number = 2
+
+	@property({ type: Boolean })
+	queryExpansion: boolean = false
 
 	@query('#starttime')
 	private __txtStartTime!: TextField
@@ -32,20 +47,51 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 	@query('#endtime')
 	private __txtEndTime!: TextField
 
-	mapState(state: AppState) {
-		return {
-			startTime: plotSelectors.startTime(state),
-			endTime: plotSelectors.endTime(state),
-			queryExpansion: plotSelectors.queryExpansion(state),
-		}
-	}
-
 	private __calcCanPlot(): boolean {
 		if (this.__txtStartTime === null) return false
 		if (TIMESTAMP_REGEX.test(this.__txtStartTime.value) === false) return false
 		if (this.__txtEndTime === null) return false
 		if (TIMESTAMP_REGEX.test(this.__txtEndTime.value) === false) return false
 		return true
+	}
+	private _dispatchStartChanged() {
+		const event = new CustomEvent<{ time: number }>('startchanged', {
+			bubbles: true,
+			composed: true,
+			detail: { time: this.startTime },
+		})
+		this.dispatchEvent(event)
+	}
+
+	private _dispatchEndChanged() {
+		const event = new CustomEvent<{ time: number }>('endchanged', {
+			bubbles: true,
+			composed: true,
+			detail: { time: this.endTime },
+		})
+		this.dispatchEvent(event)
+	}
+
+	private _dispatchQueryExpansion() {
+		const event = new CustomEvent<{ enabled: boolean }>('queryexpansion', {
+			bubbles: true,
+			composed: true,
+			detail: { enabled: this.queryExpansion },
+		})
+		this.dispatchEvent(event)
+	}
+
+	private _dispatchPlot() {
+		const event = new CustomEvent<PlotEventDetail>('plot', {
+			bubbles: true,
+			composed: true,
+			detail: {
+				start: this.startTime,
+				end: this.endTime,
+				queryExpansion: this.queryExpansion,
+			},
+		})
+		this.dispatchEvent(event)
 	}
 
 	private __onStartTimeChanged(e: Event) {
@@ -57,7 +103,8 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 			this.canPlot = false
 			return
 		}
-		store.dispatch.plot.changeStartTime(d)
+		this.startTime = d
+		this._dispatchStartChanged()
 	}
 
 	private __onEndTimeChanged(e: Event) {
@@ -69,12 +116,15 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 			this.canPlot = false
 			return
 		}
-		store.dispatch.plot.changeEndTime(d)
+		this.endTime = d
+		this._dispatchEndChanged()
 	}
 
 	private __setTimeRange(range: TimeRange) {
-		store.dispatch.plot.changeEndTime(range.end)
-		store.dispatch.plot.changeStartTime(range.start)
+		this.startTime = range.start
+		this.endTime = range.end
+		this._dispatchStartChanged()
+		this._dispatchEndChanged()
 	}
 
 	firstUpdated() {
@@ -120,12 +170,13 @@ export class DaqRangeSelectElement extends connect(store, LitElement) {
 							@click=${(e: Event) => {
 								if (e.target === null) return
 								const val = (e.target as Switch).selected
-								store.dispatch.plot.setQueryExpansion(val)
+								this.queryExpansion = val
+								this._dispatchQueryExpansion()
 							}}
 						></mwc-switch>
 					</mwc-formfield>
 					<mwc-button
-						@click=${() => dispatch.plot.drawPlot()}
+						@click=${() => this._dispatchPlot()}
 						?disabled=${!this.canPlot}
 						icon="show_chart"
 						label="plot"
