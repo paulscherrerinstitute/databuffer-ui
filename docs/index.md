@@ -1,8 +1,16 @@
-# Databuffer UI online manual
+# Databuffer UI online manual <!-- omit in toc -->
 
 ![databuffer UI logo](../assets/app-icon-material.png)
 
 This is the online documentation for _databuffer UI_ version 4.
+
+## Contents <!-- omit in toc -->
+
+- [FAQs](#faqs)
+- [How-To guides](#how-to-guides)
+- [Background information](#background-information)
+- [Reference material](#reference-material)
+- [Maintainer documentation](#maintainer-documentation)
 
 ## FAQs
 
@@ -12,6 +20,7 @@ We have compiled a list of [frequently asked questions](./faqs.md) and their ans
 
 These guides provide step-by-step instructions for **achieving common tasks**. We try to keep them short and to the point, so you can reach your goal without much fuss. That's why in the how-to guides we keep explanations to a minimum. We want you to have a little bit of context and maybe a pointer or two if you _want_ to extend your knowledge, so you don't have to trust us blindly.
 
+- [How to correlate two channels](./howtos/correlate_channels.md)
 - [How to download channel data](./howtos/download_channel_data.md)
 - [How to extend the query range](./howtos/query_expansion.md)
 - [How to plot wave forms with the index plot](./howtos/index_plot.md)
