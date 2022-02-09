@@ -26,6 +26,8 @@ export class ChannelSearchSelectedListElement extends connect(
 ) {
 	@state() selectedChannels: DataUiChannel[] = []
 	@state() canCorrelate: boolean = false
+	@state() canPlot: boolean = false
+	@state() canViewImage: boolean = false
 
 	public mapState(state: AppState) {
 		return {
@@ -49,6 +51,8 @@ export class ChannelSearchSelectedListElement extends connect(
 	updated(changedProperties: PropertyValues) {
 		if (changedProperties.has('selectedChannels')) {
 			this.canCorrelate = this._calcCanCorrelate()
+			this.canPlot = this._calcCanPlot()
+			this.canViewImage = this._calcCanViewImage()
 		}
 	}
 
@@ -58,6 +62,19 @@ export class ChannelSearchSelectedListElement extends connect(
 			if (ch.dataType === 'string') return false
 			if (ch.dataType === 'bool') return false
 			if (ch.dataShape !== 'scalar') return false
+		}
+		return true
+	}
+
+	private _calcCanPlot() {
+		if (this.selectedChannels.length === 0) return false
+		return true
+	}
+
+	private _calcCanViewImage() {
+		if (this.selectedChannels.length !== 1) return false
+		for (const ch of this.selectedChannels) {
+			if (ch.dataShape !== 'image') return false
 		}
 		return true
 	}
@@ -120,6 +137,13 @@ export class ChannelSearchSelectedListElement extends connect(
 					>Clear selection</mwc-button
 				>
 				<mwc-button
+					icon="photo"
+					raised
+					@click=${() => this.dispatchEvent(new Event('image-viewer'))}
+					?disabled=${!this.canViewImage}
+					>View</mwc-button
+				>
+				<mwc-button
 					icon="scatter_plot"
 					raised
 					@click=${() => this.dispatchEvent(new Event('correlation-plot'))}
@@ -130,7 +154,7 @@ export class ChannelSearchSelectedListElement extends connect(
 					icon="show_chart"
 					raised
 					@click=${() => this.dispatchEvent(new CustomEvent('channel-plot'))}
-					?disabled=${this.selectedChannels.length === 0}
+					?disabled=${!this.canPlot}
 					>Plot</mwc-button
 				>
 			</div>
