@@ -1,15 +1,10 @@
 import { createModel } from '@captaincodeman/rdx'
 import { createSelector } from 'reselect'
 import { channelToId, DataUiChannel } from '../../shared/channel'
+import type { DataUiDataPoint, DataUiImage } from '../../shared/dataseries'
 import type { AppState, EffectsStore } from '../store'
 import { appcfgSelectors } from './appcfg'
 import { make_error } from './applog'
-
-export type ImageViewerImage = {
-	timestamp: number
-	pulseId: number
-	data: string
-}
 
 export type RequestStatus = {
 	fetching: boolean
@@ -23,8 +18,8 @@ export type ImageviewerState = {
 	endTime: number
 	channel?: DataUiChannel
 	request: RequestStatus
-	thumbnails: ImageViewerImage[]
-	detailImage?: ImageViewerImage
+	thumbnails: DataUiDataPoint<number, DataUiImage>[]
+	detailImage?: DataUiDataPoint<number, DataUiImage>
 }
 
 export const imageviewer = createModel({
@@ -65,13 +60,19 @@ export const imageviewer = createModel({
 		clearThumbnails(state: ImageviewerState) {
 			return { ...state, thumbnails: [] }
 		},
-		setThumbnails(state: ImageviewerState, thumbnails: ImageViewerImage[]) {
+		setThumbnails(
+			state: ImageviewerState,
+			thumbnails: DataUiDataPoint<number, DataUiImage>[]
+		) {
 			return { ...state, thumbnails }
 		},
 		clearDetailImage(state: ImageviewerState) {
 			return { ...state, detailImage: undefined }
 		},
-		setDetailImage(state: ImageviewerState, detailImage: ImageViewerImage) {
+		setDetailImage(
+			state: ImageviewerState,
+			detailImage: DataUiDataPoint<number, DataUiImage>
+		) {
 			return { ...state, detailImage }
 		},
 	},
@@ -111,11 +112,41 @@ export const imageviewer = createModel({
 				}
 				dispatch.imageviewer.channelDataRequest(Date.now())
 				try {
-					const apiData = api.queryImageThumbnails(channel, startDate, endDate)
+					const apiData = await api.queryImageThumbnails(
+						channel,
+						startDate,
+						endDate
+					)
 					dispatch.imageviewer.channelDataSuccess(Date.now())
-					// TODO: transform the data form the api response
-					const thumbnails: ImageViewerImage[] = []
+					const thumbnails = apiData.datapoints
 					dispatch.imageviewer.setThumbnails(thumbnails)
+				} catch (e) {
+					const error = e as Error
+					dispatch.imageviewer.channelDataFailure({
+						timestamp: Date.now(),
+						error,
+					})
+					throw e // notify the outside world of the problem
+				}
+			},
+			async fetchDetailImage(ts: number) {
+				dispatch.imageviewer.clearDetailImage()
+				const channel = imageviewerSelectors.channel(store.getState())
+				if (channel === undefined) {
+					throw new Error('internal error: channel is undefined')
+				}
+				const channelId = channelToId(channel)
+				const queryApis = appcfgSelectors.backendToQueryApi(store.getState())
+				const api = queryApis.get(channel.backend)
+				if (!api) {
+					dispatch.applog.log(make_error(`no api provider for ${channelId}`))
+					throw new Error(`no api provider for ${channelId}`)
+				}
+				dispatch.imageviewer.channelDataRequest(Date.now())
+				try {
+					const apiData = await api.queryImageAtTimestamp(channel, ts)
+					dispatch.imageviewer.channelDataSuccess(Date.now())
+					dispatch.imageviewer.setDetailImage({ x: ts, y: apiData })
 				} catch (e) {
 					const error = e as Error
 					dispatch.imageviewer.channelDataFailure({

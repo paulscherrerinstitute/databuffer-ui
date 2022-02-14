@@ -12,7 +12,7 @@ export type DataUiAggregatedValue = {
 	max: number
 }
 
-export type DataUiImage = number[][]
+export type DataUiImage = string // base64 encoded png
 
 export type DataUiWaveform = number[]
 

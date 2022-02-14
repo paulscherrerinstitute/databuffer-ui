@@ -72,7 +72,7 @@ export interface DataUiQueryApi {
 		channel: DataUiChannel,
 		start: string,
 		end: string
-	) => Promise<DataUiImage[]>
+	) => Promise<DataUiDataSeries<number, DataUiImage>>
 
 	queryImageAtTimestamp: (
 		channel: DataUiChannel,
