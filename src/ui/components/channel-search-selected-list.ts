@@ -45,6 +45,11 @@ export class ChannelSearchSelectedListElement extends connect(
 				store.dispatch.correlationplot.selectChannels({ channelX, channelY })
 				store.dispatch.routing.push(`/correlation-plot`)
 			},
+			'image-viewer': () => {
+				const channel = this.selectedChannels[0]
+				store.dispatch.imageviewer.selectChannel(channel)
+				store.dispatch.routing.push(`/image-viewer`)
+			},
 		}
 	}
 

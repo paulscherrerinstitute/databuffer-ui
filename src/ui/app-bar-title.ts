@@ -25,6 +25,7 @@ export class AppBarTitleElement extends connect(store, LitElement) {
 		[ROUTE.CHANNEL_INFO]: `Channel info`,
 		[ROUTE.CHANNEL_SEARCH]: `Search`,
 		[ROUTE.CORRELATION_PLOT]: `Correlation plot`,
+		[ROUTE.IMAGE_VIEWER]: `Image viewer`,
 		[ROUTE.INDEX_PLOT]: `Index plot`,
 		[ROUTE.PLOT]: `Plot`,
 		[ROUTE.PLOT_SETTINGS]: `Plot settings`,

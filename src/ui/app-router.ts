@@ -26,6 +26,7 @@ export class AppRouterElement extends connect(store, LitElement) {
 		[ROUTE.CHANNEL_INFO]: `<view-channel-info></view-channel-info>`,
 		[ROUTE.CHANNEL_SEARCH]: `<view-channel-search></view-channel-search>`,
 		[ROUTE.CORRELATION_PLOT]: `<view-correlation-plot></view-correlation-plot>`,
+		[ROUTE.IMAGE_VIEWER]: `<view-image-viewer></view-image-viewer>`,
 		[ROUTE.INDEX_PLOT]: `<view-index-plot></view-index-plot>`,
 		[ROUTE.PLOT]: `<view-plot></view-plot>`,
 		[ROUTE.PLOT_SETTINGS]: `<view-plot-settings></view-plot-settings>`,
