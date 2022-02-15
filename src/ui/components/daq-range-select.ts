@@ -4,7 +4,7 @@ import '@material/mwc-formfield'
 import '@material/mwc-switch'
 import type { Switch } from '@material/mwc-switch'
 import { parseISO } from 'date-fns'
-import { LitElement, css, html, PropertyValues } from 'lit'
+import { LitElement, css, html, PropertyValues, nothing } from 'lit'
 import { customElement, property, query, state } from 'lit/decorators.js'
 
 import './daq-range-quickdial.js'
@@ -40,6 +40,9 @@ export class DaqRangeSelectElement extends LitElement {
 
 	@property({ type: Boolean })
 	queryExpansion: boolean = false
+
+	@property({ type: Boolean })
+	hideQueryExpansion: boolean = false
 
 	@query('#starttime')
 	private __txtStartTime!: TextField
@@ -164,17 +167,21 @@ export class DaqRangeSelectElement extends LitElement {
 						@daq-range-selected=${(e: DaqRangeSelectedEvent) =>
 							this.__setTimeRange(e.detail)}
 					></daq-range-quickdial>
-					<mwc-formfield label="query expansion">
-						<mwc-switch
-							?selected=${this.queryExpansion}
-							@click=${(e: Event) => {
-								if (e.target === null) return
-								const val = (e.target as Switch).selected
-								this.queryExpansion = val
-								this._dispatchQueryExpansion()
-							}}
-						></mwc-switch>
-					</mwc-formfield>
+					${this.hideQueryExpansion
+						? nothing
+						: html`
+								<mwc-formfield label="query expansion">
+									<mwc-switch
+										?selected=${this.queryExpansion}
+										@click=${(e: Event) => {
+											if (e.target === null) return
+											const val = (e.target as Switch).selected
+											this.queryExpansion = val
+											this._dispatchQueryExpansion()
+										}}
+									></mwc-switch>
+								</mwc-formfield>
+						  `}
 					<mwc-button
 						@click=${() => this._dispatchPlot()}
 						?disabled=${!this.canPlot}

@@ -24,7 +24,7 @@ export type ImageviewerState = {
 
 export const imageviewer = createModel({
 	state: {
-		startTime: Date.now() - 3_600_000,
+		startTime: Date.now() - 10_000,
 		endTime: Date.now(),
 		queryExpansion: false,
 		request: { fetching: false },
