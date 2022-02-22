@@ -4,6 +4,7 @@ import {
 	AggregationOperation,
 	AggregationResult,
 	AggregationType,
+	DataQuery,
 	EventField,
 } from '@paulscherrerinstitute/databuffer-query-js/api/v0/query-data'
 
@@ -13,6 +14,7 @@ import type {
 	DataUiAggregatedValue,
 	DataUiDataPoint,
 	DataUiDataSeries,
+	DataUiImage,
 	DataUiScalarValue,
 } from '../shared/dataseries'
 import { NR_OF_BINS } from './queryapi'
@@ -276,6 +278,66 @@ export class ApiV0QueryProvider implements DataUiQueryApi {
 			break
 		}
 		const result = {
+			name: id,
+			datapoints,
+		}
+		return result
+	}
+
+	public async queryImageAtTimestamp(channel: DataUiChannel, ts: number) {
+		const id = channelToId(channel)
+		if (channel.dataShape !== 'image') {
+			throw new Error(`internal error: not an image: ${id}`)
+		}
+		//TODO: DO STUFF
+		const result: DataUiImage = ''
+		return result
+	}
+
+	public async queryImageThumbnails(
+		channel: DataUiChannel,
+		start: string,
+		end: string
+	) {
+		const id = channelToId(channel)
+		if (channel.dataShape !== 'image') {
+			throw new Error(`internal error: not an image: ${id}`)
+		}
+		const response = await this.api.queryData({
+			channels: [{ name: channel.name, backend: channel.backend }],
+			range: {
+				startDate: start,
+				endDate: end,
+			},
+			eventFields: [EventField.GLOBAL_MILLIS, EventField.TRANSFORMED_VALUE],
+			valueTransformations: [
+				{
+					sequence: [
+						{
+							imageResize: {
+								downScaleFactor: 16,
+								valueAggregation: 'first-value',
+							},
+						},
+						{
+							imageFormat: 'png',
+							imageEncoder: 'base64string',
+						},
+					],
+				},
+			],
+		} as DataQuery)
+		let datapoints: DataUiDataPoint<number, DataUiImage>[] = []
+		for (const respItem of response) {
+			if (respItem.channel.backend !== channel.backend) continue
+			if (respItem.channel.name !== channel.name) continue
+			datapoints = respItem.data.map(e => ({
+				x: e[EventField.GLOBAL_MILLIS] as number,
+				y: e[EventField.TRANSFORMED_VALUE] as DataUiImage,
+			}))
+			break
+		}
+		const result: DataUiDataSeries<number, DataUiImage> = {
 			name: id,
 			datapoints,
 		}

@@ -12,6 +12,10 @@ export type DataUiAggregatedValue = {
 	max: number
 }
 
+export type DataUiImage = string // base64 encoded png
+
+export type DataUiWaveform = number[]
+
 export interface DataUiDataSeries<X, Y> {
 	name: string
 	datapoints: DataUiDataPoint<X, Y>[]
