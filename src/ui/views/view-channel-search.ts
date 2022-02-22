@@ -17,6 +17,7 @@ import type { TextField } from '@material/mwc-textfield'
 
 import type { DataUiChannel } from '../../shared/channel'
 import { AppState, store } from '../../state/store'
+import { appcfgSelectors } from '../../state/models/appcfg'
 import { channelsearchSelectors } from '../../state/models/channelsearch'
 
 import '../components/channel-search-result-list'
@@ -28,6 +29,7 @@ const MAX_NUM_RESULTS = 100
 
 @customElement('view-channel-search')
 export class ChannelSearchElement extends connect(store, LitElement) {
+	@state() canSearchChannels = false
 	@state() pattern: string = ''
 	@state() searchResults: DataUiChannel[] = []
 	@state() fetching: boolean = false
@@ -41,6 +43,7 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 
 	mapState(state: AppState) {
 		return {
+			canSearchChannels: appcfgSelectors.canSearchChannels(state),
 			pattern: channelsearchSelectors.pattern(state),
 			searchResults: channelsearchSelectors.results(state),
 			fetching: channelsearchSelectors.fetching(state),
@@ -84,13 +87,18 @@ export class ChannelSearchElement extends connect(store, LitElement) {
 					label="Search Data API"
 					helper="Search supports regular expressions"
 					value="${this.pattern}"
+					?disabled=${!this.canSearchChannels}
 					@keyup=${(e: KeyboardEvent): void => {
 						if (e.key === 'Enter') this.__search()
 					}}
 					@change=${() =>
 						store.dispatch.channelsearch.patternChange(this.__query.value)}
 				></mwc-textfield
-				><mwc-button icon="search" raised @click=${this.__search}
+				><mwc-button
+					icon="search"
+					raised
+					?disabled=${!this.canSearchChannels}
+					@click=${this.__search}
 					>Search</mwc-button
 				>
 			</div>

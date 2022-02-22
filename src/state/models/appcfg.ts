@@ -25,6 +25,7 @@ export interface AppcfgState {
 	queryApiProviders: QueryApiProviderInfo[]
 	queryApiProvidersFetching: boolean
 	queryApiProvidersError?: Error
+	initFinished: boolean
 }
 
 export const appcfg = createModel({
@@ -35,6 +36,7 @@ export const appcfg = createModel({
 		queryApiProviders: [],
 		queryApiProvidersFetching: false,
 		queryApiProvidersError: undefined,
+		initFinished: false,
 	} as AppcfgState,
 	reducers: {
 		dispatcherApiProvidersRequest(state: AppcfgState) {
@@ -85,6 +87,12 @@ export const appcfg = createModel({
 				...state,
 				queryApiProvidersFetching: false,
 				queryApiProvidersError: error,
+			}
+		},
+		setInitFinished(state: AppcfgState, initFinished: boolean) {
+			return {
+				...state,
+				initFinished,
 			}
 		},
 	},
@@ -148,6 +156,8 @@ export const appcfg = createModel({
 						new Error('No query API available')
 					)
 				}
+				// whatever the results, we're done with init now
+				dispatch.appcfg.setInitFinished(true)
 			},
 		}
 	},
@@ -187,6 +197,11 @@ export namespace appcfgSelectors {
 		state => state.queryApiProvidersError
 	)
 
+	export const initFinished = createSelector(
+		[getState],
+		state => state.initFinished
+	)
+
 	export const backendToQueryApi = createSelector(
 		[queryApiProviders],
 		queryApiProviders => {
@@ -218,5 +233,11 @@ export namespace appcfgSelectors {
 	export const availableBackends = createSelector(
 		[backendToQueryApi],
 		backendToQueryApi => [...backendToQueryApi.keys()].sort()
+	)
+
+	export const canSearchChannels = createSelector(
+		[initFinished, availableBackends],
+		(initFinished, availableBackends) =>
+			initFinished && availableBackends.length > 0
 	)
 }

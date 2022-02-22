@@ -19,6 +19,8 @@ export class HomeElement extends connect(store, LitElement) {
 	@state()
 	availableBackends: string[] = []
 	@state()
+	canSearchChannels: boolean = false
+	@state()
 	queryApiProvidersFetching: boolean = false
 	@state()
 	queryApiProvidersError?: Error
@@ -29,6 +31,7 @@ export class HomeElement extends connect(store, LitElement) {
 	mapState(state: AppState) {
 		return {
 			availableBackends: appcfgSelectors.availableBackends(state),
+			canSearchChannels: appcfgSelectors.canSearchChannels(state),
 			queryApiProvidersFetching:
 				appcfgSelectors.queryApiProvidersFetching(state),
 			queryApiProvidersError: appcfgSelectors.queryApiProvidersError(state),
@@ -55,6 +58,7 @@ export class HomeElement extends connect(store, LitElement) {
 						id="query"
 						label="Search Data API"
 						helper="Search supports regular expressions"
+						?disabled=${!this.canSearchChannels}
 						@change=${() =>
 							store.dispatch.channelsearch.patternChange(this.__query.value)}
 						@keyup=${(e: KeyboardEvent): void => {
@@ -62,7 +66,11 @@ export class HomeElement extends connect(store, LitElement) {
 						}}
 						value="${this.pattern}"
 					></mwc-textfield>
-					<mwc-button icon="search" raised @click=${this.__search}
+					<mwc-button
+						icon="search"
+						raised
+						?disabled=${!this.canSearchChannels}
+						@click=${this.__search}
 						>Search</mwc-button
 					>
 

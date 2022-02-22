@@ -667,9 +667,8 @@ export const plot = createModel({
 						break
 
 					case ROUTE.PRESELECT:
-						// wait until the query api providers have been configured
-						await waitUntil(
-							() => !appcfgSelectors.queryApiProvidersFetching(store.getState())
+						await waitUntil(() =>
+							appcfgSelectors.initFinished(store.getState())
 						)
 						handleRoutePreselect(
 							dispatch,
