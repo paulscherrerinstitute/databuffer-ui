@@ -7,6 +7,7 @@ import '@material/mwc-circular-progress'
 import '../components/daq-range-select'
 import '../components/daq-correlation-plot'
 import type { PlotEventDetail } from '../components/daq-range-select'
+import '../components/daq-thumbnail-list'
 
 import { store } from '../../state/store'
 import type { AppState } from '../../state/store'
@@ -21,7 +22,6 @@ import {
 } from '../shared-styles'
 import type { DataUiChannel } from '../../shared/channel'
 import { imageviewerSelectors } from '../../state/models/imageviewer'
-import { formatDate } from '../../util'
 import type { DataUiDataPoint, DataUiImage } from '../../shared/dataseries'
 
 declare global {
@@ -38,6 +38,7 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 	@state() private fetching: boolean = false
 	@state() private error?: Error
 	@state() private thumbnails: DataUiDataPoint<number, DataUiImage>[] = []
+	@state() private canLoadMore: boolean = false
 
 	mapState(state: AppState) {
 		return {
@@ -47,6 +48,7 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 			fetching: imageviewerSelectors.fetching(state),
 			error: imageviewerSelectors.error(state),
 			thumbnails: imageviewerSelectors.thumbnails(state),
+			canLoadMore: imageviewerSelectors.canLoadMoreSlices(state),
 		}
 	}
 
@@ -56,17 +58,6 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 		}
 	}
 
-	private _renderThumbnails() {
-		if (this.fetching)
-			return html`<mwc-circular-progress indeterminate></mwc-circular-progress>`
-		if (this.thumbnails.length === 0) {
-			return nothing
-		}
-		return this.thumbnails.map(
-			t => html`<img class="thumbnail" src=${t.y} title="${formatDate(t.x)}" />`
-		)
-	}
-
 	render() {
 		return html`
 			<daq-range-select
@@ -74,14 +65,35 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 				.startTime=${this.startTime}
 				.endTime=${this.endTime}
 				hideQueryExpansion
+				@startchanged=${(e: CustomEvent<{ time: number }>) => {
+					const start = e.detail.time
+					const end = this.endTime
+					store.dispatch.imageviewer.setRange({ start, end })
+				}}
+				@endchanged=${(e: CustomEvent<{ time: number }>) => {
+					const start = this.startTime
+					const end = e.detail.time
+					store.dispatch.imageviewer.setRange({ start, end })
+				}}
 				@plot=${(e: CustomEvent<PlotEventDetail>) => {
 					const { start, end } = e.detail
 					store.dispatch.imageviewer.setRange({ start, end })
-					store.dispatch.imageviewer.fetchThumbnails()
+					store.dispatch.imageviewer.fetchFirstSlice()
 				}}
 			></daq-range-select>
-			<div class="shadow p-4" id="thumbnail-container">
-				${this._renderThumbnails()}
+			<div style="overflow-y:auto;" class="shadow p-4">
+				<daq-thumbnail-list
+					.fetching=${this.fetching}
+					.thumbnails=${this.thumbnails}
+					slicesize="20"
+				>
+				</daq-thumbnail-list>
+				<mwc-button
+					raised
+					label="Load more"
+					?disabled=${!this.canLoadMore}
+					@click=${() => store.dispatch.imageviewer.fetchNextSlice()}
+				></mwc-button>
 			</div>
 		`
 	}
@@ -97,7 +109,7 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 			textHelpers,
 			css`
 				:host {
-					height: 100%;
+					height: calc(100vh - 48px);
 					width: 100%;
 					padding: 8px;
 					display: grid;
@@ -105,20 +117,8 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 					gap: 8px;
 					grid-template-rows: auto 1fr;
 				}
-				#thumbnail-container {
-					line-height: 0;
-					overflow-y: scroll;
-				}
-				.thumbnail {
-					display: inline-block;
+				mwc-button {
 					margin: 4px;
-					cursor: pointer;
-				}
-				.thumbnail:hover {
-					opacity: 0.8;
-					outline: 2px solid;
-					outline-color: var(--dui-primary);
-					outline-offset: 2px;
 				}
 			`,
 		]
