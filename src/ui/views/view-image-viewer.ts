@@ -38,6 +38,7 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 	@state() private fetching: boolean = false
 	@state() private error?: Error
 	@state() private thumbnails: DataUiDataPoint<number, DataUiImage>[] = []
+	@state() private canLoadMore: boolean = false
 
 	mapState(state: AppState) {
 		return {
@@ -47,6 +48,7 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 			fetching: imageviewerSelectors.fetching(state),
 			error: imageviewerSelectors.error(state),
 			thumbnails: imageviewerSelectors.thumbnails(state),
+			canLoadMore: imageviewerSelectors.canLoadMoreSlices(state),
 		}
 	}
 
@@ -63,10 +65,20 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 				.startTime=${this.startTime}
 				.endTime=${this.endTime}
 				hideQueryExpansion
+				@startchanged=${(e: CustomEvent<{ time: number }>) => {
+					const start = e.detail.time
+					const end = this.endTime
+					store.dispatch.imageviewer.setRange({ start, end })
+				}}
+				@endchanged=${(e: CustomEvent<{ time: number }>) => {
+					const start = this.startTime
+					const end = e.detail.time
+					store.dispatch.imageviewer.setRange({ start, end })
+				}}
 				@plot=${(e: CustomEvent<PlotEventDetail>) => {
 					const { start, end } = e.detail
 					store.dispatch.imageviewer.setRange({ start, end })
-					store.dispatch.imageviewer.fetchThumbnails()
+					store.dispatch.imageviewer.fetchFirstSlice()
 				}}
 			></daq-range-select>
 			<div style="overflow-y:auto;" class="shadow p-4">
@@ -76,7 +88,12 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 					slicesize="20"
 				>
 				</daq-thumbnail-list>
-				<mwc-button raised label="Load more"></mwc-button>
+				<mwc-button
+					raised
+					label="Load more"
+					?disabled=${!this.canLoadMore}
+					@click=${() => store.dispatch.imageviewer.fetchNextSlice()}
+				></mwc-button>
 			</div>
 		`
 	}

@@ -1,8 +1,9 @@
 import { createModel } from '@captaincodeman/rdx'
 import { createSelector } from 'reselect'
+import type { DataUiQueryApi } from '../../api'
 import { channelToId, DataUiChannel } from '../../shared/channel'
 import type { DataUiDataPoint, DataUiImage } from '../../shared/dataseries'
-import type { AppState, EffectsStore } from '../store'
+import type { AppDispatch, AppState, EffectsStore } from '../store'
 import { appcfgSelectors } from './appcfg'
 import { make_error } from './applog'
 
@@ -19,8 +20,9 @@ export type ImageviewerState = {
 	channel?: DataUiChannel
 	request: RequestStatus
 	thumbnails: DataUiDataPoint<number, DataUiImage>[]
-	detailImage?: DataUiDataPoint<number, DataUiImage>
 }
+
+const SLICE_LENGTH = 10_000 // 10 seconds
 
 export const imageviewer = createModel({
 	state: {
@@ -29,7 +31,6 @@ export const imageviewer = createModel({
 		queryExpansion: false,
 		request: { fetching: false },
 		thumbnails: [],
-		detailImage: undefined,
 	} as ImageviewerState,
 	reducers: {
 		setRange(state: ImageviewerState, payload: { start: number; end: number }) {
@@ -60,44 +61,25 @@ export const imageviewer = createModel({
 		clearThumbnails(state: ImageviewerState) {
 			return { ...state, thumbnails: [] }
 		},
-		setThumbnails(
+		addThumbnailSlice(
 			state: ImageviewerState,
-			thumbnails: DataUiDataPoint<number, DataUiImage>[]
+			slice: DataUiDataPoint<number, DataUiImage>[]
 		) {
+			const thumbnails = [...state.thumbnails, ...slice]
 			return { ...state, thumbnails }
-		},
-		clearDetailImage(state: ImageviewerState) {
-			return { ...state, detailImage: undefined }
-		},
-		setDetailImage(
-			state: ImageviewerState,
-			detailImage: DataUiDataPoint<number, DataUiImage>
-		) {
-			return { ...state, detailImage }
 		},
 	},
 	effects(store: EffectsStore) {
 		const dispatch = store.getDispatch()
 		return {
-			async setRange() {
-				dispatch.imageviewer.clearThumbnails()
-				dispatch.imageviewer.clearDetailImage()
-			},
-			async setQueryExpansion() {
-				dispatch.imageviewer.clearThumbnails()
-				dispatch.imageviewer.clearDetailImage()
-			},
 			async selectChannel() {
 				dispatch.imageviewer.clearThumbnails()
-				dispatch.imageviewer.clearDetailImage()
 			},
-			async fetchThumbnails() {
+
+			async fetchFirstSlice() {
 				dispatch.imageviewer.clearThumbnails()
-				dispatch.imageviewer.clearDetailImage()
 				const startTime = imageviewerSelectors.startTime(store.getState())
-				const startDate = new Date(startTime).toISOString()
 				const endTime = imageviewerSelectors.endTime(store.getState())
-				const endDate = new Date(endTime).toISOString()
 
 				const channel = imageviewerSelectors.channel(store.getState())
 				if (channel === undefined) {
@@ -110,27 +92,27 @@ export const imageviewer = createModel({
 					dispatch.applog.log(make_error(`no api provider for ${channelId}`))
 					throw new Error(`no api provider for ${channelId}`)
 				}
-				dispatch.imageviewer.channelDataRequest(Date.now())
-				try {
-					const apiData = await api.queryImageThumbnails(
-						channel,
-						startDate,
-						endDate
-					)
-					dispatch.imageviewer.channelDataSuccess(Date.now())
-					const thumbnails = apiData.datapoints
-					dispatch.imageviewer.setThumbnails(thumbnails)
-				} catch (e) {
-					const error = e as Error
-					dispatch.imageviewer.channelDataFailure({
-						timestamp: Date.now(),
-						error,
-					})
-					throw e // notify the outside world of the problem
+
+				let ts = startTime
+				while (ts < endTime) {
+					const slice = await fetchSlice(dispatch, channel, api, ts)
+					if (slice.length > 0) {
+						dispatch.imageviewer.addThumbnailSlice(slice)
+						break
+					}
+					ts += SLICE_LENGTH
 				}
 			},
-			async fetchDetailImage(ts: number) {
-				dispatch.imageviewer.clearDetailImage()
+
+			async fetchNextSlice() {
+				const thumbnails = imageviewerSelectors.thumbnails(store.getState())
+				if (thumbnails.length === 0) {
+					dispatch.imageviewer.fetchFirstSlice()
+					return
+				}
+				const startTime = thumbnails[thumbnails.length - 1].x + 1
+				const endTime = imageviewerSelectors.endTime(store.getState())
+
 				const channel = imageviewerSelectors.channel(store.getState())
 				if (channel === undefined) {
 					throw new Error('internal error: channel is undefined')
@@ -142,23 +124,45 @@ export const imageviewer = createModel({
 					dispatch.applog.log(make_error(`no api provider for ${channelId}`))
 					throw new Error(`no api provider for ${channelId}`)
 				}
-				dispatch.imageviewer.channelDataRequest(Date.now())
-				try {
-					const apiData = await api.queryImageAtTimestamp(channel, ts)
-					dispatch.imageviewer.channelDataSuccess(Date.now())
-					dispatch.imageviewer.setDetailImage({ x: ts, y: apiData })
-				} catch (e) {
-					const error = e as Error
-					dispatch.imageviewer.channelDataFailure({
-						timestamp: Date.now(),
-						error,
-					})
-					throw e // notify the outside world of the problem
+
+				let ts = startTime
+				while (ts < endTime) {
+					const slice = await fetchSlice(dispatch, channel, api, ts)
+					if (slice.length > 0) {
+						dispatch.imageviewer.addThumbnailSlice(slice)
+						break
+					}
+					ts += SLICE_LENGTH
 				}
 			},
 		}
 	},
 })
+
+async function fetchSlice(
+	dispatch: AppDispatch,
+	channel: DataUiChannel,
+	api: DataUiQueryApi,
+	startTime: number
+) {
+	dispatch.imageviewer.channelDataRequest(Date.now())
+	const startDate = new Date(startTime).toISOString()
+	const endTime = startTime + SLICE_LENGTH
+	const endDate = new Date(endTime).toISOString()
+	try {
+		const apiData = await api.queryImageThumbnails(channel, startDate, endDate)
+		dispatch.imageviewer.channelDataSuccess(Date.now())
+		const thumbnails = apiData.datapoints
+		return thumbnails
+	} catch (e) {
+		const error = e as Error
+		dispatch.imageviewer.channelDataFailure({
+			timestamp: Date.now(),
+			error,
+		})
+		throw e // notify the outside world of the problem
+	}
+}
 
 const getState = (state: AppState) => state.imageviewer
 
@@ -176,8 +180,12 @@ export namespace imageviewerSelectors {
 		[getState],
 		state => state.thumbnails
 	)
-	export const detailImage = createSelector(
-		[getState],
-		state => state.detailImage
+	export const canLoadMoreSlices = createSelector(
+		[endTime, thumbnails],
+		(endTime, thumbnails) => {
+			if (thumbnails.length === 0) return false
+			const lastTs = thumbnails[thumbnails.length - 1].x
+			return lastTs < endTime
+		}
 	)
 }

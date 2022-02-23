@@ -64,17 +64,14 @@ export class DaqThumbnailListElement extends LitElement {
 		</div> `
 	}
 
-	private _renderThumbnails() {
-		if (this.fetching)
-			return html`<mwc-circular-progress indeterminate></mwc-circular-progress>`
-		if (this.thumbnails.length === 0) {
-			return nothing
-		}
-		return this.slices.map(x => this._renderSlice(x))
-	}
-
 	render() {
-		return html`<div>${this._renderThumbnails()}</div>`
+		return html`<div>
+			${this.slices.map(x => this._renderSlice(x))}
+			<mwc-circular-progress
+				?hidden=${!this.fetching}
+				indeterminate
+			></mwc-circular-progress>
+		</div>`
 	}
 
 	static get styles() {
@@ -85,6 +82,9 @@ export class DaqThumbnailListElement extends LitElement {
 					display: grid;
 					grid-template-columns: 1fr;
 					grid-template-rows: 1fr;
+				}
+				mwc-circular-progress[hidden] {
+					display: none;
 				}
 				.slice-title {
 					color: hsl(0, 0%, 70%);
