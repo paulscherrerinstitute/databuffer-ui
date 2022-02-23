@@ -7,6 +7,7 @@ import '@material/mwc-circular-progress'
 import '../components/daq-range-select'
 import '../components/daq-correlation-plot'
 import type { PlotEventDetail } from '../components/daq-range-select'
+import '../components/daq-thumbnail-list'
 
 import { store } from '../../state/store'
 import type { AppState } from '../../state/store'
@@ -21,7 +22,6 @@ import {
 } from '../shared-styles'
 import type { DataUiChannel } from '../../shared/channel'
 import { imageviewerSelectors } from '../../state/models/imageviewer'
-import { formatDate } from '../../util'
 import type { DataUiDataPoint, DataUiImage } from '../../shared/dataseries'
 
 declare global {
@@ -56,17 +56,6 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 		}
 	}
 
-	private _renderThumbnails() {
-		if (this.fetching)
-			return html`<mwc-circular-progress indeterminate></mwc-circular-progress>`
-		if (this.thumbnails.length === 0) {
-			return nothing
-		}
-		return this.thumbnails.map(
-			t => html`<img class="thumbnail" src=${t.y} title="${formatDate(t.x)}" />`
-		)
-	}
-
 	render() {
 		return html`
 			<daq-range-select
@@ -80,8 +69,14 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 					store.dispatch.imageviewer.fetchThumbnails()
 				}}
 			></daq-range-select>
-			<div class="shadow p-4" id="thumbnail-container">
-				${this._renderThumbnails()}
+			<div style="overflow-y:auto;" class="shadow p-4">
+				<daq-thumbnail-list
+					.fetching=${this.fetching}
+					.thumbnails=${this.thumbnails}
+					slicesize="20"
+				>
+				</daq-thumbnail-list>
+				<mwc-button raised label="Load more"></mwc-button>
 			</div>
 		`
 	}
@@ -97,7 +92,7 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 			textHelpers,
 			css`
 				:host {
-					height: 100%;
+					height: calc(100vh - 48px);
 					width: 100%;
 					padding: 8px;
 					display: grid;
@@ -105,20 +100,8 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 					gap: 8px;
 					grid-template-rows: auto 1fr;
 				}
-				#thumbnail-container {
-					line-height: 0;
-					overflow-y: scroll;
-				}
-				.thumbnail {
-					display: inline-block;
+				mwc-button {
 					margin: 4px;
-					cursor: pointer;
-				}
-				.thumbnail:hover {
-					opacity: 0.8;
-					outline: 2px solid;
-					outline-color: var(--dui-primary);
-					outline-offset: 2px;
 				}
 			`,
 		]
