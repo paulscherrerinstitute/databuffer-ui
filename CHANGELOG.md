@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.8.0](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.7.1...v4.8.0) (2022-02-25)
+
+
+### Features
+
+* add correlation plot ([c5b4e2e](https://github.com/paulscherrerinstitute/databuffer-ui/commit/c5b4e2eb40a33127532dd6df1e154753e2bc218f)), closes [#18](https://github.com/paulscherrerinstitute/databuffer-ui/issues/18)
+* add vertical grid lines to plots ([5131397](https://github.com/paulscherrerinstitute/databuffer-ui/commit/51313976364772f008a13f10c464e039b9ba0963)), closes [#13](https://github.com/paulscherrerinstitute/databuffer-ui/issues/13)
+* change all axis types at once ([5ee003f](https://github.com/paulscherrerinstitute/databuffer-ui/commit/5ee003f300eb5f10b83f4f6a65e69f93fd3b0d4a)), closes [#163](https://github.com/paulscherrerinstitute/databuffer-ui/issues/163)
+* disable search inputs until UI is ready ([734d728](https://github.com/paulscherrerinstitute/databuffer-ui/commit/734d7288215b268bfa70e33e603c0d4fe09f120d)), closes [#168](https://github.com/paulscherrerinstitute/databuffer-ui/issues/168)
+* display info from dispatcher ([91721b3](https://github.com/paulscherrerinstitute/databuffer-ui/commit/91721b302c39a52713bddbdc204407873c247036)), closes [#15](https://github.com/paulscherrerinstitute/databuffer-ui/issues/15)
+* export chart to image ([a2b5f19](https://github.com/paulscherrerinstitute/databuffer-ui/commit/a2b5f1977a8b7372444b9dab38a61e15a36e7e82)), closes [#36](https://github.com/paulscherrerinstitute/databuffer-ui/issues/36)
+* implement image viewer ([c8a3b17](https://github.com/paulscherrerinstitute/databuffer-ui/commit/c8a3b1718b3d3260180ac274e787231148c147f1)), closes [#42](https://github.com/paulscherrerinstitute/databuffer-ui/issues/42)
+* incrementally load images ([70a1f3e](https://github.com/paulscherrerinstitute/databuffer-ui/commit/70a1f3e0a732bd8fd756c12237c121605383daf9)), closes [#169](https://github.com/paulscherrerinstitute/databuffer-ui/issues/169)
+* limit correlation to numeric scalars ([b0d2336](https://github.com/paulscherrerinstitute/databuffer-ui/commit/b0d2336183b6549be92b9ab2f4433187b1f0d9a1)), closes [#165](https://github.com/paulscherrerinstitute/databuffer-ui/issues/165)
+* link to docs in toolbar ([8be8fd6](https://github.com/paulscherrerinstitute/databuffer-ui/commit/8be8fd6f4334b33f84192951e1f6921f7509f375)), closes [#153](https://github.com/paulscherrerinstitute/databuffer-ui/issues/153)
+* make finding image slice cancelable ([1b51724](https://github.com/paulscherrerinstitute/databuffer-ui/commit/1b517249551ca0e3bcb8b6e6d7620757b84dc657)), closes [#170](https://github.com/paulscherrerinstitute/databuffer-ui/issues/170)
+* quick select for data series label ([0f8ac0c](https://github.com/paulscherrerinstitute/databuffer-ui/commit/0f8ac0c0cf765e4ff630a1894a7cc04bf4511236)), closes [#161](https://github.com/paulscherrerinstitute/databuffer-ui/issues/161)
+* select all search results at once ([c5eb40e](https://github.com/paulscherrerinstitute/databuffer-ui/commit/c5eb40e7dc25fb6fb1c24ffd62a6c06955ad7557)), closes [#142](https://github.com/paulscherrerinstitute/databuffer-ui/issues/142)
+* select multiple channels with shift click ([47b5696](https://github.com/paulscherrerinstitute/databuffer-ui/commit/47b5696625a71c5e270a1af58cdbedba17ff76db)), closes [#30](https://github.com/paulscherrerinstitute/databuffer-ui/issues/30)
+* show channel description in channel-info ([3a60065](https://github.com/paulscherrerinstitute/databuffer-ui/commit/3a60065cf46bbf6d153b656b0bc4224530aa8fdb)), closes [#149](https://github.com/paulscherrerinstitute/databuffer-ui/issues/149)
+* switch tooltip on/off ([7bfd387](https://github.com/paulscherrerinstitute/databuffer-ui/commit/7bfd38799b8e88866c23f37e8fdde447fb973cf7)), closes [#89](https://github.com/paulscherrerinstitute/databuffer-ui/issues/89)
+* use data series color in channel info ([c64b116](https://github.com/paulscherrerinstitute/databuffer-ui/commit/c64b1164960fb779bea50f678a229f767b77bf85)), closes [#162](https://github.com/paulscherrerinstitute/databuffer-ui/issues/162)
+* use data series color in plot settings ([3bd91b6](https://github.com/paulscherrerinstitute/databuffer-ui/commit/3bd91b6208ed011e5676da5c0ec88d6a87a990f3)), closes [#63](https://github.com/paulscherrerinstitute/databuffer-ui/issues/63)
+
+
+### Bug Fixes
+
+* do not reflow before chart is initialized ([775248a](https://github.com/paulscherrerinstitute/databuffer-ui/commit/775248aab202c932029ff33ae23f13de92829545)), closes [#148](https://github.com/paulscherrerinstitute/databuffer-ui/issues/148)
+* extract title from /preselect params ([3d61752](https://github.com/paulscherrerinstitute/databuffer-ui/commit/3d61752f3bdcebc375b575afc770a6f91765a64e)), closes [#151](https://github.com/paulscherrerinstitute/databuffer-ui/issues/151)
+* restore files deleted by accident ([a840732](https://github.com/paulscherrerinstitute/databuffer-ui/commit/a840732f488e9b245b399ea10eed77aea64d3e71)), closes [#167](https://github.com/paulscherrerinstitute/databuffer-ui/issues/167)
+* update mwc-switch usage ([dd15925](https://github.com/paulscherrerinstitute/databuffer-ui/commit/dd15925074df05cb636e16be31bb9f9691ba88a6))
+
 ### [4.7.1](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.7.0...v4.7.1) (2022-01-14)
 
 
