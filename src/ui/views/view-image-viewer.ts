@@ -39,6 +39,7 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 	@state() private error?: Error
 	@state() private thumbnails: DataUiDataPoint<number, DataUiImage>[] = []
 	@state() private canLoadMore: boolean = false
+	@state() private currentSlice = 0
 
 	mapState(state: AppState) {
 		return {
@@ -49,6 +50,7 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 			error: imageviewerSelectors.error(state),
 			thumbnails: imageviewerSelectors.thumbnails(state),
 			canLoadMore: imageviewerSelectors.canLoadMoreSlices(state),
+			currentSlice: imageviewerSelectors.currentSlice(state),
 		}
 	}
 
@@ -86,6 +88,9 @@ export class ViewImageViewerElement extends connect(store, LitElement) {
 					.fetching=${this.fetching}
 					.thumbnails=${this.thumbnails}
 					slicesize="20"
+					.currentSlice=${this.currentSlice}
+					@imageslice-canceled=${() =>
+						store.dispatch.imageviewer.setSliceLoadingCanceled(true)}
 				>
 				</daq-thumbnail-list>
 				<mwc-button

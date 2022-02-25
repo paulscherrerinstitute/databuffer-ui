@@ -20,6 +20,8 @@ export type ImageviewerState = {
 	channel?: DataUiChannel
 	request: RequestStatus
 	thumbnails: DataUiDataPoint<number, DataUiImage>[]
+	currentSlice?: number
+	sliceLoadingCanceled: boolean
 }
 
 const SLICE_LENGTH = 10_000 // 10 seconds
@@ -31,6 +33,8 @@ export const imageviewer = createModel({
 		queryExpansion: false,
 		request: { fetching: false },
 		thumbnails: [],
+		currentSlice: 0,
+		sliceLoadingCanceled: false,
 	} as ImageviewerState,
 	reducers: {
 		setRange(state: ImageviewerState, payload: { start: number; end: number }) {
@@ -68,6 +72,15 @@ export const imageviewer = createModel({
 			const thumbnails = [...state.thumbnails, ...slice]
 			return { ...state, thumbnails }
 		},
+		setCurrentSlice(state: ImageviewerState, currentSlice: number) {
+			return { ...state, currentSlice }
+		},
+		setSliceLoadingCanceled(
+			state: ImageviewerState,
+			sliceLoadingCanceled: boolean
+		) {
+			return { ...state, sliceLoadingCanceled }
+		},
 	},
 	effects(store: EffectsStore) {
 		const dispatch = store.getDispatch()
@@ -78,6 +91,7 @@ export const imageviewer = createModel({
 
 			async fetchFirstSlice() {
 				dispatch.imageviewer.clearThumbnails()
+				dispatch.imageviewer.setSliceLoadingCanceled(false)
 				const startTime = imageviewerSelectors.startTime(store.getState())
 				const endTime = imageviewerSelectors.endTime(store.getState())
 
@@ -94,7 +108,10 @@ export const imageviewer = createModel({
 				}
 
 				let ts = startTime
-				while (ts < endTime) {
+				while (
+					ts < endTime &&
+					!imageviewerSelectors.sliceLoadingCanceled(store.getState())
+				) {
 					const slice = await fetchSlice(dispatch, channel, api, ts)
 					if (slice.length > 0) {
 						dispatch.imageviewer.addThumbnailSlice(slice)
@@ -110,6 +127,7 @@ export const imageviewer = createModel({
 					dispatch.imageviewer.fetchFirstSlice()
 					return
 				}
+				dispatch.imageviewer.setSliceLoadingCanceled(false)
 				const startTime = thumbnails[thumbnails.length - 1].x + 1
 				const endTime = imageviewerSelectors.endTime(store.getState())
 
@@ -126,7 +144,10 @@ export const imageviewer = createModel({
 				}
 
 				let ts = startTime
-				while (ts < endTime) {
+				while (
+					ts < endTime &&
+					!imageviewerSelectors.sliceLoadingCanceled(store.getState())
+				) {
 					const slice = await fetchSlice(dispatch, channel, api, ts)
 					if (slice.length > 0) {
 						dispatch.imageviewer.addThumbnailSlice(slice)
@@ -146,6 +167,7 @@ async function fetchSlice(
 	startTime: number
 ) {
 	dispatch.imageviewer.channelDataRequest(Date.now())
+	dispatch.imageviewer.setCurrentSlice(startTime)
 	const startDate = new Date(startTime).toISOString()
 	const endTime = startTime + SLICE_LENGTH
 	const endDate = new Date(endTime).toISOString()
@@ -180,6 +202,15 @@ export namespace imageviewerSelectors {
 		[getState],
 		state => state.thumbnails
 	)
+	export const currentSlice = createSelector(
+		[getState],
+		state => state.currentSlice
+	)
+	export const sliceLoadingCanceled = createSelector(
+		[getState],
+		state => state.sliceLoadingCanceled
+	)
+
 	export const canLoadMoreSlices = createSelector(
 		[endTime, thumbnails],
 		(endTime, thumbnails) => {

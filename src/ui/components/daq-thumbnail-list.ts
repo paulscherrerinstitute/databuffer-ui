@@ -1,8 +1,11 @@
 import { css, html, LitElement, nothing, PropertyValues } from 'lit'
 import { customElement, property, query, state } from 'lit/decorators.js'
+
+import './daq-progress'
+
 import type { DataUiDataPoint, DataUiImage } from '../../shared/dataseries'
 import { formatDate } from '../../util'
-import { baseStyles } from '../shared-styles'
+import { baseStyles, opacityHelpers, textHelpers } from '../shared-styles'
 
 declare global {
 	interface HTMLElementTagNameMap {
@@ -26,6 +29,9 @@ export class DaqThumbnailListElement extends LitElement {
 
 	@state()
 	slices: ThumbnailSlice[] = []
+
+	@state()
+	currentSlice: number = 0
 
 	updated(changedProperties: PropertyValues): void {
 		if (
@@ -67,24 +73,33 @@ export class DaqThumbnailListElement extends LitElement {
 	render() {
 		return html`<div>
 			${this.slices.map(x => this._renderSlice(x))}
-			<mwc-circular-progress
-				?hidden=${!this.fetching}
-				indeterminate
-			></mwc-circular-progress>
+			<daq-progress ?hidden=${!this.fetching}>
+				<span class="text-small opacity-50"
+					>Loading slice ${formatDate(this.currentSlice)}...</span
+				>
+				<mwc-button
+					slot="action"
+					@click=${() =>
+						this.dispatchEvent(new CustomEvent('imageslice-canceled'))}
+					>Cancel</mwc-button
+				>
+			</daq-progress>
 		</div>`
 	}
 
 	static get styles() {
 		return [
 			baseStyles,
+			textHelpers,
+			opacityHelpers,
 			css`
 				:host {
 					display: grid;
 					grid-template-columns: 1fr;
 					grid-template-rows: 1fr;
 				}
-				mwc-circular-progress[hidden] {
-					display: none;
+				daq-progress {
+					margin: 4px;
 				}
 				.slice-title {
 					color: hsl(0, 0%, 70%);
