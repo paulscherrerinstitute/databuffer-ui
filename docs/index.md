@@ -26,6 +26,7 @@ These guides provide step-by-step instructions for **achieving common tasks**. W
 - [How to plot wave forms with the index plot](./howtos/index_plot.md)
 - [How to run databuffer-ui with docker](./howtos/docker.md)
 - [How to share a link to a plot](./howtos/share_link_to_plot.md)
+- [How to view images from a camera channel](./howtos/view_images.md)
 - [How to zoom and navigate in a plot](./howtos/zoom_navigate_plot.md)
 
 ## Background information
