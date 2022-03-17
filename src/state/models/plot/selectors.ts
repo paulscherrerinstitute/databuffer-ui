@@ -197,6 +197,13 @@ export const imageChannels = createSelector([channels], channels =>
 	channels.filter(c => c.dataShape === 'image')
 )
 
+export const csvDownloadDataSeries = createSelector(
+	[plotDataSeries],
+	plotDataSeries =>
+		plotDataSeries.filter(
+			x => x.channel.dataShape === 'scalar' || x.channel.dataType === 'string'
+		)
+)
 export const csvDownloadPossible = createSelector(
 	[scalarChannels],
 	scalarChannels => scalarChannels.length > 0
