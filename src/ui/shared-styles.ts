@@ -155,7 +155,7 @@ export const colorHelpers = css`
 export const flexHelpers = css`
 	.flex-col {
 		display: flex;
-		flex-direction: row;
+		flex-direction: column;
 	}
 	.flex-row {
 		display: flex;

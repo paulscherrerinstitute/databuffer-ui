@@ -187,6 +187,26 @@ export const dialogDownloadAggregation = createSelector(
 	state => state.dialogDownloadAggregation
 )
 
+export const scalarChannels = createSelector([channels], channels =>
+	channels.filter(c => c.dataShape === 'scalar' || c.dataType === 'string')
+)
+export const waveformChannels = createSelector([channels], channels =>
+	channels.filter(c => c.dataShape === 'waveform' && c.dataType !== 'string')
+)
+export const imageChannels = createSelector([channels], channels =>
+	channels.filter(c => c.dataShape === 'image')
+)
+
+export const csvDownloadPossible = createSelector(
+	[scalarChannels],
+	scalarChannels => scalarChannels.length > 0
+)
+export const csvDownloadChannelsSkipped = createSelector(
+	[waveformChannels, imageChannels],
+	(waveformChannels, imageChannels) =>
+		waveformChannels.length > 0 || imageChannels.length > 0
+)
+
 export const csvStepSize = createSelector([dialogDownloadAggregation], aggr => {
 	if (aggr === 'PT1H') return 3_600_000
 	if (aggr === 'PT1M') return 60_000
