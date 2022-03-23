@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.8.1](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.8.0...v4.8.1) (2022-03-23)
+
+
+### Bug Fixes
+
+* prevent downloading csv for waveforms ([8c30c08](https://github.com/paulscherrerinstitute/databuffer-ui/commit/8c30c08fbbd5cdf5f345cdfb7cc1e145e5cda362)), closes [#171](https://github.com/paulscherrerinstitute/databuffer-ui/issues/171)
+
 ## [4.8.0](https://github.com/paulscherrerinstitute/databuffer-ui/compare/v4.7.1...v4.8.0) (2022-02-25)
 
 
