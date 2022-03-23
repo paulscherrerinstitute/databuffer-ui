@@ -528,7 +528,7 @@ export const plot = createModel({
 
 			async downloadData() {
 				const state = store.getState()
-				const dataseries = plotSelectors.plotDataSeries(state)
+				const dataseries = plotSelectors.csvDownloadDataSeries(state)
 				const startTime = plotSelectors.startTime(state)
 				const startDate = new Date(startTime).toISOString()
 				const endTime = plotSelectors.endTime(state)

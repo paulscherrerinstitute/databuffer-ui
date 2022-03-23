@@ -9,6 +9,8 @@ Here are several frequently asked questions, and their answers.
 - [5. What does 'query expansion' mean?](#5-what-does-query-expansion-mean)
 - [6. Why is the correlation plot empty?](#6-why-is-the-correlation-plot-empty)
 - [7. Why can I not correlate two channels?](#7-why-can-i-not-correlate-two-channels)
+- [8. Why can I not download my channel as CSV?](#8-why-can-i-not-download-my-channel-as-csv)
+- [9. Why is the data in the CSV download different from the recorded data?](#9-why-is-the-data-in-the-csv-download-different-from-the-recorded-data)
 
 ## 1. Why is my data aggregated?
 
@@ -54,3 +56,20 @@ Correlation is only possible for channels that meet these criteria:
 
 - Data type must be numeric
 - Data shape must be scalar
+
+## 8. Why can I not download my channel as CSV?
+
+CSV downloads are only possible for channels that meet these criteria:
+
+- Data type must be numeric, string, or boolean.
+- Data shape must be scalar.
+
+In particular, CSV downloading is **not available** for **waveform** or **image** channels.
+
+## 9. Why is the data in the CSV download different from the recorded data?
+
+In short: In order to create a "dense matrix" with one time stamp having values for all channels, Data UI creates the CSV data by "reading from the line plot".
+
+In most archiver engines data events are not synchronized. That means that for different channels, the timestamps are slightly different, which would result in CSV lines that are blank in most columns. This would be a "sparse matrix".
+
+So, in order to create the CSV data, Data UI requests the raw data from the API, pretends to create a plot, and then reads from the plot in equal time steps.

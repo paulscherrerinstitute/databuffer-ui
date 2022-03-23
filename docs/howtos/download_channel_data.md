@@ -24,6 +24,8 @@ Open _databuffer UI_ in your browser and search for `SINEG01-CMON-DIA0091`. From
 
 Click on button _plot selected_ ![plot selected](../images/button_plot_selected.png) to change to the _plot_ view.
 
+**Please note:** CSV downloads are only available for numeric sclaras, strings and boolean channels. I.e. waveform and image channels cannot be downloaded as CSV. Use the Data API instead to access the data.
+
 ### Step 2: Select time range
 
 On the _plot_ view, check if the text fields for _Start_ and _End_ are displayed:
@@ -54,6 +56,14 @@ The download from data API will start in the background. Once it has finished it
 
 > **Side note**
 >
+> CSV downloads are **not available** for **waveform** or **image** channels.
+>
+> You will see a warning in the dialog that these channels will be omitted in the download.
+> See also [FAQ #8](../faqs.md#8-why-can-i-not-download-my-channel-as-csv).
+
+> **Side note**
+>
 > The UI will always **request raw data**, in order to create the CSV data you requested.
 >
 > It will then re-interpret the data and create completely new data points from it.
+> See also [FAQ #9](../faqs.md#9-why-is-the-data-in-the-csv-download-different-from-the-recorded-data).
